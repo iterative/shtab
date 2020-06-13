@@ -1,9 +1,8 @@
+__all__ = ["Optional", "Required", "complete"]
 import argparse
 import io
 import logging
 import sys
-
-from dvc.command.base import CmdBase, append_doc_link
 
 logger = logging.getLogger(__name__)
 GLOBAL_OPTIONS = ["-h", "--help", "-q", "--quiet", "-v", "--verbose"]
@@ -165,39 +164,40 @@ complete -o nospace -F _dvc dvc""",
     )
 
 
-class CmdCompletion(CmdBase):
-    def run(self):
-        from dvc.cli import get_main_parser
+class Choice(object):
+    """
+    Placeholder, usage:
+    >>> ArgumentParser.add_argument(..., choices=[Choice("<type>")])
+    to mark a special completion `<type>`.
+    """
+    def __init__(self, name, required=False):
+        self.required = required
+        self.type = name
 
-        if self.args.output == "-":
-            logger.debug("Writing bash completion to stdout")
-            fd = sys.stdout
-        else:
-            logger.info(f"Writing bash completion to {self.args.output}")
-            fd = open(self.args.output, "w")
-        parser = get_main_parser()
-        print_bash(parser, fd)
-        del fd
+    def __cmp__(self, other):
+        if self.required:
+            return 0 if other else -1
         return 0
 
 
-def add_parser(subparsers, parent_parser):
-    COMPLETION_HELP = "Enable shell tab completion."
-    COMPLETION_DESCRIPTION = (
-        "Automatically generates shell tab completion script."
-    )
-    completion_parser = subparsers.add_parser(
-        "completion",
-        parents=[parent_parser],
-        description=append_doc_link(COMPLETION_DESCRIPTION, "completion"),
-        help=COMPLETION_HELP,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    completion_parser.add_argument(
-        "-o",
-        "--output",
-        help="Output filename for completion script. Use - for stdout.",
-        metavar="<path>",
-        default="-",
-    )
-    completion_parser.set_defaults(func=CmdCompletion)
+class Optional(object):
+    """Example: `ArgumentParser.add_argument(..., choices=Optional.FILE)`"""
+    FILE = [Choice("file")]
+    DIR = DIRECTORY = [Choice("directory")]
+
+
+class Required(object):
+    """Example: `ArgumentParser.add_argument(..., choices=Required.FILE)`"""
+    FILE = [Choice("file", True)]
+    DIR = DIRECTORY = [Choice("directory", True)]
+
+
+def complete(parser, shell="bash", **kwargs):
+    logger.debug(str((shell, kwargs, parser)))
+
+    output = io.StringIO()
+    if shell == "bash":
+        print_bash(parser, output)
+    else:
+        raise NotImplementedError
+    return output.getvalue()
