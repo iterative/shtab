@@ -197,7 +197,7 @@ _shtab_replace_hyphen() {
 }
 
 # $1=COMP_WORDS[1]
-{root_prefix}_compgen_root() {
+{root_prefix}_compgen_root_() {
   local args_gen="{root_prefix}_COMPGEN"
   case "$word" in
     -*) COMPREPLY=( $(compgen -W "${root_prefix}_options_" -- "$word"; \
@@ -208,7 +208,7 @@ _shtab_replace_hyphen() {
 }
 
 # $1=COMP_WORDS[1]
-{root_prefix}_compgen_command() {
+{root_prefix}_compgen_command_() {
   local flags_list="{root_prefix}_$(_shtab_replace_hyphen $1)"
   local args_gen="${flags_list}_COMPGEN"
   COMPREPLY=( $(compgen -W \
@@ -218,14 +218,14 @@ _shtab_replace_hyphen() {
 
 # $1=COMP_WORDS[1]
 # $2=COMP_WORDS[2]
-{root_prefix}_compgen_subcommand() {
+{root_prefix}_compgen_subcommand_() {
   local flags_list="{root_prefix}_$(\
 _shtab_replace_hyphen $1)_$(_shtab_replace_hyphen $2)"
   local args_gen="${flags_list}_COMPGEN"
   [ -n "${!args_gen}" ] && local opts_more="$(${!args_gen} "$word")"
   local opts="${!flags_list}"
   if [ -z "$opts$opts_more" ]; then
-    {root_prefix}_compgen_command $1
+    {root_prefix}_compgen_command_ $1
   else
     COMPREPLY=( $(compgen -W \
 "${root_prefix}_global_options_ $opts" -- "$word"; \
@@ -247,11 +247,11 @@ _shtab_replace_hyphen $1)_$(_shtab_replace_hyphen $2)"
   COMPREPLY=()
 
   if [ "${COMP_CWORD}" -eq 1 ]; then
-    {root_prefix}_compgen_root ${COMP_WORDS[1]}
+    {root_prefix}_compgen_root_ ${COMP_WORDS[1]}
   elif [ "${COMP_CWORD}" -eq 2 ]; then
-    {root_prefix}_compgen_command ${COMP_WORDS[1]}
+    {root_prefix}_compgen_command_ ${COMP_WORDS[1]}
   elif [ "${COMP_CWORD}" -ge 3 ]; then
-    {root_prefix}_compgen_subcommand ${COMP_WORDS[1]} ${COMP_WORDS[2]}
+    {root_prefix}_compgen_subcommand_ ${COMP_WORDS[1]} ${COMP_WORDS[2]}
   fi
 
   return 0
