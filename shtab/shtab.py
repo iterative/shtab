@@ -10,6 +10,43 @@ CHOICE_FUNCTIONS = {
     "directory": "_shtab_compgen_files",
 }
 
+@total_ordering
+class Choice(object):
+    """
+    Placeholder, usage:
+    >>> ArgumentParser.add_argument(..., choices=[Choice("<type>")])
+    to mark a special completion `<type>`.
+    """
+    def __init__(self, choice_type, required=False):
+        self.required = required
+        self.type = choice_type
+
+    def __repr__(self):
+        return self.type + ("" if self.required else "?")
+
+    def __cmp__(self, other):
+        if self.required:
+            return 0 if other else -1
+        return 0
+
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
+
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
+
+
+class Optional(object):
+    """Example: `ArgumentParser.add_argument(..., choices=Optional.FILE)`"""
+    FILE = [Choice("file")]
+    DIR = DIRECTORY = [Choice("directory")]
+
+
+class Required(object):
+    """Example: `ArgumentParser.add_argument(..., choices=Required.FILE)`"""
+    FILE = [Choice("file", True)]
+    DIR = DIRECTORY = [Choice("directory", True)]
+
 
 def get_optional_actions(parser):
     """flattened list of all `parser`'s optional actions"""
@@ -184,40 +221,6 @@ complete -o nospace -F {root_prefix} dvc""".replace("{root_prefix}", root_prefix
         file=fd,
         end='',
     )
-
-@total_ordering
-class Choice(object):
-    """
-    Placeholder, usage:
-    >>> ArgumentParser.add_argument(..., choices=[Choice("<type>")])
-    to mark a special completion `<type>`.
-    """
-    def __init__(self, choice_type, required=False):
-        self.required = required
-        self.type = choice_type
-
-    def __cmp__(self, other):
-        if self.required:
-            return 0 if other else -1
-        return 0
-
-    def __eq__(self, other):
-        return self.__cmp__(other) == 0
-
-    def __lt__(self, other):
-        return self.__cmp__(other) < 0
-
-
-class Optional(object):
-    """Example: `ArgumentParser.add_argument(..., choices=Optional.FILE)`"""
-    FILE = [Choice("file")]
-    DIR = DIRECTORY = [Choice("directory")]
-
-
-class Required(object):
-    """Example: `ArgumentParser.add_argument(..., choices=Required.FILE)`"""
-    FILE = [Choice("file", True)]
-    DIR = DIRECTORY = [Choice("directory", True)]
 
 
 def complete(parser, shell="bash", **kwargs):
