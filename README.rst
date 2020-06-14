@@ -133,3 +133,21 @@ More Examples
 
         msg = "k thx bai!" if args.bye else "hai!"
         print("{} says '{}' to {}".format(args.me, msg, args.you))
+
+Alternatives
+------------
+
+- ``argcomplete``
+
+  - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
+  - only provides ``bash`` completion
+
+- ``pyzshcomplete``
+
+  - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
+  - only provides ``zsh`` completion
+
+- ``click``
+
+  - different framework completely replacing `argparse`
+  - solves multiple problems (rather than POSIX-style "do one thing well")
