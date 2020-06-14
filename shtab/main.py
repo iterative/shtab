@@ -11,8 +11,11 @@ logger = logging.getLogger(__name__)
 def get_main_parser():
     parser = argparse.ArgumentParser(prog="shtab")
     parser.add_argument("parser")
-    parser.add_argument("-s", "--shell", default="bash", choices=["bash", "zsh"])
-    parser.add_argument("-u", "--error-unimportable", default=False, action="store_true")
+    parser.add_argument(
+        "-s", "--shell", default="bash", choices=["bash", "zsh"])
+    parser.add_argument(
+        "-u", "--error-unimportable", default=False, action="store_true",
+        help="raise errors if `parser` is not found in $PYTHONPATH")
     return parser
 
 

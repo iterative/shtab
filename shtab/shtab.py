@@ -1,9 +1,9 @@
-__all__ = ["Optional", "Required", "complete"]
-import argparse
+from __future__ import print_function
+from functools import total_ordering
 import io
 import logging
-import sys
 
+__all__ = ["Optional", "Required", "complete"]
 logger = logging.getLogger(__name__)
 GLOBAL_OPTIONS = ["-h", "--help", "-q", "--quiet", "-v", "--verbose"]
 ROOT_PREFIX = "_dvc"
@@ -163,21 +163,27 @@ complete -o nospace -F _dvc dvc""",
         file=fd,
     )
 
-
+@total_ordering
 class Choice(object):
     """
     Placeholder, usage:
     >>> ArgumentParser.add_argument(..., choices=[Choice("<type>")])
     to mark a special completion `<type>`.
     """
-    def __init__(self, name, required=False):
+    def __init__(self, choice_type, required=False):
         self.required = required
-        self.type = name
+        self.type = choice_type
 
     def __cmp__(self, other):
         if self.required:
             return 0 if other else -1
         return 0
+
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
+
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
 
 
 class Optional(object):
