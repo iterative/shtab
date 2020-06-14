@@ -10,6 +10,7 @@ CHOICE_FUNCTIONS = {
     "directory": "_shtab_compgen_files",
 }
 
+
 @total_ordering
 class Choice(object):
     """
@@ -17,6 +18,7 @@ class Choice(object):
     >>> ArgumentParser.add_argument(..., choices=[Choice("<type>")])
     to mark a special completion `<type>`.
     """
+
     def __init__(self, choice_type, required=False):
         self.required = required
         self.type = choice_type
@@ -38,12 +40,14 @@ class Choice(object):
 
 class Optional(object):
     """Example: `ArgumentParser.add_argument(..., choices=Optional.FILE)`"""
+
     FILE = [Choice("file")]
     DIR = DIRECTORY = [Choice("directory")]
 
 
 class Required(object):
     """Example: `ArgumentParser.add_argument(..., choices=Required.FILE)`"""
+
     FILE = [Choice("file", True)]
     DIR = DIRECTORY = [Choice("directory", True)]
 
@@ -51,8 +55,7 @@ class Required(object):
 def get_optional_actions(parser):
     """flattened list of all `parser`'s optional actions"""
     return sum(
-        (opt.option_strings for opt in parser._get_optional_actions()),
-        []
+        (opt.option_strings for opt in parser._get_optional_actions()), []
     )
 
 
@@ -99,18 +102,27 @@ def print_bash_commands(
 
         for sub in positionals:
             if sub.choices:
-                logger.warning("choices:{}:{}".format(prefix, sorted(sub.choices)))
+                logger.warning(
+                    "choices:{}:{}".format(prefix, sorted(sub.choices))
+                )
                 for cmd in sorted(sub.choices):
                     if isinstance(cmd, Choice):
-                        logger.warning("Choice.{}:{}:{}".format(cmd.type, prefix, sub.dest))
+                        logger.warning(
+                            "Choice.{}:{}:{}".format(
+                                cmd.type, prefix, sub.dest
+                            )
+                        )
                         print(
                             "{}_COMPGEN={}".format(
-                                prefix, choice_type2fn[cmd.type]),
-                            file=fd)
+                                prefix, choice_type2fn[cmd.type]
+                            ),
+                            file=fd,
+                        )
                     else:
                         commands.append(cmd)
                         recurse(
-                            sub.choices[cmd], prefix + "_" + cmd.replace('-', '_')
+                            sub.choices[cmd],
+                            prefix + "_" + cmd.replace("-", "_"),
                         )
             else:
                 logger.warning("uncompletable:{}:{}".format(prefix, sub.dest))
@@ -122,12 +134,15 @@ def print_bash_commands(
     return recurse(root_parser, root_prefix)
 
 
-def print_bash(parser, root_prefix=None, fd=None, preamble="", choice_functions=None):
+def print_bash(
+    parser, root_prefix=None, fd=None, preamble="", choice_functions=None
+):
     """Prints definitions in bash syntax for use in autocompletion scripts."""
     bash = io.StringIO()
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
     commands, global_options = print_bash_commands(
-        parser, root_prefix, choice_functions=choice_functions, fd=bash)
+        parser, root_prefix, choice_functions=choice_functions, fd=bash
+    )
     options = get_optional_actions(parser)
     logger.warning("options %s", options)
 
@@ -148,14 +163,18 @@ def print_bash(parser, root_prefix=None, fd=None, preamble="", choice_functions=
 {subcommands}
 
 """.format(
-    root_prefix=root_prefix,
-    commands=" ".join(commands),
-    options=" ".join(options),
-    global_options=" ".join(global_options),
-    subcommands=bash.getvalue(),
-)
-+ ("# Preamble\n" + preamble + "\n# End Preamble\n" if preamble else "")
-+ """
+            root_prefix=root_prefix,
+            commands=" ".join(commands),
+            options=" ".join(options),
+            global_options=" ".join(global_options),
+            subcommands=bash.getvalue(),
+        )
+        + (
+            "# Preamble\n" + preamble + "\n# End Preamble\n"
+            if preamble
+            else ""
+        )
+        + """
 # $1=COMP_WORDS[1]
 _shtab_compgen_files() {
   compgen -f -- $1
@@ -171,21 +190,24 @@ _shtab_replace_hyphen() {
 {root_prefix}_compgen_command() {
   local flags_list="{root_prefix}_$(_shtab_replace_hyphen $1)"
   local args_gen="${flags_list}_COMPGEN"
-  COMPREPLY=( $(compgen -W "${root_prefix}_global_options_ ${!flags_list}" -- "$word"; \
+  COMPREPLY=( $(compgen -W \
+"${root_prefix}_global_options_ ${!flags_list}" -- "$word"; \
 [ -n "${!args_gen}" ] && ${!args_gen} "$word") )
 }
 
 # $1=COMP_WORDS[1]
 # $2=COMP_WORDS[2]
 {root_prefix}_compgen_subcommand() {
-  local flags_list="{root_prefix}_$(_shtab_replace_hyphen $1)_$(_shtab_replace_hyphen $2)"
+  local flags_list="{root_prefix}_$(\
+_shtab_replace_hyphen $1)_$(_shtab_replace_hyphen $2)"
   local args_gen="${flags_list}_COMPGEN"
   [ -n "${!args_gen}" ] && local opts_more="$(${!args_gen} "$word")"
   local opts="${!flags_list}"
   if [ -z "$opts$opts_more" ]; then
     {root_prefix}_compgen_command $1
   else
-    COMPREPLY=( $(compgen -W "${root_prefix}_global_options_ $opts" -- "$word"; \
+    COMPREPLY=( $(compgen -W \
+"${root_prefix}_global_options_ $opts" -- "$word"; \
 [ -n "$opts_more" ] && echo "$opts_more") )
   fi
 }
@@ -217,9 +239,11 @@ _shtab_replace_hyphen() {
   return 0
 }
 
-complete -o nospace -F {root_prefix} dvc""".replace("{root_prefix}", root_prefix),
+complete -o nospace -F {root_prefix} dvc""".replace(
+            "{root_prefix}", root_prefix
+        ),
         file=fd,
-        end='',
+        end="",
     )
 
 

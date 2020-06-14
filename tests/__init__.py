@@ -1,5 +1,6 @@
 import shtab
 
+
 def test_choices():
     assert "x" in shtab.Optional.FILE
     assert "" in shtab.Optional.FILE
