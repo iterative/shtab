@@ -3,7 +3,7 @@ from functools import total_ordering
 import io
 import logging
 
-__all__ = ["Optional", "Required", "complete"]
+__all__ = ["Optional", "Required", "Choice", "complete"]
 logger = logging.getLogger(__name__)
 CHOICE_FUNCTIONS = {
     "file": "_shtab_compgen_files",
@@ -249,8 +249,10 @@ _shtab_replace_hyphen $1)_$(_shtab_replace_hyphen $2)"
   return 0
 }
 
-complete -o nospace -F {root_prefix} dvc""".replace(
+complete -o nospace -F {root_prefix} {prog}""".replace(
             "{root_prefix}", root_prefix
+        ).replace(
+            "{prog}", parser.prog
         ),
         file=fd,
         end="",
