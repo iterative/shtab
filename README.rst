@@ -20,6 +20,20 @@ Installing ``shtab``'s own tab completion scripts is possible via:
 
 .. code:: sh
 
+    # Install locally
+    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+      >> ~/.bash_completion
+
+    # Install system-wide
+    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+      | sudo tee "$(pkg-config --variable=completionsdir bash-completion)"/shtab.bash
+
+    # Install system-wide (legacy)
+    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab.bash
+
+    # Alternative (not recommended):
+    # install once (will have to re-run if the target's CLI API changes)
     shtab --shell=bash shtab.main.get_main_parser \
       | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab.bash
 
@@ -42,12 +56,12 @@ For example, starting with this existing code:
         args = parser.parse_args()
         ...
 
-Assuming this code example is in ``MY_PROG/command/main.py``, simply run:
+Assuming this code example is installed in ``MY_PROG.command.main``, simply run:
 
 .. code:: sh
 
-    shtab --shell=bash MY_PROG.command.main.get_main_parser \
-      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/MY_PROG.bash
+    echo 'eval "$(shtab --shell=bash MY_PROG.command.main.get_main_parser)"' \
+      >> ~/.bash_completion
 
 Configuration
 -------------
@@ -62,11 +76,14 @@ Alternatively, add direct support to scripts for a little more configurability:
     def get_main_parser():
         parser = argparse.ArgumentParser(prog="<MY_PROG>", ...)
         parser.add_argument("--install-completion-shell", choices=["bash", "zsh"])
-        parser.add_argument("--file", choices=shtab.Optional.FILE)
+        parser.add_argument(
+            "--file",
+            choices=shtab.Optional.FILE,  # file tab completion
+        )
         parser.add_argument(
             "--dir",
-            choices=shtab.Required.DIRECTORY,
-            default=os.getenv("BASH_COMPLETION_COMPAT_DIR")
+            choices=shtab.Required.DIRECTORY,  # directory tab completion
+            default=os.getenv("BASH_COMPLETION_COMPAT_DIR"),
         )
         ...
         return parser
