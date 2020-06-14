@@ -7,7 +7,7 @@ __all__ = ["Optional", "Required", "complete"]
 logger = logging.getLogger(__name__)
 CHOICE_FUNCTIONS = {
     "file": "_shtab_compgen_files",
-    "directory": "_shtab_compgen_files",
+    "directory": "_shtab_compgen_dirs",
 }
 
 
@@ -174,14 +174,19 @@ def print_bash(
             subcommands=bash.getvalue(),
         )
         + (
-            "# Preamble\n" + preamble + "\n# End Preamble\n"
+            "# Custom Preamble\n" + preamble + "\n# End Custom Preamble\n"
             if preamble
             else ""
         )
         + """
 # $1=COMP_WORDS[1]
 _shtab_compgen_files() {
-  compgen -f -- $1
+  compgen -f -- $1  # files
+  compgen -d -S '/' -- $1  # recurse into subdirs
+}
+
+# $1=COMP_WORDS[1]
+_shtab_compgen_dirs() {
   compgen -d -S '/' -- $1  # recurse into subdirs
 }
 
