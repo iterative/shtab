@@ -92,7 +92,11 @@ def print_bash_commands(
             logger.warning("global_options: %s", root_options)
         else:
             opts = [
-                opt for sub in positionals if sub.choices for opt in sub.choices
+                opt
+                for sub in positionals
+                if sub.choices
+                for opt in sub.choices
+                if not isinstance(opt, Choice)
             ]
             opts += get_optional_actions(parser)
             # use list rather than set to maintain order
