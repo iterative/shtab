@@ -34,7 +34,9 @@ def main(argv=None):
     other_parser = getattr(module, other_parser)
     if callable(other_parser):
         other_parser = other_parser()
-    print(complete(other_parser, shell=args.shell))
+    print(complete(
+        other_parser, shell=args.shell,
+        root_prefix=args.parser.split('.', 1)[0]))
 
 
 if __name__ == "__main__":
