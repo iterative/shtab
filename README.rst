@@ -20,22 +20,26 @@ Installing ``shtab``'s own tab completion scripts is possible via:
 
 .. code:: sh
 
-    # Install locally
+    # Install locally (eager)
     echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       >> ~/.bash_completion
 
+    # Install locally (lazy load for bash-completion>=2.8)
+    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+      > "${BASH_COMPLETION_USER_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion}/completions/shtab"
+
     # Install system-wide
     echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
-      | sudo tee "$(pkg-config --variable=completionsdir bash-completion)"/shtab.bash
+      | sudo tee "$(pkg-config --variable=completionsdir bash-completion)"/shtab
 
     # Install system-wide (legacy)
     echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
-      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab.bash
+      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab
 
-    # Alternative (not recommended):
-    # install once (will have to re-run if the target's CLI API changes)
-    shtab --shell=bash shtab.main.get_main_parser \
-      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab.bash
+    # Install once (will have to re-run if the target's CLI API changes,
+    # but doesn't need target to always be in $PYTHONPATH)
+    shtab --shell=bash shtab.main.get_main_parser --error-unimportable \
+      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab
 
 The same would work for most existing ``argparse``-based scripts.
 For example, starting with this existing code:
@@ -83,7 +87,7 @@ Alternatively, add direct support to scripts for a little more configurability:
         parser.add_argument(
             "--dir",
             choices=shtab.Required.DIRECTORY,  # directory tab completion
-            default=os.getenv("BASH_COMPLETION_COMPAT_DIR"),
+            default=os.getenv("BASH_COMPLETION_USER_DIR"),
         )
         ...
         return parser
@@ -96,7 +100,7 @@ Alternatively, add direct support to scripts for a little more configurability:
         shell = args.install_completion_shell
         if shell:
             completion_script = shtab.complete(parser, shell=shell)
-            filename = args.file or "<MY_PROG>.bash"
+            filename = args.file or "<MY_PROG>"
             print("Writing to system completion directory...")
             with open(os.path.join(args.dir, filename), "w") as fd:
                 fd.write(completion_script)
