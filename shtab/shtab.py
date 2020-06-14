@@ -14,9 +14,9 @@ CHOICE_FUNCTIONS = {
 @total_ordering
 class Choice(object):
     """
-    Placeholder, usage:
+    Placeholder to mark a special completion `<type>`.
+
     >>> ArgumentParser.add_argument(..., choices=[Choice("<type>")])
-    to mark a special completion `<type>`.
     """
 
     def __init__(self, choice_type, required=False):
@@ -39,21 +39,21 @@ class Choice(object):
 
 
 class Optional(object):
-    """Example: `ArgumentParser.add_argument(..., choices=Optional.FILE)`"""
+    """Example: `ArgumentParser.add_argument(..., choices=Optional.FILE)`."""
 
     FILE = [Choice("file")]
     DIR = DIRECTORY = [Choice("directory")]
 
 
 class Required(object):
-    """Example: `ArgumentParser.add_argument(..., choices=Required.FILE)`"""
+    """Example: `ArgumentParser.add_argument(..., choices=Required.FILE)`."""
 
     FILE = [Choice("file", True)]
     DIR = DIRECTORY = [Choice("directory", True)]
 
 
 def get_optional_actions(parser):
-    """flattened list of all `parser`'s optional actions"""
+    """Flattened list of all `parser`'s optional actions."""
     return sum(
         (opt.option_strings for opt in parser._get_optional_actions()), []
     )
@@ -64,6 +64,7 @@ def print_bash_commands(
 ):
     """
     Recursive subcommand parser traversal, printing bash helper syntax.
+
     Output format:
         _{root_parser.prog}_{subcommand}='{options}'
         _{root_parser.prog}_{subcommand}_{subsubcommand}='{options}'
@@ -141,7 +142,7 @@ def print_bash_commands(
 def print_bash(
     parser, root_prefix=None, fd=None, preamble="", choice_functions=None
 ):
-    """Prints definitions in bash syntax for use in autocompletion scripts."""
+    """Print definitions in bash syntax for use in autocompletion scripts."""
     bash = io.StringIO()
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
     commands, global_options = print_bash_commands(
