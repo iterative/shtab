@@ -20,6 +20,12 @@ class Choice(object):
     """
 
     def __init__(self, choice_type, required=False):
+        """
+        See below for parameters.
+
+        choice_type  : internal `type` name
+        required  : controls result of comparison to empty strings
+        """
         self.required = required
         self.type = choice_type
 

@@ -2,9 +2,7 @@ import subprocess
 
 
 def bash_run(init="", test="1", failure_message=""):
-    """
-    bash -c '{init}; [[ {test} ]]'
-    """
+    """Equivalent to `bash -c '{init}; [[ {test} ]]'`."""
     init = init + "\n" if init else ""
     proc = subprocess.Popen(
         ["bash", "-c", "{init}[[ {test} ]]".format(init=init, test=test)]
