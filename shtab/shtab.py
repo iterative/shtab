@@ -254,7 +254,7 @@ complete -o nospace -F {root_prefix} {prog}""".replace(
             "{root_prefix}", root_prefix
         ).replace(
             "{prog}", parser.prog
-        )
+        )  # `replace` to avoid `{}` clashes with `format`
     )
 
 

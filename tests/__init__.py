@@ -1,4 +1,14 @@
+from __future__ import absolute_import
 import shtab
+from .utils import bash_run, bash_compgen
+
+
+def test_bash():
+    bash_run("export FOO=1", '"$FOO" -eq 1')
+
+
+def test_compgen():
+    bash_compgen('-W "foo bar foobar"', "fo", "foo foobar")
 
 
 def test_choices():
