@@ -91,7 +91,7 @@ def get_bash_commands(
 
         if prefix == root_prefix:  # skip root options
             root_options.extend(get_optional_actions(parser))
-            logger.warning("options: %s", root_options)
+            logger.debug("options: %s", root_options)
         else:
             opts = [
                 opt
@@ -107,12 +107,12 @@ def get_bash_commands(
 
         for sub in positionals:
             if sub.choices:
-                logger.warning(
+                logger.debug(
                     "choices:{}:{}".format(prefix, sorted(sub.choices))
                 )
                 for cmd in sorted(sub.choices):
                     if isinstance(cmd, Choice):
-                        logger.warning(
+                        logger.debug(
                             "Choice.{}:{}:{}".format(
                                 cmd.type, prefix, sub.dest
                             )
@@ -130,7 +130,7 @@ def get_bash_commands(
                             prefix + "_" + cmd.replace("-", "_"),
                         )
             else:
-                logger.warning("uncompletable:{}:{}".format(prefix, sub.dest))
+                logger.debug("uncompletable:{}:{}".format(prefix, sub.dest))
 
         if commands:
             logger.debug("subcommands:{}:{}".format(prefix, commands))
