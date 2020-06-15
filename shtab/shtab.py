@@ -91,7 +91,7 @@ def get_bash_commands(
 
         if prefix == root_prefix:  # skip root options
             root_options.extend(get_optional_actions(parser))
-            logger.warning("global_options: %s", root_options)
+            logger.warning("options: %s", root_options)
         else:
             opts = [
                 opt
@@ -102,7 +102,6 @@ def get_bash_commands(
             ]
             opts += get_optional_actions(parser)
             # use list rather than set to maintain order
-            opts = [i for i in opts if i not in root_options]
             opts = " ".join(opts)
             print("{}='{}'".format(prefix, opts), file=fd)
 
@@ -135,9 +134,9 @@ def get_bash_commands(
 
         if commands:
             logger.debug("subcommands:{}:{}".format(prefix, commands))
-        return commands, root_options
+        return commands
 
-    return recurse(root_parser, root_prefix) + (fd.getvalue(),)
+    return recurse(root_parser, root_prefix), root_options, fd.getvalue()
 
 
 def complete_bash(
@@ -145,11 +144,9 @@ def complete_bash(
 ):
     """Print definitions in bash syntax for use in autocompletion scripts."""
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
-    commands, global_options, subcommands_script = get_bash_commands(
+    commands, options, subcommands_script = get_bash_commands(
         parser, root_prefix, choice_functions=choice_functions
     )
-    options = get_optional_actions(parser)
-    logger.warning("options %s", options)
 
     # References:
     # - https://www.gnu.org/software/bash/manual/html_node/
@@ -163,7 +160,6 @@ def complete_bash(
 
 {root_prefix}_commands_='{commands}'
 {root_prefix}_options_='{options}'
-{root_prefix}_global_options_='{global_options}'
 
 {subcommands}
 
@@ -171,7 +167,6 @@ def complete_bash(
             root_prefix=root_prefix,
             commands=" ".join(commands),
             options=" ".join(options),
-            global_options=" ".join(global_options),
             subcommands=subcommands_script,
         )
         + (
@@ -211,8 +206,7 @@ _shtab_replace_hyphen() {
 {root_prefix}_compgen_command_() {
   local flags_list="{root_prefix}_$(_shtab_replace_hyphen $1)"
   local args_gen="${flags_list}_COMPGEN"
-  COMPREPLY=( $(compgen -W \
-"${root_prefix}_global_options_ ${!flags_list}" -- "$word"; \
+  COMPREPLY=( $(compgen -W ${!flags_list}" -- "$word"; \
 [ -n "${!args_gen}" ] && ${!args_gen} "$word") )
 }
 
@@ -227,8 +221,7 @@ _shtab_replace_hyphen $1)_$(_shtab_replace_hyphen $2)"
   if [ -z "$opts$opts_more" ]; then
     {root_prefix}_compgen_command_ $1
   else
-    COMPREPLY=( $(compgen -W \
-"${root_prefix}_global_options_ $opts" -- "$word"; \
+    COMPREPLY=( $(compgen -W $opts" -- "$word"; \
 [ -n "$opts_more" ] && echo "$opts_more") )
   fi
 }
