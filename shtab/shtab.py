@@ -278,7 +278,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
     # [([options], help)]
     options = [
-        (opt.option_strings, escape_zsh(opt.help))
+        (opt.option_strings, escape_zsh(opt.help or ""))
         for opt in parser._get_optional_actions()
     ]
     logger.debug("options:%s", options)
@@ -361,7 +361,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 }
                 logger.debug("subcommands:%s:%s", cmd, subcommands[cmd])
         else:
-            raise NotImplementedError
+            logger.warning("NotImplementedError:%s", sub)
 
     logger.debug("subcommands:%s:%s", root_prefix, sorted(subcommands))
 
