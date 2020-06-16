@@ -5,7 +5,7 @@ import logging
 
 __all__ = ["Optional", "Required", "Choice", "complete"]
 logger = logging.getLogger(__name__)
-CHOICE_FUNCTIONS = {
+CHOICE_FUNCTIONS_BASH = {
     "file": "_shtab_compgen_files",
     "directory": "_shtab_compgen_dirs",
 }
@@ -92,7 +92,7 @@ def get_bash_commands(
             _{root_parser.prog}_{subcommand}_COMPGEN=_shtab_compgen_files
     """
     fd = io.StringIO()
-    choice_type2fn = dict(CHOICE_FUNCTIONS)
+    choice_type2fn = dict(CHOICE_FUNCTIONS_BASH)
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
@@ -175,19 +175,7 @@ def complete_bash(
 {root_prefix}_options_='{options}'
 
 {subcommands}
-
-""".format(
-            root_prefix=root_prefix,
-            commands=" ".join(commands),
-            options=" ".join(options),
-            subcommands=subcommands_script,
-        )
-        + (
-            "# Custom Preamble\n" + preamble + "\n# End Custom Preamble\n"
-            if preamble
-            else ""
-        )
-        + """
+{preamble}
 # $1=COMP_WORDS[1]
 _shtab_compgen_files() {
   compgen -f -- $1  # files
@@ -264,8 +252,16 @@ _shtab_replace_hyphen $1)_$(_shtab_replace_hyphen $2)"
 }
 
 complete -o nospace -F {root_prefix} {prog}""",
-        root_prefix=root_prefix,
+        commands=" ".join(commands),
+        options=" ".join(options),
+        preamble=(
+            "\n# Custom Preamble\n" + preamble + "\n# End Custom Preamble\n"
+            if preamble
+            else ""
+        ),
         prog=parser.prog,
+        root_prefix=root_prefix,
+        subcommands=subcommands_script,
     )
 
 
