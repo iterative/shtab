@@ -41,6 +41,11 @@ Installing ``shtab``'s own tab completion scripts is possible via:
     shtab --shell=bash shtab.main.get_main_parser --error-unimportable \
       | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab
 
+    # zsh equivalent
+    shtab --shell=zsh shtab.main.get_main_parser --error-unimportable \
+      | sudo tee /usr/local/share/zsh/site-functions/_shtab
+
+
 The same would work for most existing ``argparse``-based scripts.
 For example, starting with this existing code:
 
@@ -64,8 +69,13 @@ Assuming this code example is installed in ``MY_PROG.command.main``, simply run:
 
 .. code:: sh
 
+    # bash
     echo 'eval "$(shtab --shell=bash MY_PROG.command.main.get_main_parser)"' \
       >> ~/.bash_completion
+
+    # zsh
+    shtab --shell=zsh -u MY_PROG.command.main.get_main_parser \
+      | sudo tee /usr/local/share/zsh/site-functions/_MY_PROG
 
 Configuration
 -------------
