@@ -9,6 +9,10 @@ CHOICE_FUNCTIONS_BASH = {
     "file": "_shtab_compgen_files",
     "directory": "_shtab_compgen_dirs",
 }
+CHOICE_FUNCTIONS_ZSH = {
+    "file": "_files",
+    "directory": "_files -/",
+}
 
 
 @total_ordering
@@ -265,7 +269,166 @@ complete -o nospace -F {root_prefix} {prog}""",
     )
 
 
+def escape_zsh(string):
+    return string.replace("`", "\\`")
+
+
+def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
+    root_prefix = "_shtab_" + (root_prefix or parser.prog)
+
+    # [([options], help)]
+    options = [
+        (opt.option_strings, escape_zsh(opt.help))
+        for opt in parser._get_optional_actions()
+    ]
+    logger.debug("options:%s", options)
+
+    # {cmd: {"help": help, "arguments": [arguments]}}
+    subcommands = {}
+
+    choice_type2fn = dict(CHOICE_FUNCTIONS_ZSH)
+    if choice_functions:
+        choice_type2fn.update(choice_functions)
+
+    for sub in parser._get_positional_actions():
+        if sub.choices:
+            logger.debug(
+                "choices:{}:{}".format(root_prefix, sorted(sub.choices))
+            )
+            for cmd, subparser in sub.choices.items():
+                # optionals
+                arguments = [
+                    '{}{}"[{}]:{}:{}"'.format(
+                        {"+": "*", "*": "*"}.get(opt.nargs, ""),
+                        (
+                            "{{{}}}".format(",".join(opt.option_strings))
+                            if len(opt.option_strings) > 1 else
+                            '"{}"'.format(''.join(opt.option_strings))
+                        ),
+                        escape_zsh(opt.help),
+                        opt.dest,
+                        choice_type2fn.get(
+                            opt.choices[0].type
+                            if opt.choices
+                            and isinstance(opt.choices[0], Choice)
+                            else "",
+                            "",
+                        ),
+                    ).replace('""', "")
+                    for opt in subparser._get_optional_actions()
+                ]
+
+                # subcommand positionals
+                subsubs = sum(
+                    (
+                        list(opt.choices)
+                        for opt in subparser._get_positional_actions()
+                        if isinstance(opt.choices, dict)
+                    ),
+                    [],
+                )
+                if subsubs:
+                    arguments.append(
+                        '"1:Sub command:({})"'.format(" ".join(subsubs))
+                    )
+
+                # positionals
+                arguments.extend(
+                    '"{}:{}:{}"'.format(
+                        {"+": "*", "*": "*"}.get(opt.nargs, i + 1),
+                        escape_zsh(opt.help.strip().split("\n")[0] or opt.dest),
+                        choice_type2fn.get(
+                            opt.choices[0].type
+                            if opt.choices
+                            and isinstance(opt.choices[0], Choice)
+                            else "",
+                            "",
+                        ),
+                    )
+                    for (i, opt) in enumerate(
+                        subparser._get_positional_actions()
+                    )
+                    if not isinstance(opt.choices, dict)
+                )
+
+                subcommands[cmd] = {
+                    "help": escape_zsh(subparser.description.strip().split("\n")[0]),
+                    "arguments": arguments,
+                }
+                logger.debug("subcommands:%s:%s", cmd, subcommands[cmd])
+        else:
+            raise NotImplementedError
+
+    logger.debug("subcommands:%s:%s", root_prefix, sorted(subcommands))
+
+    # References:
+    #   - https://github.com/zsh-users/zsh-completions
+    #   - http://zsh.sourceforge.net/Doc/Release/Completion-System.html
+    #   - https://mads-hartmann.com/2017/08/06/
+    #     writing-zsh-completion-scripts.html
+    #   - http://www.linux-mag.com/id/1106/
+    return replace_format(
+        """\
+#compdef {prog}
+
+{root_prefix}_commands_() {
+  local _commands=(
+    {commands}
+  )
+
+  _describe '{prog} commands' _commands
+}
+
+{root_prefix}_options_=(
+  {options}
+)
+
+{subcommands}
+
+typeset -A opt_args
+local context state line curcontext="$curcontext"
+
+_arguments \\
+  ${root_prefix}_options_ \\
+  '1: :{root_prefix}_commands_' \\
+  '*::args:->args'
+
+case $words[1] in
+  {commands_case}
+esac""",
+        root_prefix=root_prefix,
+        prog=parser.prog,
+        commands="\n    ".join(
+            '"{}:{}"'.format(cmd, subcommands[cmd]["help"])
+            for cmd in sorted(subcommands)
+        ),
+        options="\n  ".join(
+            '"(-)"{{{}}}"[{}]"'.format(",".join(opt), desc)
+            for opt, desc in options
+        ),
+        commands_case="\n  ".join(
+            "{cmd}) _arguments ${root_prefix}_{cmd} ;;".format(
+                cmd=cmd.replace("-", "_"), root_prefix=root_prefix,
+            )
+            for cmd in sorted(subcommands)
+        ),
+        subcommands="\n".join(
+            """
+{root_prefix}_{cmd}=(
+  {arguments}
+)""".format(
+                root_prefix=root_prefix,
+                cmd=cmd.replace("-", "_"),
+                arguments="\n  ".join(subcommands[cmd]["arguments"]),
+            )
+            for cmd in sorted(subcommands)
+        ),
+    )
+
+
 def complete(parser, shell="bash", **kwargs):
     if shell == "bash":
         return complete_bash(parser, **kwargs)
-    raise NotImplementedError
+    if shell == "zsh":
+        return complete_zsh(parser, **kwargs)
+    raise NotImplementedError(shell)
