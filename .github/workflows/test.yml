@@ -36,3 +36,29 @@ jobs:
         with:
            password: ${{ secrets.pypi_token }}
            build: true
+      - id: collect_assets
+        run: |
+          echo "::set-output name=asset_path::$(ls dist/*.whl)"
+          echo "::set-output name=asset_name::$(basename dist/*.whl)"
+          changes="$(git log --format='format:%d %B %N' $(git tag --sort=v:refname | tail -n2 | xargs | awk '{print $1".."$2}'))"
+          changes="${changes//'%'/'%25'}"
+          changes="${changes//$'\n'/'%0A'}"
+          changes="${changes//$'\r'/'%0D'}"
+          echo "::set-output name=change_log::${changes}"
+      - id: create_release
+        uses: actions/create-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: shtab ${{ github.ref }} alpha
+          body: ${{ steps.collect_assets.outputs.change_log }}
+          draft: true
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.collect_assets.outputs.asset_path }}
+          asset_name: ${{ steps.collect_assets.outputs.asset_name }}
+          asset_content_type: application/zip
