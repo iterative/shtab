@@ -26,6 +26,9 @@ README_rst = ""
 fndoc = os.path.join(src_dir, "README.rst")
 with io_open(fndoc, mode="r", encoding="utf-8") as fd:
     README_rst = fd.read()
+requirements_dev = os.path.join(src_dir, "requirements-dev.txt")
+with io_open(requirements_dev, mode="r", encoding="utf-8") as fd:
+    requirements_dev = fd.readlines()
 setup(
     name="shtab",
     version=__version__,
@@ -40,14 +43,14 @@ setup(
     packages=["shtab"],
     provides=["shtab"],
     install_requires=["argparse"],
-    extras_require={"dev": ["pre-commit", "py-make>=0.1.0", "twine"]},
+    extras_require={"dev": requirements_dev},
     entry_points={"console_scripts": ["shtab=shtab:main.main"]},
     package_data={"shtab": ["LICENCE"]},
     python_requires=">=2.7, !=3.0.*, !=3.1.*",
     classifiers=[
         # Trove classifiers
         # (https://pypi.org/pypi?%3Aaction=list_classifiers)
-        "Development Status :: 5 - Production/Stable",
+        "Development Status :: 2 - Pre-Alpha",
         "Environment :: Console",
         "Environment :: MacOS X",
         "Environment :: Other Environment",
@@ -92,6 +95,7 @@ setup(
         "Topic :: Software Development :: User Interfaces",
         "Topic :: System :: Installation/Setup",
         "Topic :: System :: Shells",
+        "Topic :: System :: System Shells",
         "Topic :: Terminals",
         "Topic :: Utilities",
     ],

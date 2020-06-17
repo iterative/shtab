@@ -1,2 +1,11 @@
-*.py[co]
+*.py[cod]
+
+# Packages
+shtab.egg-info/
+/build/
+/dist/
+
+# Unit test / coverage reports
+.tox/
+.coverage
 __pycache__/

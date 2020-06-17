@@ -1,0 +1,3 @@
+pre-commit
+py-make>=0.1.0
+twine
