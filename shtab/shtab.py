@@ -3,7 +3,24 @@ from __future__ import print_function
 import io
 import logging
 import re
+from argparse import (
+    _AppendAction,
+    _AppendConstAction,
+    _CountAction,
+    _HelpAction,
+    _StoreConstAction,
+    _VersionAction,
+)
 from functools import total_ordering
+
+FLAG_OPTION = (
+    _StoreConstAction,
+    _HelpAction,
+    _VersionAction,
+    _AppendConstAction,
+    _CountAction,
+)
+OPTION_MULTI = (_AppendAction, _AppendConstAction, _CountAction)
 
 __all__ = ["Optional", "Required", "Choice", "complete"]
 logger = logging.getLogger(__name__)
@@ -276,6 +293,14 @@ complete -o nospace -F {root_prefix} {prog}""",
     )
 
 
+def options_zsh_join(option_strings):
+    return (
+        "{{{}}}".format(",".join(option_strings))
+        if len(option_strings) > 1
+        else '"{}"'.format("".join(option_strings))
+    )
+
+
 def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
 
@@ -301,16 +326,17 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
             for cmd, subparser in sub.choices.items():
                 # optionals
                 arguments = [
-                    '{}{}"[{}]:{}:{}"'.format(
-                        {"+": "*", "*": "*"}.get(opt.nargs, ""),
-                        (
-                            "{{{}}}".format(",".join(opt.option_strings))
-                            if len(opt.option_strings) > 1
-                            else '"{}"'.format("".join(opt.option_strings))
-                        ),
-                        escape_zsh(opt.help),
-                        opt.dest,
-                        (
+                    (
+                        '{nargs}{options}"[{help}]"'
+                        if isinstance(opt, FLAG_OPTION)
+                        else '{nargs}{options}"[{help}]:{dest}:{pattern}"'
+                    )
+                    .format(
+                        nargs='"*"' if isinstance(opt, OPTION_MULTI) else "",
+                        options=options_zsh_join(opt.option_strings),
+                        help=escape_zsh(opt.help or ""),
+                        dest=opt.dest,
+                        pattern=(
                             choice_type2fn[opt.choices[0].type]
                             if isinstance(opt.choices[0], Choice)
                             else "({})".format(" ".join(opt.choices))
@@ -318,6 +344,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                         if opt.choices
                         else "",
                     )
+                    .replace('""', "")
                     for opt in subparser._get_optional_actions()
                 ]
 
@@ -340,7 +367,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                     '"{}:{}:{}"'.format(
                         {"+": "*", "*": "*"}.get(opt.nargs, ""),
                         escape_zsh(
-                            opt.help.strip().split("\n")[0] or opt.dest
+                            (opt.help or opt.dest).strip().split("\n")[0]
                         ),
                         (
                             choice_type2fn[opt.choices[0].type]
@@ -355,7 +382,9 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 )
 
                 subcommands[cmd] = {
-                    "help": subparser.description.strip().split("\n")[0],
+                    "help": (subparser.description or "")
+                    .strip()
+                    .split("\n")[0],
                     "arguments": arguments,
                 }
                 logger.debug("subcommands:%s:%s", cmd, subcommands[cmd])
@@ -407,7 +436,9 @@ esac""",
             for cmd in sorted(subcommands)
         ),
         options="\n  ".join(
-            '"(-)"{{{}}}"[{}]"'.format(",".join(opt), escape_zsh(desc))
+            '{options}"[{help}]"'.format(
+                options=options_zsh_join(opt), help=escape_zsh(desc),
+            ).replace('""', "")
             for opt, desc in options
         ),
         commands_case="\n  ".join(

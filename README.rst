@@ -41,7 +41,7 @@ Installing ``shtab``'s own tab completion scripts is possible via:
     shtab --shell=bash shtab.main.get_main_parser --error-unimportable \
       | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab
 
-    # zsh equivalent
+    # zsh equivalent (alternatively place in $fpath/_shtab)
     shtab --shell=zsh shtab.main.get_main_parser --error-unimportable \
       | sudo tee /usr/local/share/zsh/site-functions/_shtab
 
