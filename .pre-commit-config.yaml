@@ -1,6 +1,11 @@
 repos:
 - hooks:
-  - id: black
+  - args:
+    - -l
+    - '79'
+    - -t
+    - py27
+    id: black
     language_version: python3
   repo: https://github.com/ambv/black
   rev: 19.10b0

@@ -1,7 +1,8 @@
 from __future__ import print_function
-from functools import total_ordering
+
 import io
 import logging
+from functools import total_ordering
 
 __all__ = ["Optional", "Required", "Choice", "complete"]
 logger = logging.getLogger(__name__)
@@ -211,7 +212,7 @@ _shtab_replace_hyphen() {
 {root_prefix}_compgen_command_() {
   local flags_list="{root_prefix}_$(_shtab_replace_hyphen $1)"
   local args_gen="${flags_list}_COMPGEN"
-  COMPREPLY=( $(compgen -W ${!flags_list}" -- "$word"; \
+  COMPREPLY=( $(compgen -W "${!flags_list}" -- "$word"; \
 [ -n "${!args_gen}" ] && ${!args_gen} "$word") )
 }
 
@@ -226,7 +227,7 @@ _shtab_replace_hyphen $1)_$(_shtab_replace_hyphen $2)"
   if [ -z "$opts$opts_more" ]; then
     {root_prefix}_compgen_command_ $1
   else
-    COMPREPLY=( $(compgen -W $opts" -- "$word"; \
+    COMPREPLY=( $(compgen -W "$opts" -- "$word"; \
 [ -n "$opts_more" ] && echo "$opts_more") )
   fi
 }
@@ -389,7 +390,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
   _describe '{prog} commands' _commands
 }
 {subcommands}
-
+{preamble}
 typeset -A opt_args
 local context state line curcontext="$curcontext"
 
@@ -427,6 +428,11 @@ esac""",
                 arguments="\n  ".join(subcommands[cmd]["arguments"]),
             )
             for cmd in sorted(subcommands)
+        ),
+        preamble=(
+            "\n# Custom Preamble\n" + preamble + "\n# End Custom Preamble\n"
+            if preamble
+            else ""
         ),
     )
 
