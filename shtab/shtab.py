@@ -338,7 +338,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 # positionals
                 arguments.extend(
                     '"{}:{}:{}"'.format(
-                        {"+": "*", "*": "*"}.get(opt.nargs, i + 1),
+                        {"+": "*", "*": "*"}.get(opt.nargs, ""),
                         escape_zsh(
                             opt.help.strip().split("\n")[0] or opt.dest
                         ),
@@ -350,9 +350,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                         if opt.choices
                         else "",
                     )
-                    for (i, opt) in enumerate(
-                        subparser._get_positional_actions()
-                    )
+                    for opt in subparser._get_positional_actions()
                     if not isinstance(opt.choices, dict)
                 )
 
