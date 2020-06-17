@@ -8,7 +8,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
-    - run: pip install .[dev]
+      with:
+        python-version: '3.x'
+    - run: pip install -U .[dev]
     - run: python setup.py check -mrs
     - run: pre-commit run --all-files
   test:
@@ -23,7 +25,7 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - run: pip install . nose
+    - run: pip install -U nose
     - run: nosetests -d -v tests/
   deploy:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
