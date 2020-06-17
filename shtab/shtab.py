@@ -20,6 +20,7 @@ FLAG_OPTION = (
     _AppendConstAction,
     _CountAction,
 )
+END_OPTION = _HelpAction, _VersionAction
 OPTION_MULTI = (_AppendAction, _AppendConstAction, _CountAction)
 
 __all__ = ["Optional", "Required", "Choice", "complete"]
@@ -33,10 +34,6 @@ CHOICE_FUNCTIONS_ZSH = {
     "directory": "_files -/",
 }
 RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])")  # excessive but safe
-
-
-def escape_zsh(string):
-    return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", string)
 
 
 @total_ordering
@@ -293,23 +290,21 @@ complete -o nospace -F {root_prefix} {prog}""",
     )
 
 
-def options_zsh_join(option_strings):
+def escape_zsh(string):
+    return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", string)
+
+
+def options_zsh_join(optional_actions):
+    opts = optional_actions.option_strings
     return (
-        "{{{}}}".format(",".join(option_strings))
-        if len(option_strings) > 1
-        else '"{}"'.format("".join(option_strings))
+        "{{{}}}".format(",".join(opts))
+        if len(opts) > 1
+        else '"{}"'.format("".join(opts))
     )
 
 
 def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
-
-    # [([options], help)]
-    options = [
-        (opt.option_strings, opt.help or "")
-        for opt in parser._get_optional_actions()
-    ]
-    logger.debug("options:%s", options)
 
     # {cmd: {"help": help, "arguments": [arguments]}}
     subcommands = {}
@@ -332,8 +327,14 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                         else '{nargs}{options}"[{help}]:{dest}:{pattern}"'
                     )
                     .format(
-                        nargs='"*"' if isinstance(opt, OPTION_MULTI) else "",
-                        options=options_zsh_join(opt.option_strings),
+                        nargs=(
+                            '"(- *)"'
+                            if isinstance(opt, END_OPTION)
+                            else '"*"'
+                            if isinstance(opt, OPTION_MULTI)
+                            else ""
+                        ),
+                        options=options_zsh_join(opt),
                         help=escape_zsh(opt.help or ""),
                         dest=opt.dest,
                         pattern=(
@@ -436,10 +437,18 @@ esac""",
             for cmd in sorted(subcommands)
         ),
         options="\n  ".join(
-            '{options}"[{help}]"'.format(
-                options=options_zsh_join(opt), help=escape_zsh(desc),
+            '{nargs}{options}"[{help}]"'.format(
+                nargs=(
+                    '"(- *)"'
+                    if isinstance(opt, END_OPTION)
+                    else '"*"'
+                    if isinstance(opt, OPTION_MULTI)
+                    else ""
+                ),
+                options=options_zsh_join(opt),
+                help=escape_zsh(opt.help or ""),
             ).replace('""', "")
-            for opt, desc in options
+            for opt in parser._get_optional_actions()
         ),
         commands_case="\n  ".join(
             "{cmd}) _arguments ${root_prefix}_{cmd} ;;".format(
