@@ -313,11 +313,17 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
+    if len(parser._get_positional_actions()) != 1:
+        logger.warning(
+            "NotImplementedError:Expecting one positional subparser"
+        )
     for sub in parser._get_positional_actions():
         if sub.choices:
             logger.debug(
                 "choices:{}:{}".format(root_prefix, sorted(sub.choices))
             )
+            if not isinstance(sub.choices, dict):
+                logger.warning("NotImplementedError:Expecting subparser dict")
             for cmd, subparser in sub.choices.items():
                 # optionals
                 arguments = [
@@ -390,7 +396,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 }
                 logger.debug("subcommands:%s:%s", cmd, subcommands[cmd])
         else:
-            logger.warning("NotImplementedError:%s", sub)
+            logger.warning("NotImplementedError:Expecting subparser choices")
 
     logger.debug("subcommands:%s:%s", root_prefix, sorted(subcommands))
 
