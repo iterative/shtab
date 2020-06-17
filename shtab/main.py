@@ -1,7 +1,8 @@
 from __future__ import absolute_import, print_function
+
 import argparse
-from importlib import import_module
 import logging
+from importlib import import_module
 
 from .shtab import complete
 

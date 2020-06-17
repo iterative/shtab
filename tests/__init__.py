@@ -5,8 +5,10 @@ Currently runnable via nosetests, e.g.:
     shtab$ nose tests -d -v
 """
 from __future__ import absolute_import
+
 import shtab
-from .utils import bash_run, bash_compgen
+
+from .utils import bash_compgen, bash_run
 
 
 def test_bash():
