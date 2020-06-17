@@ -1,0 +1,38 @@
+name: Test
+on:
+- push
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - run: pip install .[dev]
+    - run: python setup.py check -mrs
+    - run: pre-commit run --all-files
+  test:
+    name: Test py${{ matrix.python }}
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [2.7, 3.8]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - run: pip install . nose
+    - run: nosetests -d -v tests/
+  deploy:
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    name: PyPI Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: casperdcl/deploy-pypi@v1
+        with:
+           password: ${{ secrets.pypi_token }}
+           build: true
