@@ -310,14 +310,14 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                         ),
                         escape_zsh(opt.help),
                         opt.dest,
-                        choice_type2fn.get(
-                            opt.choices[0].type
-                            if opt.choices
-                            and isinstance(opt.choices[0], Choice)
-                            else "",
-                            "",
-                        ),
-                    ).replace('""', "")
+                        (
+                            choice_type2fn[opt.choices[0].type]
+                            if isinstance(opt.choices[0], Choice)
+                            else "({})".format(" ".join(opt.choices))
+                        )
+                        if opt.choices
+                        else "",
+                    )
                     for opt in subparser._get_optional_actions()
                 ]
 
@@ -342,13 +342,13 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                         escape_zsh(
                             opt.help.strip().split("\n")[0] or opt.dest
                         ),
-                        choice_type2fn.get(
-                            opt.choices[0].type
-                            if opt.choices
-                            and isinstance(opt.choices[0], Choice)
-                            else "",
-                            "",
-                        ),
+                        (
+                            choice_type2fn[opt.choices[0].type]
+                            if isinstance(opt.choices[0], Choice)
+                            else "({})".format(" ".join(opt.choices))
+                        )
+                        if opt.choices
+                        else "",
                     )
                     for (i, opt) in enumerate(
                         subparser._get_positional_actions()
