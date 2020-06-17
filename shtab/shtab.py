@@ -355,9 +355,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 )
 
                 subcommands[cmd] = {
-                    "help": escape_zsh(
-                        subparser.description.strip().split("\n")[0]
-                    ),
+                    "help": subparser.description.strip().split("\n")[0],
                     "arguments": arguments,
                 }
                 logger.debug("subcommands:%s:%s", cmd, subcommands[cmd])
@@ -405,7 +403,7 @@ esac""",
         root_prefix=root_prefix,
         prog=parser.prog,
         commands="\n    ".join(
-            '"{}:{}"'.format(cmd, subcommands[cmd]["help"])
+            "'{}:{}'".format(cmd, subcommands[cmd]["help"])
             for cmd in sorted(subcommands)
         ),
         options="\n  ".join(
