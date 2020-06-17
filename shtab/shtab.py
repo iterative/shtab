@@ -334,7 +334,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                     )
                     .format(
                         nargs=(
-                            '"(- *)"'
+                            '"(- :)"'
                             if isinstance(opt, END_OPTION)
                             else '"*"'
                             if isinstance(opt, OPTION_MULTI)
@@ -445,7 +445,7 @@ esac""",
         options="\n  ".join(
             '{nargs}{options}"[{help}]"'.format(
                 nargs=(
-                    '"(- *)"'
+                    '"(- :)"'
                     if isinstance(opt, END_OPTION)
                     else '"*"'
                     if isinstance(opt, OPTION_MULTI)
