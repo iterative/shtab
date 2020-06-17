@@ -153,15 +153,15 @@ Alternatives
 
 - ``argcomplete``
 
-  - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
+  - executes the underlying script *every* time ``<TAB>`` is pressed (slow and has side-effects)
   - only provides ``bash`` completion
 
 - ``pyzshcomplete``
 
-  - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
+  - executes the underlying script *every* time ``<TAB>`` is pressed (slow and has side-effects)
   - only provides ``zsh`` completion
 
 - ``click``
 
-  - different framework completely replacing `argparse`
+  - different framework completely replacing ``argparse``
   - solves multiple problems (rather than POSIX-style "do one thing well")
