@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from io import open as io_open
 import os
 import sys
+from io import open as io_open
 
 try:
     from setuptools import setup
@@ -40,7 +40,7 @@ setup(
     packages=["shtab"],
     provides=["shtab"],
     install_requires=["argparse"],
-    extras_require={"dev": ["py-make>=0.1.0", "twine"]},
+    extras_require={"dev": ["pre-commit", "py-make>=0.1.0", "twine"]},
     entry_points={"console_scripts": ["shtab=shtab:main.main"]},
     package_data={"shtab": ["LICENCE"]},
     python_requires=">=2.7, !=3.0.*, !=3.1.*",
