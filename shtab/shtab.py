@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import io
 import logging
+import re
 from functools import total_ordering
 
 __all__ = ["Optional", "Required", "Choice", "complete"]
@@ -14,6 +15,11 @@ CHOICE_FUNCTIONS_ZSH = {
     "file": "_files",
     "directory": "_files -/",
 }
+RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])")  # excessive but safe
+
+
+def escape_zsh(string):
+    return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", string)
 
 
 @total_ordering
@@ -270,16 +276,12 @@ complete -o nospace -F {root_prefix} {prog}""",
     )
 
 
-def escape_zsh(string):
-    return string.replace("`", "\\`")
-
-
 def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
 
     # [([options], help)]
     options = [
-        (opt.option_strings, escape_zsh(opt.help or ""))
+        (opt.option_strings, opt.help or "")
         for opt in parser._get_optional_actions()
     ]
     logger.debug("options:%s", options)
@@ -403,11 +405,11 @@ esac""",
         root_prefix=root_prefix,
         prog=parser.prog,
         commands="\n    ".join(
-            "'{}:{}'".format(cmd, subcommands[cmd]["help"])
+            '"{}:{}"'.format(cmd, escape_zsh(subcommands[cmd]["help"]))
             for cmd in sorted(subcommands)
         ),
         options="\n  ".join(
-            '"(-)"{{{}}}"[{}]"'.format(",".join(opt), desc)
+            '"(-)"{{{}}}"[{}]"'.format(",".join(opt), escape_zsh(desc))
             for opt, desc in options
         ),
         commands_case="\n  ".join(
