@@ -4,11 +4,11 @@ Tests for `shtab`.
 Currently runnable via nosetests, e.g.:
     shtab$ nose tests -d -v
 """
-from __future__ import absolute_import
+import pytest
 
 import shtab
-
-from .utils import bash_compgen, bash_run
+from shtab.main import get_main_parser
+from utils import bash_compgen, bash_run
 
 
 def test_bash():
@@ -25,3 +25,9 @@ def test_choices():
 
     assert "x" in shtab.Required.FILE
     assert "" not in shtab.Required.FILE
+
+
+@pytest.mark.parametrize("shell", ("bash", "zsh"))
+def test_main(shell, caplog):
+    parser = get_main_parser()
+    print(shtab.complete(parser, shell=shell))

@@ -100,5 +100,4 @@ setup(
         "Topic :: Utilities",
     ],
     keywords="tab complete completion shell bash zsh argparse",
-    tests_require=["flake8", "black"],
 )
