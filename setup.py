@@ -10,7 +10,7 @@ except ImportError:
     from distutils.core import setup
 
 __author__ = "Casper da Costa-Luis <casper.dcl@physics.org>"
-__licence__ = "MPL-2.0"
+__licence__ = "Apache-2.0"
 __version__ = "0.0.1"
 src_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -59,7 +59,7 @@ setup(
         "Intended Audience :: End Users/Desktop",
         "Intended Audience :: Other Audience",
         "Intended Audience :: System Administrators",
-        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: MacOS",
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: POSIX",
