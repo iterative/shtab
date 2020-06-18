@@ -4,6 +4,8 @@ Tests for `shtab`.
 Currently runnable via nosetests, e.g.:
     shtab$ nose tests -d -v
 """
+import logging
+
 import pytest
 
 import shtab
@@ -30,4 +32,6 @@ def test_choices():
 @pytest.mark.parametrize("shell", ("bash", "zsh"))
 def test_main(shell, caplog):
     parser = get_main_parser()
-    print(shtab.complete(parser, shell=shell))
+    with caplog.at_level(logging.INFO):
+        print(shtab.complete(parser, shell=shell))
+    assert not caplog.record_tuples
