@@ -12,7 +12,7 @@ repos:
 - repo: https://github.com/asottile/seed-isort-config
   rev: v2.2.0
   hooks:
-  -   id: seed-isort-config
+  - id: seed-isort-config
 - hooks:
   - id: isort
     language_version: python3
