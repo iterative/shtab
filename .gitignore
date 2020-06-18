@@ -6,5 +6,6 @@ shtab.egg-info/
 /dist/
 
 # Unit test / coverage reports
-.coverage
+/.coverage
+/.pytest_cache/
 __pycache__/
