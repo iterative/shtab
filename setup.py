@@ -35,6 +35,7 @@ setup(
     description="Automatically generate shell tab completion scripts"
     " for python CLI apps",
     long_description=README_rst,
+    long_description_content_type="text/x-rst",
     license=__licence__,
     author=__author__.split("<")[0].strip(),
     author_email=__author__.split("<")[1][:-1],
