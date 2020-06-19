@@ -29,15 +29,54 @@ Features
 - Supports file and directory path completion
 - Supports custom path completion (e.g. ``--file={*.txt}``)
 
+------------------------------------------
+
 .. contents:: Table of contents
    :backlinks: top
    :local:
 
+
 Installation
 ------------
 
+Choose one of:
+
 - ``pip install shtab``
 - ``conda install -c conda-forge shtab``
+
+`bash` users who have never used any kind of tab completion before should also
+follow the OS-specific instructions below.
+
+Ubuntu/Debian
+~~~~~~~~~~~~~
+
+First run ``sudo apt install --reinstall bash-completion``, then make sure these
+lines appear in `~/.bashrc`:
+
+.. code:: sh
+
+    # enable bash completion in interactive shells
+    if ! shopt -oq posix; then
+     if [ -f /usr/share/bash-completion/bash_completion ]; then
+       . /usr/share/bash-completion/bash_completion
+     elif [ -f /etc/bash_completion ]; then
+       . /etc/bash_completion
+     fi
+    fi
+
+
+MacOS
+~~~~~
+
+First run ``brew install bash-completion``, then add the following to
+``~/.bash_profile``:
+
+.. code:: sh
+
+    if [ -f $(brew --prefix)/etc/bash_completion ]; then
+       . $(brew --prefix)/etc/bash_completion
+    fi
+
 
 Usage
 -----
