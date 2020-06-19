@@ -306,15 +306,6 @@ def escape_zsh(string):
     return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", string)
 
 
-def options_zsh_join(optional_actions):
-    opts = optional_actions.option_strings
-    return (
-        "{{{}}}".format(",".join(opts))
-        if len(opts) > 1
-        else '"{}"'.format("".join(opts))
-    )
-
-
 def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     """
     Returns zsh syntax autocompletion script.
@@ -330,26 +321,33 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
+    def join_options(optional_actions):
+        opts = optional_actions.option_strings
+        return (
+            "{{{}}}".format(",".join(opts))
+            if len(opts) > 1
+            else '"{}"'.format("".join(opts))
+        )
+
+    def format_positional(opt):
+        return '"{nargs}:{help}:{choices}"'.format(
+            nargs={"+": "*", "*": "*"}.get(opt.nargs, ""),
+            help=escape_zsh((opt.help or opt.dest).strip().split("\n")[0]),
+            choices=(
+                choice_type2fn[opt.choices[0].type]
+                if isinstance(opt.choices[0], Choice)
+                else "({})".format(" ".join(opt.choices))
+            )
+            if opt.choices
+            else "",
+        )
+
     for sub in parser._get_positional_actions():
         if not sub.choices or not isinstance(sub.choices, dict):
             # positional argument
             opt = sub
             if opt.help != SUPPRESS:
-                root_arguments.append(
-                    '"{nargs}:{help}:{choices}"'.format(
-                        nargs={"+": "*", "*": "*"}.get(opt.nargs, ""),
-                        help=escape_zsh(
-                            (opt.help or opt.dest).strip().split("\n")[0]
-                        ),
-                        choices=(
-                            choice_type2fn[opt.choices[0].type]
-                            if isinstance(opt.choices[0], Choice)
-                            else "({})".format(" ".join(opt.choices))
-                        )
-                        if opt.choices
-                        else "",
-                    )
-                )
+                root_arguments.append(format_positional(opt))
         else:  # subparser
             log.debug("choices:{}:{}".format(root_prefix, sorted(sub.choices)))
             for cmd, subparser in sub.choices.items():
@@ -373,7 +371,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                             if isinstance(opt, OPTION_MULTI)
                             else ""
                         ),
-                        options=options_zsh_join(opt),
+                        options=join_options(opt),
                         help=escape_zsh(opt.help or ""),
                         dest=opt.dest,
                         pattern=(
@@ -405,19 +403,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
                 # positionals
                 arguments.extend(
-                    '"{nargs}:{help}:{choices}"'.format(
-                        nargs={"+": "*", "*": "*"}.get(opt.nargs, ""),
-                        help=escape_zsh(
-                            (opt.help or opt.dest).strip().split("\n")[0]
-                        ),
-                        choices=(
-                            choice_type2fn[opt.choices[0].type]
-                            if isinstance(opt.choices[0], Choice)
-                            else "({})".format(" ".join(opt.choices))
-                        )
-                        if opt.choices
-                        else "",
-                    )
+                    format_positional(opt)
                     for opt in subparser._get_positional_actions()
                     if not isinstance(opt.choices, dict)
                     if opt.help != SUPPRESS
@@ -491,7 +477,7 @@ esac""",
                     if isinstance(opt, OPTION_MULTI)
                     else ""
                 ),
-                options=options_zsh_join(opt),
+                options=join_options(opt),
                 help=escape_zsh(opt.help or ""),
                 dest=opt.dest,
                 pattern=(
