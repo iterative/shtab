@@ -44,14 +44,14 @@ Choose one of:
 - ``pip install shtab``
 - ``conda install -c conda-forge shtab``
 
-`bash` users who have never used any kind of tab completion before should also
+``bash`` users who have never used any kind of tab completion before should also
 follow the OS-specific instructions below.
 
 Ubuntu/Debian
 ~~~~~~~~~~~~~
 
 First run ``sudo apt install --reinstall bash-completion``, then make sure these
-lines appear in `~/.bashrc`:
+lines appear in ``~/.bashrc``:
 
 .. code:: sh
 
