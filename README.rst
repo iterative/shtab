@@ -1,6 +1,8 @@
 shtab
 =====
 
+|Tests| |Coverage| |Conda| |PyPI|
+
 - What: Automatically generate shell tab completion scripts for python CLI apps
 - Why: Speed & correctness. Alternatives like
   `argcomplete <https://pypi.org/project/argcomplete>`_ and
@@ -261,3 +263,19 @@ Please do open issues & pull requests! Some ideas:
 - support `fish`
 - support `powershell`
 - support `tcsh`
+
+.. |Tests| image:: https://github.com/iterative/shtab/workflows/Test/badge.svg
+   :target: https://github.com/iterative/shtab/actions
+   :alt: Tests
+
+.. |Coverage| image:: https://codecov.io/gh/iterative/shtab/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/iterative/shtab
+   :alt: Coverage
+
+.. |Conda| image:: https://img.shields.io/conda/v/conda-forge/shtab.svg?label=conda&logo=conda-forge
+   :target: https://anaconda.org/conda-forge/shtab
+   :alt: conda-forge
+
+.. |PyPI| image:: https://img.shields.io/pypi/v/shtab.svg?label=pip&logo=PyPI&logoColor=white
+   :target: https://pypi.org/project/shtab
+   :alt: PyPI
