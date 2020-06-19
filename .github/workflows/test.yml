@@ -39,6 +39,7 @@ jobs:
            password: ${{ secrets.pypi_token }}
            build: true
       - id: collect_assets
+        name: Collect assets
         run: |
           echo "::set-output name=asset_path::$(ls dist/*.whl)"
           echo "::set-output name=asset_name::$(basename dist/*.whl)"

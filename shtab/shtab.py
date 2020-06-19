@@ -13,18 +13,9 @@ from argparse import (
 )
 from functools import total_ordering
 
-FLAG_OPTION = (
-    _StoreConstAction,
-    _HelpAction,
-    _VersionAction,
-    _AppendConstAction,
-    _CountAction,
-)
-END_OPTION = _HelpAction, _VersionAction
-OPTION_MULTI = (_AppendAction, _AppendConstAction, _CountAction)
-
 __all__ = ["Optional", "Required", "Choice", "complete"]
 logger = logging.getLogger(__name__)
+
 CHOICE_FUNCTIONS_BASH = {
     "file": "_shtab_compgen_files",
     "directory": "_shtab_compgen_dirs",
@@ -33,6 +24,15 @@ CHOICE_FUNCTIONS_ZSH = {
     "file": "_files",
     "directory": "_files -/",
 }
+FLAG_OPTION = (
+    _StoreConstAction,
+    _HelpAction,
+    _VersionAction,
+    _AppendConstAction,
+    _CountAction,
+)
+OPTION_END = _HelpAction, _VersionAction
+OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
 RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])")  # excessive but safe
 
 
@@ -347,7 +347,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                     .format(
                         nargs=(
                             '"(- :)"'
-                            if isinstance(opt, END_OPTION)
+                            if isinstance(opt, OPTION_END)
                             else '"*"'
                             if isinstance(opt, OPTION_MULTI)
                             else ""
@@ -458,7 +458,7 @@ esac""",
             '{nargs}{options}"[{help}]"'.format(
                 nargs=(
                     '"(- :)"'
-                    if isinstance(opt, END_OPTION)
+                    if isinstance(opt, OPTION_END)
                     else '"*"'
                     if isinstance(opt, OPTION_MULTI)
                     else ""
