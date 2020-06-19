@@ -264,6 +264,16 @@ Please do open issues & pull requests! Some ideas:
 - support `powershell`
 - support `tcsh`
 
+When contributing pull requests, it's a good idea to run basic checks locally:
+
+.. code:: sh
+
+    shtab (master)$ pip install .[dev]  # install development dependencies
+    shtab (master)$ pre-commit install  # install pre-commit checks
+    shtab (master)$ python -m tests     # run all tests
+
+|Hits|
+
 .. |Tests| image:: https://github.com/iterative/shtab/workflows/Test/badge.svg
    :target: https://github.com/iterative/shtab/actions
    :alt: Tests
