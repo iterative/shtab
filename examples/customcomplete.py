@@ -9,8 +9,8 @@ import argparse
 import shtab  # for completion magic
 
 CHOICE_FUNCTIONS = {
-    "bash": {"TXTFile": "_shtab_greeter_compgen_TXTFiles"},
-    "zsh": {"TXTFile": "_files -g '(*.txt|*.TXT)'"},
+    "bash": {"*.txt": "_shtab_greeter_compgen_TXTFiles"},
+    "zsh": {"*.txt": "_files -g '(*.txt|*.TXT)'"},
 }
 PREAMBLE = {
     "bash": """
@@ -26,15 +26,15 @@ _shtab_greeter_compgen_TXTFiles() {
 
 
 class Optional(shtab.Required):
-    TXT_FILE = [shtab.Choice("TXTFile", required=False)]
+    TXT_FILE = [shtab.Choice("*.txt", required=False)]
 
 
 class Required(shtab.Required):
-    TXT_FILE = [shtab.Choice("TXTFile", required=True)]
+    TXT_FILE = [shtab.Choice("*.txt", required=True)]
 
 
 def get_main_parser():
-    parser = argparse.ArgumentParser(prog="pathcomplete")
+    parser = argparse.ArgumentParser(prog="customcomplete")
     parser.add_argument(
         "-s", "--print-completion-shell", choices=["bash", "zsh"]
     )

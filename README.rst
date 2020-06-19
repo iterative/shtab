@@ -12,7 +12,7 @@ shtab
 Features
 --------
 
-- Outputs completion for
+- Outputs tab completion scripts for
 
   - ``bash``
   - ``zsh``
@@ -23,7 +23,9 @@ Features
   - `docopt <https://pypi.org/project/docopt>`_ (via `argopt <https://pypi.org/project/argopt>`_)
 
 - Supports arguments, options and subparsers
-- Supports path completion
+- Supports choices (e.g. ``--say={hello,goodbye}``)
+- Supports file and directory path completion
+- Supports custom path completion (e.g. ``--file={*.txt}``)
 
 .. contents:: Table of contents
    :backlinks: top
@@ -92,8 +94,8 @@ For example, add these lines to the top of ``~/.zshrc``:
 
 .. code:: sh
 
-    fpath=($fpath ~/.local)
-    shtab --shell=zsh shtab.main.get_main_parser > ~/.local/_shtab
+    fpath=($fpath ~/.local/completions)
+    shtab --shell=zsh shtab.main.get_main_parser > ~/.local/completions/_shtab
 
 Examples
 --------
