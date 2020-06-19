@@ -11,7 +11,7 @@ except ImportError:
 
 __author__ = "Casper da Costa-Luis <casper.dcl@physics.org>"
 __licence__ = "Apache-2.0"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 src_dir = os.path.abspath(os.path.dirname(__file__))
 
 # Execute Makefile commands if specified
@@ -51,7 +51,7 @@ setup(
     classifiers=[
         # Trove classifiers
         # (https://pypi.org/pypi?%3Aaction=list_classifiers)
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Environment :: MacOS X",
         "Environment :: Other Environment",
