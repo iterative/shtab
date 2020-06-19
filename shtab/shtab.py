@@ -321,12 +321,37 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
-    def join_options(optional_actions):
-        opts = optional_actions.option_strings
+    def format_optional(opt):
         return (
-            "{{{}}}".format(",".join(opts))
-            if len(opts) > 1
-            else '"{}"'.format("".join(opts))
+            (
+                '{nargs}{options}"[{help}]"'
+                if isinstance(opt, FLAG_OPTION)
+                else '{nargs}{options}"[{help}]:{dest}:{pattern}"'
+            )
+            .format(
+                nargs=(
+                    '"(- :)"'
+                    if isinstance(opt, OPTION_END)
+                    else '"*"'
+                    if isinstance(opt, OPTION_MULTI)
+                    else ""
+                ),
+                options=(
+                    "{{{}}}".format(",".join(opt.option_strings))
+                    if len(opt.option_strings) > 1
+                    else '"{}"'.format("".join(opt.option_strings))
+                ),
+                help=escape_zsh(opt.help or ""),
+                dest=opt.dest,
+                pattern=(
+                    choice_type2fn[opt.choices[0].type]
+                    if isinstance(opt.choices[0], Choice)
+                    else "({})".format(" ".join(opt.choices))
+                )
+                if opt.choices
+                else "",
+            )
+            .replace('""', "")
         )
 
     def format_positional(opt):
@@ -358,31 +383,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
                 # optionals
                 arguments = [
-                    (
-                        '{nargs}{options}"[{help}]"'
-                        if isinstance(opt, FLAG_OPTION)
-                        else '{nargs}{options}"[{help}]:{dest}:{pattern}"'
-                    )
-                    .format(
-                        nargs=(
-                            '"(- :)"'
-                            if isinstance(opt, OPTION_END)
-                            else '"*"'
-                            if isinstance(opt, OPTION_MULTI)
-                            else ""
-                        ),
-                        options=join_options(opt),
-                        help=escape_zsh(opt.help or ""),
-                        dest=opt.dest,
-                        pattern=(
-                            choice_type2fn[opt.choices[0].type]
-                            if isinstance(opt.choices[0], Choice)
-                            else "({})".format(" ".join(opt.choices))
-                        )
-                        if opt.choices
-                        else "",
-                    )
-                    .replace('""', "")
+                    format_optional(opt)
                     for opt in subparser._get_optional_actions()
                     if opt.help != SUPPRESS
                 ]
@@ -464,31 +465,7 @@ esac""",
         ),
         root_arguments=" \\\n  ".join(root_arguments),
         root_options="\n  ".join(
-            (
-                '{nargs}{options}"[{help}]"'
-                if isinstance(opt, FLAG_OPTION)
-                else '{nargs}{options}"[{help}]:{dest}:{pattern}"'
-            )
-            .format(
-                nargs=(
-                    '"(- :)"'
-                    if isinstance(opt, OPTION_END)
-                    else '"*"'
-                    if isinstance(opt, OPTION_MULTI)
-                    else ""
-                ),
-                options=join_options(opt),
-                help=escape_zsh(opt.help or ""),
-                dest=opt.dest,
-                pattern=(
-                    choice_type2fn[opt.choices[0].type]
-                    if isinstance(opt.choices[0], Choice)
-                    else "({})".format(" ".join(opt.choices))
-                )
-                if opt.choices
-                else "",
-            )
-            .replace('""', "")
+            format_optional(opt)
             for opt in parser._get_optional_actions()
             if opt.help != SUPPRESS
         ),
