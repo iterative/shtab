@@ -98,7 +98,7 @@ def get_optional_actions(parser):
 
 
 def get_bash_commands(
-    root_parser, root_prefix, choice_functions=None,
+    root_parser, root_prefix, choice_functions=None, skip=None,
 ):
     """
     Recursive subcommand parser traversal, printing bash helper syntax.
@@ -116,11 +116,12 @@ def get_bash_commands(
             # `add_argument('subcommand', choices=shtab.Required.FILE)`)
             _{root_parser.prog}_{subcommand}_COMPGEN=_shtab_compgen_files
     """
-    fd = io.StringIO()
+    skip = skip or []
     choice_type2fn = dict(CHOICE_FUNCTIONS_BASH)
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
+    fd = io.StringIO()
     root_options = []
 
     def recurse(parser, prefix):
@@ -161,6 +162,8 @@ def get_bash_commands(
                             ),
                             file=fd,
                         )
+                    elif cmd in skip:
+                        logger.debug("skip:subcommand:%s", cmd)
                     else:
                         commands.append(cmd)
                         recurse(
@@ -178,12 +181,12 @@ def get_bash_commands(
 
 
 def complete_bash(
-    parser, root_prefix=None, preamble="", choice_functions=None
+    parser, root_prefix=None, preamble="", choice_functions=None, skip=None,
 ):
     """Print definitions in bash syntax for use in autocompletion scripts."""
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
     commands, options, subcommands_script = get_bash_commands(
-        parser, root_prefix, choice_functions=choice_functions
+        parser, root_prefix, choice_functions=choice_functions, skip=skip,
     )
 
     # References:
@@ -303,8 +306,11 @@ def options_zsh_join(optional_actions):
     )
 
 
-def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
+def complete_zsh(
+    parser, root_prefix=None, preamble="", choice_functions=None, skip=None
+):
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
+    skip = skip or []
 
     root_arguments = []
     subcommands = {}  # {cmd: {"help": help, "arguments": [arguments]}}
@@ -337,6 +343,10 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 "choices:{}:{}".format(root_prefix, sorted(sub.choices))
             )
             for cmd, subparser in sub.choices.items():
+                if cmd in skip:
+                    logger.debug("skip:subcommand:%s", cmd)
+                    continue
+
                 # optionals
                 arguments = [
                     (
@@ -494,7 +504,12 @@ esac""",
 
 
 def complete(
-    parser, shell="bash", root_prefix=None, preamble="", choice_functions=None
+    parser,
+    shell="bash",
+    root_prefix=None,
+    preamble="",
+    choice_functions=None,
+    skip=None,
 ):
     if shell == "bash":
         return complete_bash(
@@ -502,6 +517,7 @@ def complete(
             root_prefix=root_prefix,
             preamble=preamble,
             choice_functions=choice_functions,
+            skip=skip,
         )
     if shell == "zsh":
         return complete_zsh(
@@ -509,5 +525,6 @@ def complete(
             root_prefix=root_prefix,
             preamble=preamble,
             choice_functions=choice_functions,
+            skip=skip,
         )
     raise NotImplementedError(shell)
