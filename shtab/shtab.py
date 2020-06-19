@@ -94,7 +94,12 @@ def replace_format(string, **fmt):
 def get_optional_actions(parser):
     """Flattened list of all `parser`'s optional actions."""
     return sum(
-        (opt.option_strings for opt in parser._get_optional_actions()), []
+        (
+            opt.option_strings
+            for opt in parser._get_optional_actions()
+            if opt.help != SUPPRESS
+        ),
+        [],
     )
 
 
@@ -136,6 +141,7 @@ def get_bash_commands(
             opts = [
                 opt
                 for sub in positionals
+                if sub.help != SUPPRESS
                 if sub.choices
                 for opt in sub.choices
                 if not isinstance(opt, Choice)
