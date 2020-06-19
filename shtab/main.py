@@ -16,6 +16,12 @@ def get_main_parser():
         "-s", "--shell", default="bash", choices=["bash", "zsh"]
     )
     parser.add_argument(
+        "--skip",
+        nargs="*",
+        metavar="cmd",
+        help="subparsers to skip completing",
+    )
+    parser.add_argument(
         "-u",
         "--error-unimportable",
         default=False,
@@ -45,6 +51,7 @@ def main(argv=None):
             other_parser,
             shell=args.shell,
             root_prefix=args.parser.split(".", 1)[0],
+            skip=args.skip,
         )
     )
 
