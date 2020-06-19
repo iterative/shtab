@@ -4,6 +4,7 @@ import io
 import logging
 import re
 from argparse import (
+    SUPPRESS,
     _AppendAction,
     _AppendConstAction,
     _CountAction,
@@ -330,21 +331,22 @@ def complete_zsh(
         if not sub.choices or not isinstance(sub.choices, dict):
             # positional argument
             opt = sub
-            root_arguments.append(
-                '"{nargs}:{help}:{choices}"'.format(
-                    nargs={"+": "*", "*": "*"}.get(opt.nargs, ""),
-                    help=escape_zsh(
-                        (opt.help or opt.dest).strip().split("\n")[0]
-                    ),
-                    choices=(
-                        choice_type2fn[opt.choices[0].type]
-                        if isinstance(opt.choices[0], Choice)
-                        else "({})".format(" ".join(opt.choices))
+            if opt.help != SUPPRESS:
+                root_arguments.append(
+                    '"{nargs}:{help}:{choices}"'.format(
+                        nargs={"+": "*", "*": "*"}.get(opt.nargs, ""),
+                        help=escape_zsh(
+                            (opt.help or opt.dest).strip().split("\n")[0]
+                        ),
+                        choices=(
+                            choice_type2fn[opt.choices[0].type]
+                            if isinstance(opt.choices[0], Choice)
+                            else "({})".format(" ".join(opt.choices))
+                        )
+                        if opt.choices
+                        else "",
                     )
-                    if opt.choices
-                    else "",
                 )
-            )
         else:  # subparser
             log.debug("choices:{}:{}".format(root_prefix, sorted(sub.choices)))
             for cmd, subparser in sub.choices.items():
@@ -380,6 +382,7 @@ def complete_zsh(
                     )
                     .replace('""', "")
                     for opt in subparser._get_optional_actions()
+                    if opt.help != SUPPRESS
                 ]
 
                 # subcommand positionals
@@ -413,6 +416,7 @@ def complete_zsh(
                     )
                     for opt in subparser._get_positional_actions()
                     if not isinstance(opt.choices, dict)
+                    if opt.help != SUPPRESS
                 )
 
                 subcommands[cmd] = {
@@ -496,6 +500,7 @@ esac""",
             )
             .replace('""', "")
             for opt in parser._get_optional_actions()
+            if opt.help != SUPPRESS
         ),
         commands_case="\n  ".join(
             "{cmd}) _arguments ${root_prefix}_{cmd} ;;".format(
