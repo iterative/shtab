@@ -260,9 +260,9 @@ Contributions
 
 Please do open issues & pull requests! Some ideas:
 
-- support `fish`
-- support `powershell`
-- support `tcsh`
+- support ``fish``
+- support ``powershell``
+- support ``tcsh``
 
 When contributing pull requests, it's a good idea to run basic checks locally:
 
