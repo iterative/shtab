@@ -11,7 +11,9 @@ logger = logging.getLogger(__name__)
 
 def get_main_parser():
     parser = argparse.ArgumentParser(prog="shtab")
-    parser.add_argument("parser")
+    parser.add_argument(
+        "parser", help="importable parser (or fuction returning parser)"
+    )
     parser.add_argument(
         "-s", "--shell", default="bash", choices=["bash", "zsh"]
     )
@@ -21,6 +23,10 @@ def get_main_parser():
         metavar="cmd",
         help="subparsers to skip completing",
     )
+    parser.add_argument(
+        "--prefix", help="prepended to generated functions to avoid clashes"
+    )
+    parser.add_argument("--preamble", help="prepended to generated script")
     parser.add_argument(
         "-u",
         "--error-unimportable",
@@ -50,7 +56,8 @@ def main(argv=None):
         complete(
             other_parser,
             shell=args.shell,
-            root_prefix=args.parser.split(".", 1)[0],
+            root_prefix=args.prefix or args.parser.split(".", 1)[0],
+            preamble=args.preamble,
             skip=args.skip,
         )
     )
