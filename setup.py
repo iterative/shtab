@@ -11,7 +11,7 @@ except ImportError:
 
 __author__ = "Casper da Costa-Luis <casper.dcl@physics.org>"
 __licence__ = "Apache-2.0"
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 src_dir = os.path.abspath(os.path.dirname(__file__))
 
 # Execute Makefile commands if specified
