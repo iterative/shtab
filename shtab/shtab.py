@@ -183,7 +183,11 @@ def get_bash_commands(
 def complete_bash(
     parser, root_prefix=None, preamble="", choice_functions=None, skip=None,
 ):
-    """Print definitions in bash syntax for use in autocompletion scripts."""
+    """
+    Returns bash syntax autocompletion script.
+
+    See `complete` for arguments.
+    """
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
     commands, options, subcommands_script = get_bash_commands(
         parser, root_prefix, choice_functions=choice_functions, skip=skip,
@@ -309,6 +313,11 @@ def options_zsh_join(optional_actions):
 def complete_zsh(
     parser, root_prefix=None, preamble="", choice_functions=None, skip=None
 ):
+    """
+    Returns zsh syntax autocompletion script.
+
+    See `complete` for arguments.
+    """
     root_prefix = "_shtab_" + (root_prefix or parser.prog)
     skip = skip or []
 
@@ -511,6 +520,16 @@ def complete(
     choice_functions=None,
     skip=None,
 ):
+    """
+    parser  : argparse.ArgumentParser
+    shell  : str (bash/zsh)
+    root_prefix  : str, prefix for shell functions to avoid clashes
+      (default: "_{parser.prog}")
+    preamble  : str, prepended to generated script
+    choice_functions  : dict, maps custom `shtab.Choice.type`s to
+      completion functions (possibly defined in `preamble`)
+    skip  : list(str), subparsers to avoid completing (hidden subcommands)
+    """
     if shell == "bash":
         return complete_bash(
             parser,
