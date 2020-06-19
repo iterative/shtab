@@ -8,4 +8,5 @@ shtab.egg-info/
 # Unit test / coverage reports
 /.coverage
 /.pytest_cache/
+/coverage.xml
 __pycache__/
