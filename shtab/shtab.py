@@ -14,7 +14,7 @@ from argparse import (
 from functools import total_ordering
 
 __all__ = ["Optional", "Required", "Choice", "complete"]
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 CHOICE_FUNCTIONS_BASH = {
     "file": "_shtab_compgen_files",
@@ -130,7 +130,7 @@ def get_bash_commands(
 
         if prefix == root_prefix:  # skip root options
             root_options.extend(get_optional_actions(parser))
-            logger.debug("options: %s", root_options)
+            log.debug("options: %s", root_options)
         else:
             opts = [
                 opt
@@ -146,12 +146,10 @@ def get_bash_commands(
 
         for sub in positionals:
             if sub.choices:
-                logger.debug(
-                    "choices:{}:{}".format(prefix, sorted(sub.choices))
-                )
+                log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
                 for cmd in sorted(sub.choices):
                     if isinstance(cmd, Choice):
-                        logger.debug(
+                        log.debug(
                             "Choice.{}:{}:{}".format(
                                 cmd.type, prefix, sub.dest
                             )
@@ -163,7 +161,7 @@ def get_bash_commands(
                             file=fd,
                         )
                     elif cmd in skip:
-                        logger.debug("skip:subcommand:%s", cmd)
+                        log.debug("skip:subcommand:%s", cmd)
                     else:
                         commands.append(cmd)
                         recurse(
@@ -171,10 +169,10 @@ def get_bash_commands(
                             prefix + "_" + cmd.replace("-", "_"),
                         )
             else:
-                logger.debug("uncompletable:{}:{}".format(prefix, sub.dest))
+                log.debug("uncompletable:{}:{}".format(prefix, sub.dest))
 
         if commands:
-            logger.debug("subcommands:{}:{}".format(prefix, commands))
+            log.debug("subcommands:{}:{}".format(prefix, commands))
         return commands
 
     return recurse(root_parser, root_prefix), root_options, fd.getvalue()
@@ -348,12 +346,10 @@ def complete_zsh(
                 )
             )
         else:  # subparser
-            logger.debug(
-                "choices:{}:{}".format(root_prefix, sorted(sub.choices))
-            )
+            log.debug("choices:{}:{}".format(root_prefix, sorted(sub.choices)))
             for cmd, subparser in sub.choices.items():
                 if cmd in skip:
-                    logger.debug("skip:subcommand:%s", cmd)
+                    log.debug("skip:subcommand:%s", cmd)
                     continue
 
                 # optionals
@@ -425,9 +421,9 @@ def complete_zsh(
                     .split("\n")[0],
                     "arguments": arguments,
                 }
-                logger.debug("subcommands:%s:%s", cmd, subcommands[cmd])
+                log.debug("subcommands:%s:%s", cmd, subcommands[cmd])
 
-    logger.debug("subcommands:%s:%s", root_prefix, sorted(subcommands))
+    log.debug("subcommands:%s:%s", root_prefix, sorted(subcommands))
 
     # References:
     #   - https://github.com/zsh-users/zsh-completions

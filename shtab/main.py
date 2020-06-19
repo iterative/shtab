@@ -6,7 +6,7 @@ from importlib import import_module
 
 from .shtab import complete
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def get_main_parser():
@@ -40,6 +40,7 @@ def get_main_parser():
 def main(argv=None):
     parser = get_main_parser()
     args = parser.parse_args(argv)
+    log.debug(args)
 
     module, other_parser = args.parser.rsplit(".", 1)
     try:
@@ -47,7 +48,7 @@ def main(argv=None):
     except ImportError as err:
         if args.error_unimportable:
             raise
-        logger.debug(str(err))
+        log.debug(str(err))
         return
     other_parser = getattr(module, other_parser)
     if callable(other_parser):
@@ -64,4 +65,5 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
