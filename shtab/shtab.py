@@ -470,7 +470,12 @@ esac""",
         ),
         root_arguments=" \\\n  ".join(root_arguments),
         root_options="\n  ".join(
-            '{nargs}{options}"[{help}]"'.format(
+            (
+                '{nargs}{options}"[{help}]"'
+                if isinstance(opt, FLAG_OPTION)
+                else '{nargs}{options}"[{help}]:{dest}:{pattern}"'
+            )
+            .format(
                 nargs=(
                     '"(- :)"'
                     if isinstance(opt, OPTION_END)
@@ -480,7 +485,16 @@ esac""",
                 ),
                 options=options_zsh_join(opt),
                 help=escape_zsh(opt.help or ""),
-            ).replace('""', "")
+                dest=opt.dest,
+                pattern=(
+                    choice_type2fn[opt.choices[0].type]
+                    if isinstance(opt.choices[0], Choice)
+                    else "({})".format(" ".join(opt.choices))
+                )
+                if opt.choices
+                else "",
+            )
+            .replace('""', "")
             for opt in parser._get_optional_actions()
         ),
         commands_case="\n  ".join(
