@@ -18,12 +18,6 @@ def get_main_parser():
         "-s", "--shell", default="bash", choices=["bash", "zsh"]
     )
     parser.add_argument(
-        "--skip",
-        nargs="*",
-        metavar="cmd",
-        help="subparsers to skip completing",
-    )
-    parser.add_argument(
         "--prefix", help="prepended to generated functions to avoid clashes"
     )
     parser.add_argument("--preamble", help="prepended to generated script")
@@ -59,7 +53,6 @@ def main(argv=None):
             shell=args.shell,
             root_prefix=args.prefix or args.parser.split(".", 1)[0],
             preamble=args.preamble,
-            skip=args.skip,
         )
     )
 
