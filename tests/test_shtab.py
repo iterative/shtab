@@ -10,7 +10,9 @@ import subprocess
 import pytest
 
 import shtab
-from shtab.main import get_main_parser
+from shtab.main import get_main_parser, main
+
+SUPPORTED_SHELLS = "bash", "zsh"
 
 
 class Bash(object):
@@ -67,8 +69,8 @@ def test_choices():
     assert "" not in shtab.Required.FILE
 
 
-@pytest.mark.parametrize("shell", ("bash", "zsh"))
-def test_main(shell, caplog):
+@pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
+def test_complete(shell, caplog):
     parser = get_main_parser()
     with caplog.at_level(logging.INFO):
         completion = shtab.complete(parser, shell=shell)
@@ -77,5 +79,13 @@ def test_main(shell, caplog):
     if shell == "bash":
         shell = Bash(completion)
         shell.compgen('-W "$_shtab_shtab_options_"', "--h", "--help")
+
+    assert not caplog.record_tuples
+
+
+@pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
+def test_main(shell, caplog):
+    with caplog.at_level(logging.INFO):
+        main(["-s", shell, "shtab.main.get_main_parser"])
 
     assert not caplog.record_tuples
