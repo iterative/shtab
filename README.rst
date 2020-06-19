@@ -88,7 +88,7 @@ Note that ``zsh`` requires completion script files to be named ``_{EXECUTABLE}``
       | sudo tee /usr/local/share/zsh/site-functions/_shtab
 
 To be more eager, place the generated script somewhere in ``$fpath``.
-For example, at the top of ``.zshrc``:
+For example, add these lines to the top of ``~/.zshrc``:
 
 .. code:: sh
 
@@ -153,6 +153,11 @@ Advanced Configuration
 
 See the `examples/ <https://github.com/iterative/shtab/tree/master/examples>`_
 folder for more.
+
+Complex projects with subparsers and custom completions for paths matching
+certain patterns (e.g. ``--file=*.txt``) are fully supported (see
+`iterative/dvc:command/completion.py <https://github.com/iterative/dvc/blob/master/dvc/command/completion.py>`_
+for example).
 
 Add direct support to scripts for a little more configurability:
 
