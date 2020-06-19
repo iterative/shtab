@@ -44,10 +44,12 @@ jobs:
           echo "::set-output name=asset_path::$(ls dist/*.whl)"
           echo "::set-output name=asset_name::$(basename dist/*.whl)"
           changes="$(git log --format='format:%d %B %N' $(git tag --sort=v:refname | tail -n2 | xargs | awk '{print $1".."$2}'))"
+          changes="${changes//' '/'%20'}"
           changes="${changes//'%'/'%25'}"
           changes="${changes//$'\n'/'%0A'}"
           changes="${changes//$'\r'/'%0D'}"
           echo "::set-output name=change_log::${changes}"
+          echo "${changes}"
       - id: create_release
         uses: actions/create-release@v1
         env:
