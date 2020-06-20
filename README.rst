@@ -31,9 +31,8 @@ Features
 
 ------------------------------------------
 
-.. contents:: Table of contents
+.. contents:: Table of Contents
    :backlinks: top
-   :local:
 
 
 Installation
@@ -50,7 +49,8 @@ follow the OS-specific instructions below.
 Ubuntu/Debian
 ~~~~~~~~~~~~~
 
-First run ``sudo apt install --reinstall bash-completion``, then make sure these
+Recent versions should have completion already enabled. For older versions,
+first run ``sudo apt install --reinstall bash-completion``, then make sure these
 lines appear in ``~/.bashrc``:
 
 .. code:: sh
@@ -86,7 +86,7 @@ The only requirement is that external CLI applications provide an importable
 which returns a parser object). This may require a trivial code change.
 
 Once that's done, simply add
-``eval "$(shtab --shell=bash your_cli_app.your_parser_object)"``
+``which shtab && eval "$(shtab --shell=bash your_cli_app.your_parser_object)"``
 to ``~/.bash_completion`` (assuming ``bash``).
 
 Below are various examples of enabling ``shtab``'s own tab completion scripts.
@@ -97,19 +97,19 @@ bash
 .. code:: sh
 
     # Install locally
-    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+    echo 'which shtab && eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       >> ~/.bash_completion
 
     # Install locally (lazy load for bash-completion>=2.8)
-    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+    echo 'which shtab && eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       > "${BASH_COMPLETION_USER_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion}/completions/shtab"
 
     # Install system-wide
-    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+    echo 'which shtab && eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       | sudo tee "$(pkg-config --variable=completionsdir bash-completion)"/shtab
 
     # Install system-wide (legacy)
-    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+    echo 'which shtab && eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab
 
     # Install once (will have to re-run if the target's CLI API changes,
@@ -135,8 +135,10 @@ For example, add these lines to the top of ``~/.zshrc``:
 
 .. code:: sh
 
-    fpath=($fpath ~/.local/completions)
-    shtab --shell=zsh shtab.main.get_main_parser > ~/.local/completions/_shtab
+    mkdir -p ~/.zsh/completions
+    fpath=($fpath ~/.zsh/completions)
+    which shtab && shtab --shell=zsh shtab.main.get_main_parser \
+      > ~/.zsh/completions/_shtab
 
 Examples
 --------
@@ -153,7 +155,7 @@ For example, starting with this existing code:
     import argparse
 
     def get_main_parser():
-        parser = argparse.ArgumentParser(prog="<MY_PROG>", ...)
+        parser = argparse.ArgumentParser(prog="MY_PROG", ...)
         parser.add_argument(...)
         parser.add_subparsers(...)
         ...
@@ -169,7 +171,7 @@ Assuming this code example is installed in ``MY_PROG.command.main``, simply run:
 .. code:: sh
 
     # bash
-    echo 'eval "$(shtab --shell=bash MY_PROG.command.main.get_main_parser)"' \
+    echo 'which shtab && eval "$(shtab --shell=bash MY_PROG.command.main.get_main_parser)"' \
       >> ~/.bash_completion
 
     # zsh
@@ -303,13 +305,9 @@ Please do open issues & pull requests! Some ideas:
 - support ``powershell``
 - support ``tcsh``
 
-When contributing pull requests, it's a good idea to run basic checks locally:
-
-.. code:: sh
-
-    shtab (master)$ pip install .[dev]  # install development dependencies
-    shtab (master)$ pre-commit install  # install pre-commit checks
-    shtab (master)$ python -m tests     # run all tests
+See
+`CONTRIBUTING.md <https://github.com/iterative/shtab/tree/master/CONTRIBUTING.md>`_
+for more guidance.
 
 |Hits|
 
