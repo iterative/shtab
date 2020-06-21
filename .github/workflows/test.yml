@@ -46,7 +46,6 @@ jobs:
           echo "::set-output name=asset_name::$(basename dist/*.whl)"
           git fetch --tags
           changes="$(git log --format='format:%d %B %N' $(git tag --sort=v:refname | tail -n2 | xargs | awk '{print $1".."$2}'))"
-          changes="${changes//' '/'%20'}"
           changes="${changes//'%'/'%25'}"
           changes="${changes//$'\n'/'%0A'}"
           changes="${changes//$'\r'/'%0D'}"
