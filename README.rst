@@ -96,25 +96,32 @@ bash
 
 .. code:: sh
 
+    shtab --shell=bash shtab.main.get_main_parser --error-unimportable \
+      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab
+
+Eager bash
+^^^^^^^^^^
+
+If both `shtab` and the module it's completing are globally importable, eager
+usage is an option. "Eager" means automatically updating completions each time a
+terminal is opened.
+
+.. code:: sh
+
     # Install locally
-    echo 'which shtab && eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       >> ~/.bash_completion
 
     # Install locally (lazy load for bash-completion>=2.8)
-    echo 'which shtab && eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       > "${BASH_COMPLETION_USER_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion}/completions/shtab"
 
     # Install system-wide
-    echo 'which shtab && eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
+    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       | sudo tee "$(pkg-config --variable=completionsdir bash-completion)"/shtab
 
     # Install system-wide (legacy)
-    echo 'which shtab && eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
-      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab
-
-    # Install once (will have to re-run if the target's CLI API changes,
-    # but doesn't need target to always be in $PYTHONPATH)
-    shtab --shell=bash shtab.main.get_main_parser --error-unimportable \
+    echo 'eval "$(shtab --shell=bash shtab.main.get_main_parser)"' \
       | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/shtab
 
 zsh
@@ -125,10 +132,12 @@ Note that ``zsh`` requires completion script files to be named ``_{EXECUTABLE}``
 
 .. code:: sh
 
-    # Install once (will have to re-run if the target's CLI API changes,
-    # but doesn't need target to always be in $PYTHONPATH)
+    # note the underscore `_` prefix
     shtab --shell=zsh shtab.main.get_main_parser --error-unimportable \
       | sudo tee /usr/local/share/zsh/site-functions/_shtab
+
+Eager zsh
+^^^^^^^^^
 
 To be more eager, place the generated script somewhere in ``$fpath``.
 For example, add these lines to the top of ``~/.zshrc``:
@@ -136,9 +145,8 @@ For example, add these lines to the top of ``~/.zshrc``:
 .. code:: sh
 
     mkdir -p ~/.zsh/completions
-    fpath=($fpath ~/.zsh/completions)
-    which shtab && shtab --shell=zsh shtab.main.get_main_parser \
-      > ~/.zsh/completions/_shtab
+    fpath=($fpath ~/.zsh/completions)  # must be before `compinit` lines
+    shtab --shell=zsh shtab.main.get_main_parser > ~/.zsh/completions/_shtab
 
 Examples
 --------
@@ -171,8 +179,8 @@ Assuming this code example is installed in ``MY_PROG.command.main``, simply run:
 .. code:: sh
 
     # bash
-    echo 'which shtab && eval "$(shtab --shell=bash MY_PROG.command.main.get_main_parser)"' \
-      >> ~/.bash_completion
+    shtab --shell=bash -u MY_PROG.command.main.get_main_parser \
+      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/MY_PROG
 
     # zsh
     shtab --shell=zsh -u MY_PROG.command.main.get_main_parser \
@@ -191,7 +199,7 @@ in a different virtual environment, you'd have to add a line somewhere
 appropriate (e.g. ``$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh``).
 
 By default, ``shtab`` will silently do nothing if it cannot import the requested
-application. Use ``--error-unimportable`` to noisily complain.
+application. Use ``-u, --error-unimportable`` to noisily complain.
 
 Advanced Configuration
 ----------------------
