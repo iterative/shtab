@@ -470,8 +470,10 @@ esac""",
             if opt.help != SUPPRESS
         ),
         commands_case="\n  ".join(
-            "{cmd}) _arguments ${root_prefix}_{cmd} ;;".format(
-                cmd=cmd.replace("-", "_"), root_prefix=root_prefix,
+            "{cmd_orig}) _arguments ${root_prefix}_{cmd} ;;".format(
+                cmd_orig=cmd,
+                cmd=cmd.replace("-", "_"),
+                root_prefix=root_prefix,
             )
             for cmd in sorted(subcommands)
         ),
