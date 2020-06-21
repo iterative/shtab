@@ -85,9 +85,9 @@ The only requirement is that external CLI applications provide an importable
 ``argparse.ArgumentParser`` object (or alternatively an importable function
 which returns a parser object). This may require a trivial code change.
 
-Once that's done, simply add
-``which shtab && eval "$(shtab --shell=bash your_cli_app.your_parser_object)"``
-to ``~/.bash_completion`` (assuming ``bash``).
+Once that's done, simply put the output of
+``shtab --shell=your_shell your_cli_app.your_parser_object`` somewhere your
+shell looks for completions.
 
 Below are various examples of enabling ``shtab``'s own tab completion scripts.
 
