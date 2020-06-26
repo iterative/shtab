@@ -43,7 +43,7 @@ setup(
     platforms=["any"],
     packages=["shtab"],
     provides=["shtab"],
-    install_requires=["argparse"],
+    install_requires=["argparse; python_version < '3.2'"],
     extras_require={"dev": requirements_dev},
     entry_points={"console_scripts": ["shtab=shtab:main.main"]},
     package_data={"shtab": ["LICENCE"]},
