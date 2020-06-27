@@ -4,7 +4,7 @@ import argparse
 import logging
 from importlib import import_module
 
-from .shtab import complete
+from . import complete
 
 log = logging.getLogger(__name__)
 
