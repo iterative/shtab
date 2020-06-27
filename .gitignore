@@ -2,6 +2,7 @@
 
 # Packages
 shtab.egg-info/
+/.eggs/
 /build/
 /dist/
 
