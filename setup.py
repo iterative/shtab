@@ -11,7 +11,7 @@ except ImportError:
 
 __author__ = "Casper da Costa-Luis <casper.dcl@physics.org>"
 __licence__ = "Apache-2.0"
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 src_dir = os.path.abspath(os.path.dirname(__file__))
 
 # Execute Makefile commands if specified
@@ -43,7 +43,10 @@ setup(
     platforms=["any"],
     packages=["shtab"],
     provides=["shtab"],
-    install_requires=["argparse; python_version < '3.2'"],
+    install_requires=[
+        "argparse; python_version < '2.7'"
+        " or ('3.0' <= python_version and python_version < '3.2')"
+    ],
     extras_require={"dev": requirements_dev},
     entry_points={"console_scripts": ["shtab=shtab:main.main"]},
     package_data={"shtab": ["LICENCE"]},
