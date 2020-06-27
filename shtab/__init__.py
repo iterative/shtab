@@ -14,6 +14,19 @@ from argparse import (
 )
 from functools import total_ordering
 
+# N.B. if running from local repo but `setuptools_scm` is not importable,
+# then __version__ will be wrongly obtained from an installed distribution
+try:  # running from local repo
+    from setuptools_scm import get_version
+
+    __version__ = get_version(root="..", relative_to=__file__)
+except (ImportError, LookupError):  # installed
+    from pkg_resources import DistributionNotFound, get_distribution
+
+    try:
+        __version__ = get_distribution(__name__).version
+    except DistributionNotFound:
+        __version__ = "UNKNOWN"
 __all__ = ["Optional", "Required", "Choice", "complete"]
 log = logging.getLogger(__name__)
 
