@@ -1,0 +1,47 @@
+name: Comment Bot
+on:
+  issue_comment:
+    types: [created, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+
+jobs:
+  tag:
+    if: startsWith(github.event.comment.body, '/tag ')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: React Seen
+      uses: actions/github-script@v2
+      with:
+        script: |
+          post = context.eventName === 'issue_comment' ? github.reactions.createForIssueComment : github.reactions.createForPullRequestReviewComment
+          post({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: context.payload.comment.id,
+            content: "eyes",
+          })
+    - name: Tag Commit
+      run: |
+        git config user.name tag-bot
+        git config user.email casperdcl@noreply.github.com
+        git tag $(echo "$BODY" | awk '{print $2" "$3}')
+        git push --tags
+      env:
+        BODY: ${{ github.event.comment.body }}
+    - name: React Success
+      uses: actions/github-script@v2
+      with:
+        script: |
+          post = context.eventName === 'issue_comment' ? github.reactions.createForIssueComment : github.reactions.createForPullRequestReviewComment
+          post({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: context.payload.comment.id,
+            content: "rocket",
+          })
+  always:
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo prevent failure when other jobs are skipped
