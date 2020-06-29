@@ -4,7 +4,7 @@ import argparse
 import logging
 from importlib import import_module
 
-from . import complete
+from . import __version__, complete
 
 log = logging.getLogger(__name__)
 
@@ -13,6 +13,9 @@ def get_main_parser():
     parser = argparse.ArgumentParser(prog="shtab")
     parser.add_argument(
         "parser", help="importable parser (or fuction returning parser)"
+    )
+    parser.add_argument(
+        "--version", action="version", version="%(prog)s " + __version__
     )
     parser.add_argument(
         "-s", "--shell", default="bash", choices=["bash", "zsh"]

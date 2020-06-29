@@ -35,3 +35,13 @@ string snippets without clashing between python's `str.format` and shell
 parameter expansion.
 
 The generated shell code itself is also meant to be readable.
+
+## Releases
+
+Tests and deployment are handled automatically by continuous integration. Simply
+tag a commit `v{major}.{minor}.{patch}` and wait for a draft release to appear
+at <https://github.com/iterative/shtab/releases>. Tidy up the draft's
+description before publishing it.
+
+Note that tagging a release is possible by commenting `/tag vM.m.p HASH` in an
+issue or PR.

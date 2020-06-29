@@ -11,7 +11,6 @@ except ImportError:
 
 __author__ = "Casper da Costa-Luis <casper.dcl@physics.org>"
 __licence__ = "Apache-2.0"
-__version__ = "1.0.4"
 src_dir = os.path.abspath(os.path.dirname(__file__))
 
 # Execute Makefile commands if specified
@@ -31,7 +30,8 @@ with io_open(requirements_dev, mode="r", encoding="utf-8") as fd:
     requirements_dev = fd.readlines()
 setup(
     name="shtab",
-    version=__version__,
+    use_scm_version=True,
+    setup_requires=["setuptools_scm"],
     description="Automatically generate shell tab completion scripts"
     " for python CLI apps",
     long_description=README_rst,

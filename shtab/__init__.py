@@ -14,6 +14,31 @@ from argparse import (
 )
 from functools import total_ordering
 
+
+def get_version_dist(name=__name__):
+    from pkg_resources import DistributionNotFound, get_distribution
+
+    try:
+        return get_distribution(name).version
+    except DistributionNotFound:
+        return "UNKNOWN"
+
+
+try:
+    from setuptools_scm import get_version
+except ImportError:
+    from os import path
+
+    ROOT = path.abspath(path.dirname(path.dirname(__file__)))
+    if path.exists(path.join(ROOT, ".git")):
+        __version__ = "UNKNOWN - please install setuptools_scm"
+    else:
+        __version__ = get_version_dist()
+else:
+    try:
+        __version__ = get_version(root="..", relative_to=__file__)
+    except LookupError:
+        __version__ = get_version_dist()
 __all__ = ["Optional", "Required", "Choice", "complete"]
 log = logging.getLogger(__name__)
 
