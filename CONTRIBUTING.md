@@ -12,17 +12,17 @@ shtab (master)$ python -m tests     # run all tests
 
 ## Layout
 
-Most of the magic lives in [shtab/shtab.py](./shtab/shtab.py).
+Most of the magic lives in [`shtab/__init__.py`](./shtab/__init__.py).
 
 - [shtab/](./shtab/)
-  - [shtab.py](./shtab/shtab.py)
+  - [`__init__.py`](./shtab/__init__.py)
     - `complete()` - primary API, calls shell-specific versions
     - `complete_bash()`
     - `complete_zsh()`
     - ...
     - `Optional()`, `Required()`, `Choice()` - helpers for advanced completion
       (e.g. dirs, files, `*.txt`)
-  - [main.py](./shtab/main.py)
+  - [`main.py`](./shtab/main.py)
     - `get_main_parser()` - returns `shtab`'s own parser object
     - `main()` - `shtab`'s own CLI application
 
