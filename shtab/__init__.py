@@ -150,7 +150,6 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
         """Flattened list of all `parser`'s optional actions."""
         return sum(
             (
-                # TODO: if hasattr(opt, "complete")?
                 opt.option_strings
                 for opt in parser._get_optional_actions()
                 if opt.help != SUPPRESS
