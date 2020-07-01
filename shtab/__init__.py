@@ -42,14 +42,12 @@ else:
 __all__ = ["Optional", "Required", "Choice", "complete"]
 log = logging.getLogger(__name__)
 
-CHOICE_FUNCTIONS_BASH = {
-    "file": "_shtab_compgen_files",
-    "directory": "_shtab_compgen_dirs",
+CHOICE_FUNCTIONS = {
+    "file": {"bash": "_shtab_compgen_files", "zsh": "_files"},
+    "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/"},
 }
-CHOICE_FUNCTIONS_ZSH = {
-    "file": "_files",
-    "directory": "_files -/",
-}
+FILE = CHOICE_FUNCTIONS["file"]
+DIRECTORY = DIR = CHOICE_FUNCTIONS["directory"]
 FLAG_OPTION = (
     _StoreConstAction,
     _HelpAction,
@@ -109,23 +107,19 @@ class Required(object):
     DIR = DIRECTORY = [Choice("directory", True)]
 
 
+def complete2pattern(opt_complete, shell, choice_type2fn):
+    return (
+        opt_complete.get(shell, "")
+        if isinstance(opt_complete, dict)
+        else choice_type2fn[opt_complete]
+    )
+
+
 def replace_format(string, **fmt):
     """Similar to `string.format(**fmt)` but ignores unknown `{key}`s."""
     for k, v in fmt.items():
         string = string.replace("{" + k + "}", v)
     return string
-
-
-def get_optional_actions(parser):
-    """Flattened list of all `parser`'s optional actions."""
-    return sum(
-        (
-            opt.option_strings
-            for opt in parser._get_optional_actions()
-            if opt.help != SUPPRESS
-        ),
-        [],
-    )
 
 
 def get_bash_commands(root_parser, root_prefix, choice_functions=None):
@@ -145,12 +139,23 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             # `add_argument('subcommand', choices=shtab.Required.FILE)`)
             _{root_parser.prog}_{subcommand}_COMPGEN=_shtab_compgen_files
     """
-    choice_type2fn = dict(CHOICE_FUNCTIONS_BASH)
+    choice_type2fn = {k: v["bash"] for k, v in CHOICE_FUNCTIONS.items()}
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
     fd = io.StringIO()
     root_options = []
+
+    def get_optional_actions(parser):
+        """Flattened list of all `parser`'s optional actions."""
+        return sum(
+            (
+                opt.option_strings
+                for opt in parser._get_optional_actions()
+                if opt.help != SUPPRESS
+            ),
+            [],
+        )
 
     def recurse(parser, prefix):
         positionals = parser._get_positional_actions()
@@ -176,6 +181,16 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
         for sub in positionals:
             if sub.choices:
                 log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
+                if hasattr(sub, "complete"):
+                    print(
+                        "{}_COMPGEN={}".format(
+                            prefix,
+                            complete2pattern(
+                                sub.complete, "bash", choice_type2fn
+                            ),
+                        ),
+                        file=fd,
+                    )
                 for cmd in sorted(sub.choices):
                     if isinstance(cmd, Choice):
                         log.debug(
@@ -342,7 +357,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     root_arguments = []
     subcommands = {}  # {cmd: {"help": help, "arguments": [arguments]}}
 
-    choice_type2fn = dict(CHOICE_FUNCTIONS_ZSH)
+    choice_type2fn = {k: v["zsh"] for k, v in CHOICE_FUNCTIONS.items()}
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
@@ -368,7 +383,9 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 ),
                 help=escape_zsh(opt.help or ""),
                 dest=opt.dest,
-                pattern=(
+                pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
+                if hasattr(opt, "complete")
+                else (
                     choice_type2fn[opt.choices[0].type]
                     if isinstance(opt.choices[0], Choice)
                     else "({})".format(" ".join(opt.choices))
@@ -380,10 +397,12 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
         )
 
     def format_positional(opt):
-        return '"{nargs}:{help}:{choices}"'.format(
+        return '"{nargs}:{help}:{pattern}"'.format(
             nargs={"+": "*", "*": "*"}.get(opt.nargs, ""),
             help=escape_zsh((opt.help or opt.dest).strip().split("\n")[0]),
-            choices=(
+            pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
+            if hasattr(opt, "complete")
+            else (
                 choice_type2fn[opt.choices[0].type]
                 if isinstance(opt.choices[0], Choice)
                 else "({})".format(" ".join(opt.choices))
@@ -529,10 +548,15 @@ def complete(
     shell  : str (bash/zsh)
     root_prefix  : str, prefix for shell functions to avoid clashes
       (default: "_{parser.prog}")
-    preamble  : str, prepended to generated script
-    choice_functions  : dict, maps custom `shtab.Choice.type`s to
-      completion functions (possibly defined in `preamble`)
+    preamble  : dict, mapping shell to text to prepend to generated script
+      (e.g. `{"bash": "_myprog_custom_function(){ echo hello }"}`)
+    choice_functions  : deprecated.
+
+    N.B. `parser.add_argument().complete = ...` can be used to define custom
+    completions (e.g. filenames). See <../examples/pathcomplete.py>.
     """
+    if isinstance(preamble, dict):
+        preamble = preamble.get(shell, "")
     if shell == "bash":
         return complete_bash(
             parser,
