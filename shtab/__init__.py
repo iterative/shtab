@@ -105,6 +105,14 @@ class Required(object):
     DIR = DIRECTORY = [Choice("directory", True)]
 
 
+def complete2pattern(opt_complete, shell, choice_type2fn):
+    return (
+        opt_complete.get(shell, "")
+        if isinstance(opt_complete, dict)
+        else choice_type2fn[opt_complete]
+    )
+
+
 def replace_format(string, **fmt):
     """Similar to `string.format(**fmt)` but ignores unknown `{key}`s."""
     for k, v in fmt.items():
@@ -364,7 +372,9 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 ),
                 help=escape_zsh(opt.help or ""),
                 dest=opt.dest,
-                pattern=(
+                pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
+                if hasattr(opt, "complete")
+                else (
                     choice_type2fn[opt.choices[0].type]
                     if isinstance(opt.choices[0], Choice)
                     else "({})".format(" ".join(opt.choices))
@@ -376,10 +386,12 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
         )
 
     def format_positional(opt):
-        return '"{nargs}:{help}:{choices}"'.format(
+        return '"{nargs}:{help}:{pattern}"'.format(
             nargs={"+": "*", "*": "*"}.get(opt.nargs, ""),
             help=escape_zsh((opt.help or opt.dest).strip().split("\n")[0]),
-            choices=(
+            pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
+            if hasattr(opt, "complete")
+            else (
                 choice_type2fn[opt.choices[0].type]
                 if isinstance(opt.choices[0], Choice)
                 else "({})".format(" ".join(opt.choices))
