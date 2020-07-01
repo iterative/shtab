@@ -120,18 +120,6 @@ def replace_format(string, **fmt):
     return string
 
 
-def get_optional_actions(parser):
-    """Flattened list of all `parser`'s optional actions."""
-    return sum(
-        (
-            opt.option_strings
-            for opt in parser._get_optional_actions()
-            if opt.help != SUPPRESS
-        ),
-        [],
-    )
-
-
 def get_bash_commands(root_parser, root_prefix, choice_functions=None):
     """
     Recursive subcommand parser traversal, printing bash helper syntax.
@@ -155,6 +143,18 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
 
     fd = io.StringIO()
     root_options = []
+
+    def get_optional_actions(parser):
+        """Flattened list of all `parser`'s optional actions."""
+        return sum(
+            (
+                # TODO: if hasattr(opt, "complete")?
+                opt.option_strings
+                for opt in parser._get_optional_actions()
+                if opt.help != SUPPRESS
+            ),
+            [],
+        )
 
     def recurse(parser, prefix):
         positionals = parser._get_positional_actions()
@@ -180,6 +180,16 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
         for sub in positionals:
             if sub.choices:
                 log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
+                if hasattr(sub, "complete"):
+                    print(
+                        "{}_COMPGEN={}".format(
+                            prefix,
+                            complete2pattern(
+                                sub.complete, "bash", choice_type2fn
+                            ),
+                        ),
+                        file=fd,
+                    )
                 for cmd in sorted(sub.choices):
                     if isinstance(cmd, Choice):
                         log.debug(
@@ -540,6 +550,9 @@ def complete(
     preamble  : dict, mapping shell to text to prepend to generated script
       (e.g. `{"bash": "_myprog_custom_function(){ echo hello }"}`)
     choice_functions  : deprecated.
+
+    N.B. `parser.add_argument().complete = ...` can be used to define custom
+    completions (e.g. filenames). See <../examples/pathcomplete.py>.
     """
     if isinstance(preamble, dict):
         preamble = preamble.get(shell, "")
