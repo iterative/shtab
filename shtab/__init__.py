@@ -46,6 +46,8 @@ CHOICE_FUNCTIONS = {
     "file": {"bash": "_shtab_compgen_files", "zsh": "_files"},
     "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/"},
 }
+FILE = CHOICE_FUNCTIONS["file"]
+DIRECTORY = DIR = CHOICE_FUNCTIONS["directory"]
 FLAG_OPTION = (
     _StoreConstAction,
     _HelpAction,

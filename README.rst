@@ -228,9 +228,9 @@ Add direct support to scripts for a little more configurability:
             choices=["bash", "zsh"],
             help="prints completion script",
         )
-        # "file" & "directory" tab complete
-        parser.add_argument("file", nargs="?").complete = "file"
-        parser.add_argument("--dir", default=".").complete = "directory"
+        # file & directory tab complete
+        parser.add_argument("file", nargs="?").complete = shtab.FILE
+        parser.add_argument("--dir", default=".").complete = shtab.DIRECTORY
         return parser
 
     if __name__ == "__main__":

@@ -35,8 +35,8 @@ def get_main_parser():
     )
     # `*.txt` file tab completion
     parser.add_argument("input_txt", nargs="?").complete = TXT_FILE
-    # "file" tab completion builtin shortcut
-    parser.add_argument("-i", "--input-file").complete = "file"
+    # file tab completion builtin shortcut
+    parser.add_argument("-i", "--input-file").complete = shtab.FILE
     parser.add_argument(
         "-o",
         "--output-name",
@@ -44,7 +44,7 @@ def get_main_parser():
             "output file name. Completes directory names to avoid users"
             " accidentally overwriting existing files."
         ),
-    ).complete = "directory"  # "directory" tab completion builtin shortcut
+    ).complete = shtab.DIRECTORY  # directory tab completion builtin shortcut
     return parser
 
 

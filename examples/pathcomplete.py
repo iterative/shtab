@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 `argparse`-based CLI app using
-`add_argument().complete = "file" or "directory"` for file/dir tab completion.
+`add_argument().complete = shtab.(FILE|DIR)` for file/dir tab completion.
 
 See `customcomplete.py` for a more advanced version.
 """
@@ -18,9 +18,9 @@ def get_main_parser():
         choices=["bash", "zsh"],
         help="prints completion script",
     )
-    # "file" & "directory" tab complete
-    parser.add_argument("file", nargs="?").complete = "file"
-    parser.add_argument("--dir", default=".").complete = "directory"
+    # file & directory tab complete
+    parser.add_argument("file", nargs="?").complete = shtab.FILE
+    parser.add_argument("--dir", default=".").complete = shtab.DIRECTORY
     return parser
 
 
