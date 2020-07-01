@@ -24,12 +24,13 @@ jobs:
           })
     - name: Tag Commit
       run: |
-        git config user.name tag-bot
-        git config user.email casperdcl@noreply.github.com
-        git tag $(echo "$BODY" | awk '{print $2" "$3}')
-        git push --tags
+        git clone https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY} repo
+        git -C repo tag $(echo "$BODY" | awk '{print $2" "$3}')
+        git -C repo push --tags
+        rm -rf repo
       env:
         BODY: ${{ github.event.comment.body }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     - name: React Success
       uses: actions/github-script@v2
       with:
