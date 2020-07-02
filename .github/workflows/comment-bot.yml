@@ -15,13 +15,22 @@ jobs:
       uses: actions/github-script@v2
       with:
         script: |
-          post = context.eventName === 'issue_comment' ? github.reactions.createForIssueComment : github.reactions.createForPullRequestReviewComment
+          perm = github.repos.getCollaboratorPermissionLevel({
+            owner: context.repo.owner, repo: context.repo.repo,
+            username: context.payload.comment.user.login})
+          post = (context.eventName === 'issue_comment'
+            ? github.reactions.createForIssueComment
+            : github.reactions.createForPullRequestReviewComment)
+
+          if (!['admin', 'write'].includes(perm)){
+            post({
+              owner: context.repo.owner, repo: context.repo.repo,
+              comment_id: context.payload.comment.id, content: "laugh"})
+            throw "Permission denied for user " + context.payload.comment.user.login
+          }
           post({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            comment_id: context.payload.comment.id,
-            content: "eyes",
-          })
+            owner: context.repo.owner, repo: context.repo.repo,
+            comment_id: context.payload.comment.id, content: "eyes"})
     - name: Tag Commit
       run: |
         git clone https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY} repo
@@ -35,13 +44,12 @@ jobs:
       uses: actions/github-script@v2
       with:
         script: |
-          post = context.eventName === 'issue_comment' ? github.reactions.createForIssueComment : github.reactions.createForPullRequestReviewComment
+          post = (context.eventName === 'issue_comment'
+            ? github.reactions.createForIssueComment
+            : github.reactions.createForPullRequestReviewComment)
           post({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            comment_id: context.payload.comment.id,
-            content: "rocket",
-          })
+            owner: context.repo.owner, repo: context.repo.repo,
+            comment_id: context.payload.comment.id, content: "rocket"})
   always:
     runs-on: ubuntu-latest
     steps:
