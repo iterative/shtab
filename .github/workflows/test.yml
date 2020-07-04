@@ -45,7 +45,7 @@ jobs:
         echo "::set-output name=asset_path::$(ls dist/*.whl)"
         echo "::set-output name=asset_name::$(basename dist/*.whl)"
         git fetch --unshallow --tags
-        git log --format='format:%d %B %N' $(git tag --sort=v:refname | tail -n2 | xargs | awk '{print $1".."$2}') > _CHANGES.md
+        git log --pretty='format:%d%n- %s%n%b---' $(git tag --sort=v:refname | tail -n2 | head -n1)..HEAD > _CHANGES.md
     - id: create_release
       uses: actions/create-release@v1
       env:

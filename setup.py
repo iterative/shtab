@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-import sys
 from io import open as io_open
 
 try:
@@ -12,14 +11,6 @@ except ImportError:
 __author__ = "Casper da Costa-Luis <casper.dcl@physics.org>"
 __licence__ = "Apache-2.0"
 src_dir = os.path.abspath(os.path.dirname(__file__))
-
-# Execute Makefile commands if specified
-if sys.argv[1].lower().strip() == "make":
-    import pymake
-
-    fpath = os.path.join(src_dir, "Makefile")
-    pymake.main(["-f", fpath] + sys.argv[2:])
-    sys.exit(0)
 
 README_rst = ""
 fndoc = os.path.join(src_dir, "README.rst")
