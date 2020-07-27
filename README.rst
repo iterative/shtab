@@ -1,3 +1,5 @@
+|Logo|
+
 shtab
 =====
 
@@ -316,6 +318,8 @@ See
 for more guidance.
 
 |Hits|
+
+.. |Logo| image:: https://github.com/iterative/shtab/blob/master/meta/logo.png
 
 .. |Tests| image:: https://github.com/iterative/shtab/workflows/Test/badge.svg
    :target: https://github.com/iterative/shtab/actions
