@@ -2,6 +2,8 @@ from __future__ import absolute_import, print_function
 
 import argparse
 import logging
+import os
+import sys
 from importlib import import_module
 
 from . import __version__, complete
@@ -43,6 +45,8 @@ def main(argv=None):
     log.debug(args)
 
     module, other_parser = args.parser.rsplit(".", 1)
+    if sys.path and sys.path[0]:  # not blank so not searching curdir
+        sys.path.insert(1, os.curdir)
     try:
         module = import_module(module)
     except ImportError as err:
