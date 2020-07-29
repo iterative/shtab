@@ -14,6 +14,7 @@ import shtab
 from shtab.main import get_main_parser, main
 
 SUPPORTED_SHELLS = "bash", "zsh"
+fix_shell = pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
 
 
 class Bash(object):
@@ -70,7 +71,7 @@ def test_choices():
     assert "" not in shtab.Required.FILE
 
 
-@pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
+@fix_shell
 def test_main(shell, caplog):
     with caplog.at_level(logging.INFO):
         main(["-s", shell, "shtab.main.get_main_parser"])
@@ -78,7 +79,34 @@ def test_main(shell, caplog):
     assert not caplog.record_tuples
 
 
-@pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
+@fix_shell
+def test_prog_override(shell, caplog, capsys):
+    with caplog.at_level(logging.INFO):
+        main(["-s", shell, "--prog", "foo", "shtab.main.get_main_parser"])
+
+    captured = capsys.readouterr()
+    assert not captured.err
+    if shell == "bash":
+        assert "complete -o nospace -F _shtab_shtab foo" in captured.out
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
+def test_prefix_override(shell, caplog, capsys):
+    with caplog.at_level(logging.INFO):
+        main(["-s", shell, "--prefix", "foo", "shtab.main.get_main_parser"])
+
+    captured = capsys.readouterr()
+    assert not captured.err
+    if shell == "bash":
+        shell = Bash(captured.out)
+        shell.compgen('-W "$_shtab_foo_options_"', "--h", "--help")
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
 def test_complete(shell, caplog):
     parser = get_main_parser()
     with caplog.at_level(logging.INFO):
@@ -92,7 +120,7 @@ def test_complete(shell, caplog):
     assert not caplog.record_tuples
 
 
-@pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
+@fix_shell
 def test_positional_choices(shell, caplog):
     parser = ArgumentParser(prog="test")
     parser.add_argument("posA", choices=["one", "two"])
