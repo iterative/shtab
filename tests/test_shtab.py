@@ -6,6 +6,7 @@ Currently runnable via nosetests, e.g.:
 """
 import logging
 import subprocess
+from argparse import ArgumentParser
 
 import pytest
 
@@ -70,6 +71,14 @@ def test_choices():
 
 
 @pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
+def test_main(shell, caplog):
+    with caplog.at_level(logging.INFO):
+        main(["-s", shell, "shtab.main.get_main_parser"])
+
+    assert not caplog.record_tuples
+
+
+@pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
 def test_complete(shell, caplog):
     parser = get_main_parser()
     with caplog.at_level(logging.INFO):
@@ -84,8 +93,15 @@ def test_complete(shell, caplog):
 
 
 @pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
-def test_main(shell, caplog):
+def test_positional_choices(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    parser.add_argument("posA", choices=["one", "two"])
     with caplog.at_level(logging.INFO):
-        main(["-s", shell, "shtab.main.get_main_parser"])
+        completion = shtab.complete(parser, shell=shell)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.compgen('-W "$_shtab_test_commands_"', "o", "one")
 
     assert not caplog.record_tuples

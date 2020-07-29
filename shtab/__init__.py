@@ -204,8 +204,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                             ),
                             file=fd,
                         )
-                    else:
-                        assert isinstance(sub.choices, dict)
+                    elif isinstance(sub.choices, dict):
                         log.debug("subcommand:%s", cmd)
                         if sub.choices[cmd].add_help:
                             commands.append(cmd)
@@ -215,6 +214,8 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                             )
                         else:
                             log.debug("skip:subcommand:%s", cmd)
+                    else:
+                        commands.append(cmd)
             else:
                 log.debug("uncompletable:{}:{}".format(prefix, sub.dest))
 
