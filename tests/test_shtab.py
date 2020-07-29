@@ -102,8 +102,6 @@ def test_positional_choices(shell, caplog):
 
     if shell == "bash":
         shell = Bash(completion)
-        # ideally should check completion
-        # https://github.com/iterative/shtab/issues/11
-        shell.compgen('-W "$_shtab_test_options_"', "", "-h --help")
+        shell.compgen('-W "$_shtab_test_commands_"', "o", "one")
 
     assert not caplog.record_tuples
