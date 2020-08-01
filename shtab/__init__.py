@@ -564,9 +564,8 @@ def complete(
     try:
         driver = globals()["complete_" + shell]
     except KeyError:
-        raise KeyError(
-            "shell (%s) must be one of {%s}"
-            % (shell, ",".join(SUPPORTED_SHELLS))
+        raise NotImplementedError(
+            "shell (%s) must be in {%s}" % (shell, ",".join(SUPPORTED_SHELLS))
         )
     return driver(
         parser,
@@ -574,7 +573,6 @@ def complete(
         preamble=preamble,
         choice_functions=choice_functions,
     )
-    raise NotImplementedError(shell)
 
 
 class PrintCompletionAction(Action):
