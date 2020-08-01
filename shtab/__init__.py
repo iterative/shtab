@@ -3,8 +3,10 @@ from __future__ import print_function
 import io
 import logging
 import re
+import sys
 from argparse import (
     SUPPRESS,
+    Action,
     _AppendAction,
     _AppendConstAction,
     _CountAction,
@@ -573,3 +575,33 @@ def complete(
         choice_functions=choice_functions,
     )
     raise NotImplementedError(shell)
+
+
+class PrintCompletionAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        print(complete(parser, values))
+        parser.exit(0)
+
+
+def add_argument_to(
+    parser,
+    option_string="--print-completion-shell",
+    help="print shell completion script",
+):
+    """
+    parser  : argparse.ArgumentParser
+    option_string  : str or list[str]
+    help  : str
+    """
+    if isinstance(
+        option_string, str if sys.version_info[0] > 2 else basestring  # NOQA
+    ):
+        option_string = [option_string]
+    kwargs = dict(
+        choices=SUPPORTED_SHELLS,
+        default=None,
+        help=help,
+        action=PrintCompletionAction,
+    )
+    parser.add_argument(*option_string, **kwargs)
+    return parser
