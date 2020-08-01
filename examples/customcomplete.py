@@ -27,12 +27,7 @@ _shtab_greeter_compgen_TXTFiles() {
 
 def get_main_parser():
     parser = argparse.ArgumentParser(prog="customcomplete")
-    parser.add_argument(
-        "-s",
-        "--print-completion-shell",
-        choices=shtab.SUPPORTED_SHELLS,
-        help="prints completion script",
-    )
+    shtab.add_argument_to(parser, ["-s", "--print-completion-shell"])  # magic!
     # `*.txt` file tab completion
     parser.add_argument("input_txt", nargs="?").complete = TXT_FILE
     # file tab completion builtin shortcut
@@ -51,14 +46,7 @@ def get_main_parser():
 if __name__ == "__main__":
     parser = get_main_parser()
     args = parser.parse_args()
-
-    # completion magic
-    shell = args.print_completion_shell
-    if shell:
-        script = shtab.complete(parser, shell=shell, preamble=PREAMBLE)
-        print(script)
-    else:
-        print(
-            "received <input_txt>=%r --output-dir=%r --output-name=%r"
-            % (args.input_txt, args.output_dir, args.output_name)
-        )
+    print(
+        "received <input_txt>=%r --input-file=%r --output-name=%r"
+        % (args.input_txt, args.input_file, args.output_name)
+    )

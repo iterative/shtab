@@ -224,12 +224,7 @@ Add direct support to scripts for a little more configurability:
 
     def get_main_parser():
         parser = argparse.ArgumentParser(prog="pathcomplete")
-        parser.add_argument(
-            "-s",
-            "--print-completion-shell",
-            choices=shtab.SUPPORTED_SHELLS,
-            help="prints completion script",
-        )
+        shtab.add_argument_to(parser, ["-s", "--print-completion-shell"])  # magic!
         # file & directory tab complete
         parser.add_argument("file", nargs="?").complete = shtab.FILE
         parser.add_argument("--dir", default=".").complete = shtab.DIRECTORY
@@ -262,8 +257,6 @@ object from `docopt <https://pypi.org/project/docopt>`_ syntax:
 
     Options:
       -g, --goodbye  : Say "goodbye" (instead of "hello")
-      -b, --print-bash-completion  : Output a bash tab-completion script
-      -z, --print-zsh-completion  : Output a zsh tab-completion script
 
     Arguments:
       <you>  : Your name [default: Anon]
@@ -272,15 +265,9 @@ object from `docopt <https://pypi.org/project/docopt>`_ syntax:
     import sys, argopt, shtab  # NOQA
 
     parser = argopt.argopt(__doc__)
+    shtab.add_argument_to(parser, ["-s", "--print-completion-shell"])  # magic!
     if __name__ == "__main__":
         args = parser.parse_args()
-        if args.print_bash_completion:
-            print(shtab.complete(parser, shell="bash"))
-            sys.exit(0)
-        if args.print_zsh_completion:
-            print(shtab.complete(parser, shell="zsh"))
-            sys.exit(0)
-
         msg = "k thx bai!" if args.goodbye else "hai!"
         print("{} says '{}' to {}".format(args.me, msg, args.you))
 
