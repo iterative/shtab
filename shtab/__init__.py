@@ -558,18 +558,15 @@ def complete(
     """
     if isinstance(preamble, dict):
         preamble = preamble.get(shell, "")
-    if shell == "bash":
-        return complete_bash(
-            parser,
-            root_prefix=root_prefix,
-            preamble=preamble,
-            choice_functions=choice_functions,
-        )
-    if shell == "zsh":
-        return complete_zsh(
-            parser,
-            root_prefix=root_prefix,
-            preamble=preamble,
-            choice_functions=choice_functions,
-        )
+    completers = {"bash": complete_bash, "zsh": complete_zsh}
+    try:
+        driver = completers[shell]
+    except KeyError:
+        raise KeyError("shell must be one of {%s}" % ",".join(completers))
+    return driver(
+        parser,
+        root_prefix=root_prefix,
+        preamble=preamble,
+        choice_functions=choice_functions,
+    )
     raise NotImplementedError(shell)
