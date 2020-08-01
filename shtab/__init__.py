@@ -607,7 +607,7 @@ class PrintCompletionAction(Action):
 
 def add_argument_to(
     parser,
-    option_string="--print-completion-shell",
+    option_string="--print-completion",
     help="print shell completion script",
 ):
     """

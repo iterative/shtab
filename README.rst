@@ -93,7 +93,7 @@ There are two ways of using ``shtab``:
 - `Library Usage`_: as a library integrated into your CLI application
 
   - adds a couple of lines to your application
-  - argument mode: end-users execute ``your_cli_app --print-completion-shell {bash,zsh}``
+  - argument mode: end-users execute ``your_cli_app --print-completion {bash,zsh}``
   - subparser mode: end-users execute ``your_cli_app completion {bash,zsh}``
 
 CLI Usage
@@ -245,7 +245,7 @@ argparse
 
     def get_main_parser():
         parser = argparse.ArgumentParser(prog="pathcomplete")
-        shtab.add_argument_to(parser, ["-s", "--print-completion-shell"])  # magic!
+        shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!
         # file & directory tab complete
         parser.add_argument("file", nargs="?").complete = shtab.FILE
         parser.add_argument("--dir", default=".").complete = shtab.DIRECTORY
@@ -286,7 +286,7 @@ object from `docopt <https://pypi.org/project/docopt>`_ syntax:
     import sys, argopt, shtab  # NOQA
 
     parser = argopt.argopt(__doc__)
-    shtab.add_argument_to(parser, ["-s", "--print-completion-shell"])  # magic!
+    shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!
     if __name__ == "__main__":
         args = parser.parse_args()
         msg = "k thx bai!" if args.goodbye else "hai!"

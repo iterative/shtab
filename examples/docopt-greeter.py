@@ -14,7 +14,7 @@ Arguments:
 import sys, argopt, shtab  # NOQA
 
 parser = argopt.argopt(__doc__)
-shtab.add_argument_to(parser, ["-s", "--print-completion-shell"])  # magic!
+shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!
 if __name__ == "__main__":
     args = parser.parse_args()
 
