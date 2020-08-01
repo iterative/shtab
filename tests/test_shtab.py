@@ -13,8 +13,7 @@ import pytest
 import shtab
 from shtab.main import get_main_parser, main
 
-SUPPORTED_SHELLS = "bash", "zsh"
-fix_shell = pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
+fix_shell = pytest.mark.parametrize("shell", shtab.SUPPORTED_SHELLS)
 
 
 class Bash(object):

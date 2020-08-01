@@ -41,10 +41,18 @@ else:
         __version__ = get_version(root="..", relative_to=__file__)
     except LookupError:
         __version__ = get_version_dist()
-__all__ = ["Optional", "Required", "Choice", "complete"]
+__all__ = [
+    "complete",
+    "add_argument_to",
+    "SUPPORTED_SHELLS",
+    "FILE",
+    "DIRECTORY",
+    "DIR",
+]
 log = logging.getLogger(__name__)
 
-SUPPORTED_SHELLS = ("bash", "zsh")
+SUPPORTED_SHELLS = []
+_SUPPORTED_COMPLETERS = {}
 CHOICE_FUNCTIONS = {
     "file": {"bash": "_shtab_compgen_files", "zsh": "_files"},
     "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/"},
@@ -61,6 +69,25 @@ FLAG_OPTION = (
 OPTION_END = _HelpAction, _VersionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
 RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])")  # excessive but safe
+
+
+def mark_completer(shell):
+    def wrapper(func):
+        if shell not in SUPPORTED_SHELLS:
+            SUPPORTED_SHELLS.append(shell)
+        _SUPPORTED_COMPLETERS[shell] = func
+        return func
+
+    return wrapper
+
+
+def get_completer(shell):
+    try:
+        return _SUPPORTED_COMPLETERS[shell]
+    except KeyError:
+        raise NotImplementedError(
+            "shell (%s) must be in {%s}" % (shell, ",".join(SUPPORTED_SHELLS))
+        )
 
 
 @total_ordering
@@ -229,6 +256,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
     return recurse(root_parser, root_prefix), root_options, fd.getvalue()
 
 
+@mark_completer("bash")
 def complete_bash(
     parser, root_prefix=None, preamble="", choice_functions=None,
 ):
@@ -350,6 +378,7 @@ def escape_zsh(string):
     return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", string)
 
 
+@mark_completer("zsh")
 def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     """
     Returns zsh syntax autocompletion script.
@@ -561,12 +590,7 @@ def complete(
     """
     if isinstance(preamble, dict):
         preamble = preamble.get(shell, "")
-    try:
-        driver = globals()["complete_" + shell]
-    except KeyError:
-        raise NotImplementedError(
-            "shell (%s) must be in {%s}" % (shell, ",".join(SUPPORTED_SHELLS))
-        )
+    driver = get_completer(shell)
     return driver(
         parser,
         root_prefix=root_prefix,
