@@ -227,7 +227,7 @@ Add direct support to scripts for a little more configurability:
         parser.add_argument(
             "-s",
             "--print-completion-shell",
-            choices=["bash", "zsh"],
+            choices=shtab.SUPPORTED_SHELLS,
             help="prints completion script",
         )
         # file & directory tab complete

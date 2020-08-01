@@ -42,6 +42,7 @@ else:
 __all__ = ["Optional", "Required", "Choice", "complete"]
 log = logging.getLogger(__name__)
 
+SUPPORTED_SHELLS = ("bash", "zsh")
 CHOICE_FUNCTIONS = {
     "file": {"bash": "_shtab_compgen_files", "zsh": "_files"},
     "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/"},
@@ -558,11 +559,13 @@ def complete(
     """
     if isinstance(preamble, dict):
         preamble = preamble.get(shell, "")
-    completers = {"bash": complete_bash, "zsh": complete_zsh}
     try:
-        driver = completers[shell]
+        driver = globals()["complete_" + shell]
     except KeyError:
-        raise KeyError("shell must be one of {%s}" % ",".join(completers))
+        raise KeyError(
+            "shell (%s) must be one of {%s}"
+            % (shell, ",".join(SUPPORTED_SHELLS))
+        )
     return driver(
         parser,
         root_prefix=root_prefix,

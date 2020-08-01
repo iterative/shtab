@@ -30,7 +30,7 @@ def get_main_parser():
     parser.add_argument(
         "-s",
         "--print-completion-shell",
-        choices=["bash", "zsh"],
+        choices=shtab.SUPPORTED_SHELLS,
         help="prints completion script",
     )
     # `*.txt` file tab completion
