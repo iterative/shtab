@@ -590,8 +590,8 @@ def complete(
     """
     if isinstance(preamble, dict):
         preamble = preamble.get(shell, "")
-    driver = get_completer(shell)
-    return driver(
+    completer = get_completer(shell)
+    return completer(
         parser,
         root_prefix=root_prefix,
         preamble=preamble,

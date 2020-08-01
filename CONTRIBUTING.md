@@ -20,8 +20,8 @@ Most of the magic lives in [`shtab/__init__.py`](./shtab/__init__.py).
     - `complete_bash()`
     - `complete_zsh()`
     - ...
-    - `Optional()`, `Required()`, `Choice()` - helpers for advanced completion
-      (e.g. dirs, files, `*.txt`)
+    - `add_argument_to()` - convenience function for library integration
+    - `Optional()`, `Required()`, `Choice()` - legacy helpers for advanced completion (e.g. dirs, files, `*.txt`)
   - [`main.py`](./shtab/main.py)
     - `get_main_parser()` - returns `shtab`'s own parser object
     - `main()` - `shtab`'s own CLI application
