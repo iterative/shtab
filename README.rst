@@ -83,6 +83,22 @@ First run ``brew install bash-completion``, then add the following to
 Usage
 -----
 
+There are two ways of using ``shtab``:
+
+- `CLI Usage`_: ``shtab``'s own CLI interface for external applications
+
+  - may not require any code modifications whatsoever
+  - end-users execute ``shtab your_cli_app.your_parser_object``
+
+- `Library Usage`_: as a library integrated into your CLI application
+
+  - adds a couple of lines to your application
+  - argument mode: end-users execute ``your_cli_app --print-completion-shell {bash,zsh}``
+  - subparser mode: end-users execute ``your_cli_app completion {bash,zsh}``
+
+CLI Usage
+---------
+
 The only requirement is that external CLI applications provide an importable
 ``argparse.ArgumentParser`` object (or alternatively an importable function
 which returns a parser object). This may require a trivial code change.
@@ -203,18 +219,23 @@ appropriate (e.g. ``$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh``).
 By default, ``shtab`` will silently do nothing if it cannot import the requested
 application. Use ``-u, --error-unimportable`` to noisily complain.
 
-Advanced Configuration
-----------------------
+Library Usage
+-------------
 
 See the `examples/ <https://github.com/iterative/shtab/tree/master/examples>`_
 folder for more.
 
 Complex projects with subparsers and custom completions for paths matching
 certain patterns (e.g. ``--file=*.txt``) are fully supported (see
+`examples/customcomplete.py <https://github.com/iterative/shtab/tree/master/examples/customcomplete.py>`_
+or even
 `iterative/dvc:command/completion.py <https://github.com/iterative/dvc/blob/master/dvc/command/completion.py>`_
 for example).
 
 Add direct support to scripts for a little more configurability:
+
+argparse
+~~~~~~~~
 
 .. code:: python
 

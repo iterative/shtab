@@ -28,7 +28,7 @@ Most of the magic lives in [`shtab/__init__.py`](./shtab/__init__.py).
 
 Given that the number of completions a program may need would likely be less
 than a million, the focus is on readability rather than premature speed
-optimisations.
+optimisations. The generated code itself, on the other had, should be fast.
 
 Helper functions such as `replace_format` allows use of curly braces `{}` in
 string snippets without clashing between python's `str.format` and shell

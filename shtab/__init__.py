@@ -588,7 +588,8 @@ def add_argument_to(
 ):
     """
     parser  : argparse.ArgumentParser
-    option_string  : str or list[str]
+    option_string  : str or list[str], iff positional (no `-` prefix) then
+      `parser` is assumed to actually be a subparser (subcommand mode)
     help  : str
     """
     if isinstance(
@@ -601,5 +602,7 @@ def add_argument_to(
         help=help,
         action=PrintCompletionAction,
     )
+    if option_string[0][0] != "-":  # subparser mode
+        kwargs.update(default=SUPPORTED_SHELLS[0], nargs="?")
     parser.add_argument(*option_string, **kwargs)
     return parser

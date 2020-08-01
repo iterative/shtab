@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-`argparse`-based CLI app with custom file completion.
+`argparse`-based CLI app with custom file completion as well as subparsers.
 
 See `pathcomplete.py` for a more basic version.
 """
@@ -26,8 +26,13 @@ _shtab_greeter_compgen_TXTFiles() {
 
 
 def get_main_parser():
-    parser = argparse.ArgumentParser(prog="customcomplete")
-    shtab.add_argument_to(parser, ["-s", "--print-completion-shell"])  # magic!
+    main_parser = argparse.ArgumentParser(prog="customcomplete")
+    subparsers = main_parser.add_subparsers()
+
+    parser = subparsers.add_parser("completion")
+    shtab.add_argument_to(parser, "shell")  # magic!
+
+    parser = subparsers.add_parser("process")
     # `*.txt` file tab completion
     parser.add_argument("input_txt", nargs="?").complete = TXT_FILE
     # file tab completion builtin shortcut
@@ -40,7 +45,7 @@ def get_main_parser():
             " accidentally overwriting existing files."
         ),
     ).complete = shtab.DIRECTORY  # directory tab completion builtin shortcut
-    return parser
+    return main_parser
 
 
 if __name__ == "__main__":
