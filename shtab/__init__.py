@@ -209,18 +209,16 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             print("{}='{}'".format(prefix, opts), file=fd)
 
         for sub in positionals:
+            if hasattr(sub, "complete"):
+                print(
+                    "{}_COMPGEN={}".format(
+                        prefix,
+                        complete2pattern(sub.complete, "bash", choice_type2fn),
+                    ),
+                    file=fd,
+                )
             if sub.choices:
                 log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
-                if hasattr(sub, "complete"):
-                    print(
-                        "{}_COMPGEN={}".format(
-                            prefix,
-                            complete2pattern(
-                                sub.complete, "bash", choice_type2fn
-                            ),
-                        ),
-                        file=fd,
-                    )
                 for cmd in sorted(sub.choices):
                     if isinstance(cmd, Choice):
                         log.debug(
