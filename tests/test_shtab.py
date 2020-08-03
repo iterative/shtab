@@ -132,3 +132,12 @@ def test_positional_choices(shell, caplog):
         shell.compgen('-W "$_shtab_test_commands_"', "o", "one")
 
     assert not caplog.record_tuples
+
+
+def test_get_completer():
+    try:
+        shtab.get_completer("invalid")
+    except NotImplementedError:
+        pass
+    else:
+        raise NotImplementedError("invalid")
