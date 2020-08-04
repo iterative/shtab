@@ -206,12 +206,12 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             opts += get_optional_actions(parser)
             # use list rather than set to maintain order
             opts = " ".join(opts)
-            print("{}='{}'".format(prefix, opts), file=fd)
+            print(u"{}='{}'".format(prefix, opts), file=fd)
 
         for sub in positionals:
             if hasattr(sub, "complete"):
                 print(
-                    "{}_COMPGEN={}".format(
+                    u"{}_COMPGEN={}".format(
                         prefix,
                         complete2pattern(sub.complete, "bash", choice_type2fn),
                     ),
@@ -227,7 +227,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                             )
                         )
                         print(
-                            "{}_COMPGEN={}".format(
+                            u"{}_COMPGEN={}".format(
                                 prefix, choice_type2fn[cmd.type]
                             ),
                             file=fd,
