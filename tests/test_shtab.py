@@ -174,6 +174,39 @@ def test_subparser_custom_complete(shell, caplog):
 
 
 @fix_shell
+def test_add_argument_to_optional(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    shtab.add_argument_to(parser, ["-s", "--shell"])
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.compgen('-W "$_shtab_test_options_"', "--s", "--shell")
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
+def test_add_argument_to_positional(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    subparsers = parser.add_subparsers()
+    sub = subparsers.add_parser("completion")
+    shtab.add_argument_to(sub, "shell")
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.compgen('-W "$_shtab_test_completion"', "ba", "bash")
+        shell.compgen('-W "$_shtab_test_completion"', "z", "zsh")
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
 def test_get_completer(shell):
     shtab.get_completer(shell)
 
