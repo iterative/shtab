@@ -254,13 +254,7 @@ argparse
     if __name__ == "__main__":
         parser = get_main_parser()
         args = parser.parse_args()
-
-        # completion magic
-        shell = args.print_completion_shell
-        if shell:
-            print(shtab.complete(parser, shell=shell))
-        else:
-            print("received <file>=%r --dir=%r" % (args.file, args.dir))
+        print("received <file>=%r --dir=%r" % (args.file, args.dir))
 
 docopt
 ~~~~~~

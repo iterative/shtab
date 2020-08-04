@@ -5,6 +5,8 @@
 See `pathcomplete.py` for a more basic version.
 """
 import argparse
+import functools
+import sys
 
 import shtab  # for completion magic
 
@@ -25,9 +27,22 @@ _shtab_greeter_compgen_TXTFiles() {
 }
 
 
+def process(args):
+    print(
+        "received <input_txt>=%r --input-file=%r --output-name=%r"
+        % (args.input_txt, args.input_file, args.output_name)
+    )
+
+
 def get_main_parser():
     main_parser = argparse.ArgumentParser(prog="customcomplete")
-    subparsers = main_parser.add_subparsers()
+    add_subparsers = functools.partial(
+        main_parser.add_subparsers, dest="subcommand"
+    )
+    if sys.version_info[:2] >= (3, 7):
+        subparsers = add_subparsers(required=True)
+    else:
+        subparsers = add_subparsers()
 
     parser = subparsers.add_parser("completion")
     shtab.add_argument_to(parser, "shell")  # magic!
@@ -45,13 +60,11 @@ def get_main_parser():
             " accidentally overwriting existing files."
         ),
     ).complete = shtab.DIRECTORY  # directory tab completion builtin shortcut
+    parser.set_defaults(func=process)
     return main_parser
 
 
 if __name__ == "__main__":
     parser = get_main_parser()
     args = parser.parse_args()
-    print(
-        "received <input_txt>=%r --input-file=%r --output-name=%r"
-        % (args.input_txt, args.input_file, args.output_name)
-    )
+    args.func(args)
