@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-`argparse`-based CLI app with custom file completion.
+`argparse`-based CLI app with custom file completion as well as subparsers.
 
 See `pathcomplete.py` for a more basic version.
 """
@@ -25,14 +25,24 @@ _shtab_greeter_compgen_TXTFiles() {
 }
 
 
-def get_main_parser():
-    parser = argparse.ArgumentParser(prog="customcomplete")
-    parser.add_argument(
-        "-s",
-        "--print-completion-shell",
-        choices=["bash", "zsh"],
-        help="prints completion script",
+def process(args):
+    print(
+        "received <input_txt>=%r --input-file=%r --output-name=%r"
+        % (args.input_txt, args.input_file, args.output_name)
     )
+
+
+def get_main_parser():
+    main_parser = argparse.ArgumentParser(prog="customcomplete")
+    subparsers = main_parser.add_subparsers()
+    # make required (py3.7 API change); vis. https://bugs.python.org/issue16308
+    subparsers.required = True
+    subparsers.dest = "subcommand"
+
+    parser = subparsers.add_parser("completion")
+    shtab.add_argument_to(parser, "shell")  # magic!
+
+    parser = subparsers.add_parser("process")
     # `*.txt` file tab completion
     parser.add_argument("input_txt", nargs="?").complete = TXT_FILE
     # file tab completion builtin shortcut
@@ -45,20 +55,11 @@ def get_main_parser():
             " accidentally overwriting existing files."
         ),
     ).complete = shtab.DIRECTORY  # directory tab completion builtin shortcut
-    return parser
+    parser.set_defaults(func=process)
+    return main_parser
 
 
 if __name__ == "__main__":
     parser = get_main_parser()
     args = parser.parse_args()
-
-    # completion magic
-    shell = args.print_completion_shell
-    if shell:
-        script = shtab.complete(parser, shell=shell, preamble=PREAMBLE)
-        print(script)
-    else:
-        print(
-            "received <input_txt>=%r --output-dir=%r --output-name=%r"
-            % (args.input_txt, args.output_dir, args.output_name)
-        )
+    args.func(args)

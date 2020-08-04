@@ -6,7 +6,7 @@ import os
 import sys
 from importlib import import_module
 
-from . import __version__, complete
+from . import SUPPORTED_SHELLS, __version__, complete
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def get_main_parser():
         "--version", action="version", version="%(prog)s " + __version__
     )
     parser.add_argument(
-        "-s", "--shell", default="bash", choices=["bash", "zsh"]
+        "-s", "--shell", default=SUPPORTED_SHELLS[0], choices=SUPPORTED_SHELLS
     )
     parser.add_argument(
         "--prefix", help="prepended to generated functions to avoid clashes"

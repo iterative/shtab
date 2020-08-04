@@ -20,15 +20,15 @@ Most of the magic lives in [`shtab/__init__.py`](./shtab/__init__.py).
     - `complete_bash()`
     - `complete_zsh()`
     - ...
-    - `Optional()`, `Required()`, `Choice()` - helpers for advanced completion
-      (e.g. dirs, files, `*.txt`)
+    - `add_argument_to()` - convenience function for library integration
+    - `Optional()`, `Required()`, `Choice()` - legacy helpers for advanced completion (e.g. dirs, files, `*.txt`)
   - [`main.py`](./shtab/main.py)
     - `get_main_parser()` - returns `shtab`'s own parser object
     - `main()` - `shtab`'s own CLI application
 
 Given that the number of completions a program may need would likely be less
 than a million, the focus is on readability rather than premature speed
-optimisations.
+optimisations. The generated code itself, on the other had, should be fast.
 
 Helper functions such as `replace_format` allows use of curly braces `{}` in
 string snippets without clashing between python's `str.format` and shell

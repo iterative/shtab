@@ -83,6 +83,22 @@ First run ``brew install bash-completion``, then add the following to
 Usage
 -----
 
+There are two ways of using ``shtab``:
+
+- `CLI Usage`_: ``shtab``'s own CLI interface for external applications
+
+  - may not require any code modifications whatsoever
+  - end-users execute ``shtab your_cli_app.your_parser_object``
+
+- `Library Usage`_: as a library integrated into your CLI application
+
+  - adds a couple of lines to your application
+  - argument mode: end-users execute ``your_cli_app --print-completion {bash,zsh}``
+  - subparser mode: end-users execute ``your_cli_app completion {bash,zsh}``
+
+CLI Usage
+---------
+
 The only requirement is that external CLI applications provide an importable
 ``argparse.ArgumentParser`` object (or alternatively an importable function
 which returns a parser object). This may require a trivial code change.
@@ -203,18 +219,23 @@ appropriate (e.g. ``$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh``).
 By default, ``shtab`` will silently do nothing if it cannot import the requested
 application. Use ``-u, --error-unimportable`` to noisily complain.
 
-Advanced Configuration
-----------------------
+Library Usage
+-------------
 
 See the `examples/ <https://github.com/iterative/shtab/tree/master/examples>`_
 folder for more.
 
 Complex projects with subparsers and custom completions for paths matching
 certain patterns (e.g. ``--file=*.txt``) are fully supported (see
+`examples/customcomplete.py <https://github.com/iterative/shtab/tree/master/examples/customcomplete.py>`_
+or even
 `iterative/dvc:command/completion.py <https://github.com/iterative/dvc/blob/master/dvc/command/completion.py>`_
 for example).
 
 Add direct support to scripts for a little more configurability:
+
+argparse
+~~~~~~~~
 
 .. code:: python
 
@@ -224,12 +245,7 @@ Add direct support to scripts for a little more configurability:
 
     def get_main_parser():
         parser = argparse.ArgumentParser(prog="pathcomplete")
-        parser.add_argument(
-            "-s",
-            "--print-completion-shell",
-            choices=["bash", "zsh"],
-            help="prints completion script",
-        )
+        shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!
         # file & directory tab complete
         parser.add_argument("file", nargs="?").complete = shtab.FILE
         parser.add_argument("--dir", default=".").complete = shtab.DIRECTORY
@@ -238,13 +254,7 @@ Add direct support to scripts for a little more configurability:
     if __name__ == "__main__":
         parser = get_main_parser()
         args = parser.parse_args()
-
-        # completion magic
-        shell = args.print_completion_shell
-        if shell:
-            print(shtab.complete(parser, shell=shell))
-        else:
-            print("received <file>=%r --dir=%r" % (args.file, args.dir))
+        print("received <file>=%r --dir=%r" % (args.file, args.dir))
 
 docopt
 ~~~~~~
@@ -262,8 +272,6 @@ object from `docopt <https://pypi.org/project/docopt>`_ syntax:
 
     Options:
       -g, --goodbye  : Say "goodbye" (instead of "hello")
-      -b, --print-bash-completion  : Output a bash tab-completion script
-      -z, --print-zsh-completion  : Output a zsh tab-completion script
 
     Arguments:
       <you>  : Your name [default: Anon]
@@ -272,15 +280,9 @@ object from `docopt <https://pypi.org/project/docopt>`_ syntax:
     import sys, argopt, shtab  # NOQA
 
     parser = argopt.argopt(__doc__)
+    shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!
     if __name__ == "__main__":
         args = parser.parse_args()
-        if args.print_bash_completion:
-            print(shtab.complete(parser, shell="bash"))
-            sys.exit(0)
-        if args.print_zsh_completion:
-            print(shtab.complete(parser, shell="zsh"))
-            sys.exit(0)
-
         msg = "k thx bai!" if args.goodbye else "hai!"
         print("{} says '{}' to {}".format(args.me, msg, args.you))
 

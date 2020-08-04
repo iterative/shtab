@@ -3,8 +3,10 @@ from __future__ import print_function
 import io
 import logging
 import re
+import sys
 from argparse import (
     SUPPRESS,
+    Action,
     _AppendAction,
     _AppendConstAction,
     _CountAction,
@@ -39,9 +41,18 @@ else:
         __version__ = get_version(root="..", relative_to=__file__)
     except LookupError:
         __version__ = get_version_dist()
-__all__ = ["Optional", "Required", "Choice", "complete"]
+__all__ = [
+    "complete",
+    "add_argument_to",
+    "SUPPORTED_SHELLS",
+    "FILE",
+    "DIRECTORY",
+    "DIR",
+]
 log = logging.getLogger(__name__)
 
+SUPPORTED_SHELLS = []
+_SUPPORTED_COMPLETERS = {}
 CHOICE_FUNCTIONS = {
     "file": {"bash": "_shtab_compgen_files", "zsh": "_files"},
     "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/"},
@@ -58,6 +69,25 @@ FLAG_OPTION = (
 OPTION_END = _HelpAction, _VersionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
 RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])")  # excessive but safe
+
+
+def mark_completer(shell):
+    def wrapper(func):
+        if shell not in SUPPORTED_SHELLS:
+            SUPPORTED_SHELLS.append(shell)
+        _SUPPORTED_COMPLETERS[shell] = func
+        return func
+
+    return wrapper
+
+
+def get_completer(shell):
+    try:
+        return _SUPPORTED_COMPLETERS[shell]
+    except KeyError:
+        raise NotImplementedError(
+            "shell (%s) must be in {%s}" % (shell, ",".join(SUPPORTED_SHELLS))
+        )
 
 
 @total_ordering
@@ -122,6 +152,11 @@ def replace_format(string, **fmt):
     return string
 
 
+def wordify(string):
+    """Replace hyphens (-) and spaces ( ) with underscores (_)"""
+    return string.replace("-", "_").replace(" ", "_")
+
+
 def get_bash_commands(root_parser, root_prefix, choice_functions=None):
     """
     Recursive subcommand parser traversal, printing bash helper syntax.
@@ -176,21 +211,19 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             opts += get_optional_actions(parser)
             # use list rather than set to maintain order
             opts = " ".join(opts)
-            print("{}='{}'".format(prefix, opts), file=fd)
+            print(u"{}='{}'".format(prefix, opts), file=fd)
 
         for sub in positionals:
+            if hasattr(sub, "complete"):
+                print(
+                    u"{}_COMPGEN={}".format(
+                        prefix,
+                        complete2pattern(sub.complete, "bash", choice_type2fn),
+                    ),
+                    file=fd,
+                )
             if sub.choices:
                 log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
-                if hasattr(sub, "complete"):
-                    print(
-                        "{}_COMPGEN={}".format(
-                            prefix,
-                            complete2pattern(
-                                sub.complete, "bash", choice_type2fn
-                            ),
-                        ),
-                        file=fd,
-                    )
                 for cmd in sorted(sub.choices):
                     if isinstance(cmd, Choice):
                         log.debug(
@@ -199,7 +232,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                             )
                         )
                         print(
-                            "{}_COMPGEN={}".format(
+                            u"{}_COMPGEN={}".format(
                                 prefix, choice_type2fn[cmd.type]
                             ),
                             file=fd,
@@ -209,8 +242,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         if sub.choices[cmd].add_help:
                             commands.append(cmd)
                             recurse(
-                                sub.choices[cmd],
-                                prefix + "_" + cmd.replace("-", "_"),
+                                sub.choices[cmd], prefix + "_" + wordify(cmd),
                             )
                         else:
                             log.debug("skip:subcommand:%s", cmd)
@@ -226,6 +258,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
     return recurse(root_parser, root_prefix), root_options, fd.getvalue()
 
 
+@mark_completer("bash")
 def complete_bash(
     parser, root_prefix=None, preamble="", choice_functions=None,
 ):
@@ -234,7 +267,7 @@ def complete_bash(
 
     See `complete` for arguments.
     """
-    root_prefix = "_shtab_" + (root_prefix or parser.prog)
+    root_prefix = wordify("_shtab_" + (root_prefix or parser.prog))
     commands, options, subcommands_script = get_bash_commands(
         parser, root_prefix, choice_functions=choice_functions
     )
@@ -347,14 +380,14 @@ def escape_zsh(string):
     return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", string)
 
 
+@mark_completer("zsh")
 def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     """
     Returns zsh syntax autocompletion script.
 
     See `complete` for arguments.
     """
-    root_prefix = "_shtab_" + (root_prefix or parser.prog)
-
+    root_prefix = wordify("_shtab_" + (root_prefix or parser.prog))
     root_arguments = []
     subcommands = {}  # {cmd: {"help": help, "arguments": [arguments]}}
 
@@ -516,9 +549,7 @@ esac""",
         ),
         commands_case="\n  ".join(
             "{cmd_orig}) _arguments ${root_prefix}_{cmd} ;;".format(
-                cmd_orig=cmd,
-                cmd=cmd.replace("-", "_"),
-                root_prefix=root_prefix,
+                cmd_orig=cmd, cmd=wordify(cmd), root_prefix=root_prefix,
             )
             for cmd in sorted(subcommands)
         ),
@@ -528,7 +559,7 @@ esac""",
   {arguments}
 )""".format(
                 root_prefix=root_prefix,
-                cmd=cmd.replace("-", "_"),
+                cmd=wordify(cmd),
                 arguments="\n  ".join(subcommands[cmd]["arguments"]),
             )
             for cmd in sorted(subcommands)
@@ -558,18 +589,43 @@ def complete(
     """
     if isinstance(preamble, dict):
         preamble = preamble.get(shell, "")
-    if shell == "bash":
-        return complete_bash(
-            parser,
-            root_prefix=root_prefix,
-            preamble=preamble,
-            choice_functions=choice_functions,
-        )
-    if shell == "zsh":
-        return complete_zsh(
-            parser,
-            root_prefix=root_prefix,
-            preamble=preamble,
-            choice_functions=choice_functions,
-        )
-    raise NotImplementedError(shell)
+    completer = get_completer(shell)
+    return completer(
+        parser,
+        root_prefix=root_prefix,
+        preamble=preamble,
+        choice_functions=choice_functions,
+    )
+
+
+class PrintCompletionAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        print(complete(parser, values))
+        parser.exit(0)
+
+
+def add_argument_to(
+    parser,
+    option_string="--print-completion",
+    help="print shell completion script",
+):
+    """
+    parser  : argparse.ArgumentParser
+    option_string  : str or list[str], iff positional (no `-` prefix) then
+      `parser` is assumed to actually be a subparser (subcommand mode)
+    help  : str
+    """
+    if isinstance(
+        option_string, str if sys.version_info[0] > 2 else basestring  # NOQA
+    ):
+        option_string = [option_string]
+    kwargs = dict(
+        choices=SUPPORTED_SHELLS,
+        default=None,
+        help=help,
+        action=PrintCompletionAction,
+    )
+    if option_string[0][0] != "-":  # subparser mode
+        kwargs.update(default=SUPPORTED_SHELLS[0], nargs="?")
+    parser.add_argument(*option_string, **kwargs)
+    return parser

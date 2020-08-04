@@ -13,8 +13,7 @@ import pytest
 import shtab
 from shtab.main import get_main_parser, main
 
-SUPPORTED_SHELLS = "bash", "zsh"
-fix_shell = pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
+fix_shell = pytest.mark.parametrize("shell", shtab.SUPPORTED_SHELLS)
 
 
 class Bash(object):
@@ -133,3 +132,89 @@ def test_positional_choices(shell, caplog):
         shell.compgen('-W "$_shtab_test_commands_"', "o", "one")
 
     assert not caplog.record_tuples
+
+
+@fix_shell
+def test_custom_complete(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    parser.add_argument("posA").complete = {"bash": "_shtab_test_some_func"}
+    preamble = {
+        "bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"
+    }
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell, preamble=preamble)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.test('"$($_shtab_test_COMPGEN o)" = "one"')
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
+def test_subparser_custom_complete(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    subparsers = parser.add_subparsers()
+    sub = subparsers.add_parser("sub")
+    sub.add_argument("posA").complete = {"bash": "_shtab_test_some_func"}
+    preamble = {
+        "bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"
+    }
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell, preamble=preamble)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.test('"$($_shtab_test_sub_COMPGEN o)" = "one"')
+        shell.test('-z "$($_shtab_test_COMPGEN o)"')
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
+def test_add_argument_to_optional(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    shtab.add_argument_to(parser, ["-s", "--shell"])
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.compgen('-W "$_shtab_test_options_"', "--s", "--shell")
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
+def test_add_argument_to_positional(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    subparsers = parser.add_subparsers()
+    sub = subparsers.add_parser("completion")
+    shtab.add_argument_to(sub, "shell")
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.compgen('-W "$_shtab_test_completion"', "ba", "bash")
+        shell.compgen('-W "$_shtab_test_completion"', "z", "zsh")
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
+def test_get_completer(shell):
+    shtab.get_completer(shell)
+
+
+def test_get_completer_invalid():
+    try:
+        shtab.get_completer("invalid")
+    except NotImplementedError:
+        pass
+    else:
+        raise NotImplementedError("invalid")
