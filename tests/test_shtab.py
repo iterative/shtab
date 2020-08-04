@@ -173,7 +173,12 @@ def test_subparser_custom_complete(shell, caplog):
     assert not caplog.record_tuples
 
 
-def test_get_completer():
+@fix_shell
+def test_get_completer(shell):
+    shtab.get_completer(shell)
+
+
+def test_get_completer_invalid():
     try:
         shtab.get_completer("invalid")
     except NotImplementedError:
