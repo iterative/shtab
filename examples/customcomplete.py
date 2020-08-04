@@ -5,8 +5,6 @@
 See `pathcomplete.py` for a more basic version.
 """
 import argparse
-import functools
-import sys
 
 import shtab  # for completion magic
 
@@ -36,13 +34,10 @@ def process(args):
 
 def get_main_parser():
     main_parser = argparse.ArgumentParser(prog="customcomplete")
-    add_subparsers = functools.partial(
-        main_parser.add_subparsers, dest="subcommand"
-    )
-    if sys.version_info[:2] >= (3, 7):
-        subparsers = add_subparsers(required=True)
-    else:
-        subparsers = add_subparsers()
+    subparsers = main_parser.add_subparsers()
+    # make required (py3.7 API change); vis. https://bugs.python.org/issue16308
+    subparsers.required = True
+    subparsers.dest = "subcommand"
 
     parser = subparsers.add_parser("completion")
     shtab.add_argument_to(parser, "shell")  # magic!

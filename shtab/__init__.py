@@ -152,6 +152,11 @@ def replace_format(string, **fmt):
     return string
 
 
+def wordify(string):
+    """Replace hyphens (-) and spaces ( ) with underscores (_)"""
+    return string.replace("-", "_").replace(" ", "_")
+
+
 def get_bash_commands(root_parser, root_prefix, choice_functions=None):
     """
     Recursive subcommand parser traversal, printing bash helper syntax.
@@ -237,8 +242,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         if sub.choices[cmd].add_help:
                             commands.append(cmd)
                             recurse(
-                                sub.choices[cmd],
-                                prefix + "_" + cmd.replace("-", "_"),
+                                sub.choices[cmd], prefix + "_" + wordify(cmd),
                             )
                         else:
                             log.debug("skip:subcommand:%s", cmd)
@@ -263,7 +267,7 @@ def complete_bash(
 
     See `complete` for arguments.
     """
-    root_prefix = "_shtab_" + (root_prefix or parser.prog)
+    root_prefix = wordify("_shtab_" + (root_prefix or parser.prog))
     commands, options, subcommands_script = get_bash_commands(
         parser, root_prefix, choice_functions=choice_functions
     )
@@ -383,8 +387,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
     See `complete` for arguments.
     """
-    root_prefix = "_shtab_" + (root_prefix or parser.prog)
-
+    root_prefix = wordify("_shtab_" + (root_prefix or parser.prog))
     root_arguments = []
     subcommands = {}  # {cmd: {"help": help, "arguments": [arguments]}}
 
@@ -546,9 +549,7 @@ esac""",
         ),
         commands_case="\n  ".join(
             "{cmd_orig}) _arguments ${root_prefix}_{cmd} ;;".format(
-                cmd_orig=cmd,
-                cmd=cmd.replace("-", "_"),
-                root_prefix=root_prefix,
+                cmd_orig=cmd, cmd=wordify(cmd), root_prefix=root_prefix,
             )
             for cmd in sorted(subcommands)
         ),
@@ -558,7 +559,7 @@ esac""",
   {arguments}
 )""".format(
                 root_prefix=root_prefix,
-                cmd=cmd.replace("-", "_"),
+                cmd=wordify(cmd),
                 arguments="\n  ".join(subcommands[cmd]["arguments"]),
             )
             for cmd in sorted(subcommands)
