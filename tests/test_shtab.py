@@ -134,6 +134,45 @@ def test_positional_choices(shell, caplog):
     assert not caplog.record_tuples
 
 
+@fix_shell
+def test_custom_complete(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    parser.add_argument("posA").complete = {"bash": "_shtab_test_some_func"}
+    preamble = {
+        "bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"
+    }
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell, preamble=preamble)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.test('"$($_shtab_test_COMPGEN o)" = "one"')
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
+def test_subparser_custom_complete(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    subparsers = parser.add_subparsers()
+    sub = subparsers.add_parser("sub")
+    sub.add_argument("posA").complete = {"bash": "_shtab_test_some_func"}
+    preamble = {
+        "bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"
+    }
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell, preamble=preamble)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.test('"$($_shtab_test_sub_COMPGEN o)" = "one"')
+        shell.test('-z "$($_shtab_test_COMPGEN o)"')
+
+    assert not caplog.record_tuples
+
+
 def test_get_completer():
     try:
         shtab.get_completer("invalid")
