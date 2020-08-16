@@ -92,6 +92,31 @@ def test_prog_override(shell, caplog, capsys):
 
 
 @fix_shell
+def test_prog_scripts(shell, caplog, capsys):
+    with caplog.at_level(logging.INFO):
+        main(
+            ["-s", shell, "--prog", "script.py", "shtab.main.get_main_parser"]
+        )
+
+    captured = capsys.readouterr()
+    assert not captured.err
+    script_py = [
+        i.strip() for i in captured.out.splitlines() if "script.py" in i
+    ]
+    if shell == "bash":
+        assert script_py == ["complete -o nospace -F _shtab_shtab script.py"]
+    elif shell == "zsh":
+        assert script_py == [
+            "#compdef script.py",
+            "_describe 'script.py commands' _commands",
+        ]
+    else:
+        raise NotImplementedError(shell)
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
 def test_prefix_override(shell, caplog, capsys):
     with caplog.at_level(logging.INFO):
         main(["-s", shell, "--prefix", "foo", "shtab.main.get_main_parser"])

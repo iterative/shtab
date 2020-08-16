@@ -153,8 +153,8 @@ def replace_format(string, **fmt):
 
 
 def wordify(string):
-    """Replace hyphens (-) and spaces ( ) with underscores (_)"""
-    return string.replace("-", "_").replace(" ", "_")
+    """Replace non-word chars [-. ] with underscores [_]"""
+    return string.replace("-", "_").replace(".", " ").replace(" ", "_")
 
 
 def get_bash_commands(root_parser, root_prefix, choice_functions=None):
