@@ -602,22 +602,27 @@ def complete(
     )
 
 
-class PrintCompletionAction(Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        print(complete(parser, values))
-        parser.exit(0)
+def completion_action(parent=None):
+    class PrintCompletionAction(Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            print(complete(parent or parser, values))
+            parser.exit(0)
+
+    return PrintCompletionAction
 
 
 def add_argument_to(
     parser,
     option_string="--print-completion",
     help="print shell completion script",
+    parent=None,
 ):
     """
     parser  : argparse.ArgumentParser
     option_string  : str or list[str], iff positional (no `-` prefix) then
       `parser` is assumed to actually be a subparser (subcommand mode)
     help  : str
+    parent  : argparse.ArgumentParser, required in subcommand mode
     """
     if isinstance(
         option_string, str if sys.version_info[0] > 2 else basestring  # NOQA
@@ -627,9 +632,10 @@ def add_argument_to(
         choices=SUPPORTED_SHELLS,
         default=None,
         help=help,
-        action=PrintCompletionAction,
+        action=completion_action(parent),
     )
     if option_string[0][0] != "-":  # subparser mode
         kwargs.update(default=SUPPORTED_SHELLS[0], nargs="?")
+        assert parent is not None, "subcommand mode: parent required"
     parser.add_argument(*option_string, **kwargs)
     return parser
