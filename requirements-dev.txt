@@ -1,3 +1,5 @@
 pre-commit
+twine
+wheel
 pytest
 pytest-cov

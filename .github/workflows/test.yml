@@ -6,12 +6,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - run: pip install -U -r requirements-dev.txt twine
-    - run: python setup.py check -mrs
-    - run: pre-commit run --all-files
+    - name: set PYSHA
+      run: echo "PYSHA=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit|${{ env.PYSHA }}|${{ hashFiles('.pre-commit-config.yaml') }}
+    - run: pip install -U -r requirements-dev.txt
+    - run: python setup.py sdist bdist_wheel
+    - run: twine check dist/*
+    - uses: reviewdog/action-setup@v1
+    - run: |
+        pre-commit run -a flake8 | reviewdog -f=pep8 -name=flake8 -tee -reporter=github-check -filter-mode nofilter
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - run: pre-commit run -a --show-diff-on-failure
   test:
     name: Test py${{ matrix.python }}
     needs: check
@@ -21,6 +35,8 @@ jobs:
         python: [2.7, 3.8]
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
@@ -34,6 +50,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: casperdcl/deploy-pypi@v1
       with:
         password: ${{ secrets.pypi_token }}
@@ -51,7 +69,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: shtab ${{ github.ref }} alpha
+        release_name: shtab ${{ github.ref }} beta
         body_path: _CHANGES.md
         draft: true
     - uses: actions/upload-release-asset@v1

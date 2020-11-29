@@ -1,4 +1,5 @@
 *.py[cod]
+/shtab/_dist_ver.py
 
 # Packages
 shtab.egg-info/

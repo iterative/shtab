@@ -16,31 +16,16 @@ from argparse import (
 )
 from functools import total_ordering
 
-
-def get_version_dist(name=__name__):
-    from pkg_resources import DistributionNotFound, get_distribution
-
-    try:
-        return get_distribution(name).version
-    except DistributionNotFound:
-        return "UNKNOWN"
-
-
+# version detector. Precedence: installed dist, git, 'UNKNOWN'
 try:
-    from setuptools_scm import get_version
+    from ._dist_ver import __version__
 except ImportError:
-    from os import path
-
-    ROOT = path.abspath(path.dirname(path.dirname(__file__)))
-    if path.exists(path.join(ROOT, ".git")):
-        __version__ = "UNKNOWN - please install setuptools_scm"
-    else:
-        __version__ = get_version_dist()
-else:
     try:
+        from setuptools_scm import get_version
+
         __version__ = get_version(root="..", relative_to=__file__)
-    except LookupError:
-        __version__ = get_version_dist()
+    except (ImportError, LookupError):
+        __version__ = "UNKNOWN"
 __all__ = [
     "complete",
     "add_argument_to",
@@ -217,8 +202,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             if hasattr(sub, "complete"):
                 print(
                     u"{}_COMPGEN={}".format(
-                        prefix,
-                        complete2pattern(sub.complete, "bash", choice_type2fn),
+                        prefix, complete2pattern(sub.complete, "bash", choice_type2fn),
                     ),
                     file=fd,
                 )
@@ -226,15 +210,9 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                 log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
                 for cmd in sorted(sub.choices):
                     if isinstance(cmd, Choice):
-                        log.debug(
-                            "Choice.{}:{}:{}".format(
-                                cmd.type, prefix, sub.dest
-                            )
-                        )
+                        log.debug("Choice.{}:{}:{}".format(cmd.type, prefix, sub.dest))
                         print(
-                            u"{}_COMPGEN={}".format(
-                                prefix, choice_type2fn[cmd.type]
-                            ),
+                            u"{}_COMPGEN={}".format(prefix, choice_type2fn[cmd.type]),
                             file=fd,
                         )
                     elif isinstance(sub.choices, dict):
@@ -480,9 +458,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                     [],
                 )
                 if subsubs:
-                    arguments.append(
-                        '"1:Sub command:({})"'.format(" ".join(subsubs))
-                    )
+                    arguments.append('"1:Sub command:({})"'.format(" ".join(subsubs)))
 
                 # positionals
                 arguments.extend(
@@ -493,9 +469,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 )
 
                 subcommands[cmd] = {
-                    "help": (subparser.description or "")
-                    .strip()
-                    .split("\n")[0],
+                    "help": (subparser.description or "").strip().split("\n")[0],
                     "arguments": arguments,
                 }
                 log.debug("subcommands:%s:%s", cmd, subcommands[cmd])
@@ -628,12 +602,12 @@ def add_argument_to(
         option_string, str if sys.version_info[0] > 2 else basestring  # NOQA
     ):
         option_string = [option_string]
-    kwargs = dict(
-        choices=SUPPORTED_SHELLS,
-        default=None,
-        help=help,
-        action=completion_action(parent),
-    )
+    kwargs = {
+        "choices": SUPPORTED_SHELLS,
+        "default": None,
+        "help": help,
+        "action": completion_action(parent),
+    }
     if option_string[0][0] != "-":  # subparser mode
         kwargs.update(default=SUPPORTED_SHELLS[0], nargs="?")
         assert parent is not None, "subcommand mode: parent required"
