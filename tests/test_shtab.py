@@ -214,17 +214,27 @@ def test_add_argument_to_optional(shell, caplog):
 
 
 @fix_shell
-def test_add_argument_to_positional(shell, caplog):
+def test_add_argument_to_positional(shell, caplog, capsys):
     parser = ArgumentParser(prog="test")
     subparsers = parser.add_subparsers()
     sub = subparsers.add_parser("completion")
-    shtab.add_argument_to(sub, "shell")
+    shtab.add_argument_to(sub, "shell", parent=parser)
+    from argparse import Namespace
+
     with caplog.at_level(logging.INFO):
-        completion = shtab.complete(parser, shell=shell)
+        completion_manual = shtab.complete(parser, shell=shell)
+        with pytest.raises(SystemExit) as exc:
+            sub._actions[-1](sub, Namespace(), shell)
+            assert exc.type == SystemExit
+            assert exc.vaue.code == 0
+    completion, err = capsys.readouterr()
     print(completion)
+    assert completion_manual == completion.rstrip()
+    assert not err
 
     if shell == "bash":
         shell = Bash(completion)
+        shell.compgen('-W "$_shtab_test_commands_"', "c", "completion")
         shell.compgen('-W "$_shtab_test_completion"', "ba", "bash")
         shell.compgen('-W "$_shtab_test_completion"', "z", "zsh")
 
