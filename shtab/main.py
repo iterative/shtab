@@ -26,9 +26,7 @@ def get_main_parser():
         "--prefix", help="prepended to generated functions to avoid clashes"
     )
     parser.add_argument("--preamble", help="prepended to generated script")
-    parser.add_argument(
-        "--prog", help="custom program name (overrides `parser.prog`)"
-    )
+    parser.add_argument("--prog", help="custom program name (overrides `parser.prog`)")
     parser.add_argument(
         "-u",
         "--error-unimportable",

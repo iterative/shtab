@@ -38,9 +38,7 @@ class Bash(object):
             failure_message, test, stdout or "", stderr or ""
         )
 
-    def compgen(
-        self, compgen_cmd, word, expected_completions, failure_message=""
-    ):
+    def compgen(self, compgen_cmd, word, expected_completions, failure_message=""):
         self.test(
             '"$(echo $(compgen {} -- "{}"))" = "{}"'.format(
                 compgen_cmd, word, expected_completions
@@ -94,15 +92,11 @@ def test_prog_override(shell, caplog, capsys):
 @fix_shell
 def test_prog_scripts(shell, caplog, capsys):
     with caplog.at_level(logging.INFO):
-        main(
-            ["-s", shell, "--prog", "script.py", "shtab.main.get_main_parser"]
-        )
+        main(["-s", shell, "--prog", "script.py", "shtab.main.get_main_parser"])
 
     captured = capsys.readouterr()
     assert not captured.err
-    script_py = [
-        i.strip() for i in captured.out.splitlines() if "script.py" in i
-    ]
+    script_py = [i.strip() for i in captured.out.splitlines() if "script.py" in i]
     if shell == "bash":
         assert script_py == ["complete -o nospace -F _shtab_shtab script.py"]
     elif shell == "zsh":
@@ -163,9 +157,7 @@ def test_positional_choices(shell, caplog):
 def test_custom_complete(shell, caplog):
     parser = ArgumentParser(prog="test")
     parser.add_argument("posA").complete = {"bash": "_shtab_test_some_func"}
-    preamble = {
-        "bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"
-    }
+    preamble = {"bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"}
     with caplog.at_level(logging.INFO):
         completion = shtab.complete(parser, shell=shell, preamble=preamble)
     print(completion)
@@ -183,9 +175,7 @@ def test_subparser_custom_complete(shell, caplog):
     subparsers = parser.add_subparsers()
     sub = subparsers.add_parser("sub")
     sub.add_argument("posA").complete = {"bash": "_shtab_test_some_func"}
-    preamble = {
-        "bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"
-    }
+    preamble = {"bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"}
     with caplog.at_level(logging.INFO):
         completion = shtab.complete(parser, shell=shell, preamble=preamble)
     print(completion)
