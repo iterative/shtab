@@ -2,6 +2,7 @@ name: Test
 on: [push, pull_request]
 jobs:
   check:
+    if: github.event_name != 'pull_request' || github.head_ref != 'devel'
     name: Check
     runs-on: ubuntu-latest
     steps:
@@ -27,8 +28,8 @@ jobs:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: pre-commit run -a --show-diff-on-failure
   test:
+    if: github.event_name != 'pull_request' || github.head_ref != 'devel'
     name: Test py${{ matrix.python }}
-    needs: check
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,7 +47,7 @@ jobs:
   deploy:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
     name: PyPI Deploy
-    needs: test
+    needs: [check, test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -54,14 +55,13 @@ jobs:
         fetch-depth: 0
     - uses: casperdcl/deploy-pypi@v1
       with:
-        password: ${{ secrets.pypi_token }}
+        password: ${{ secrets.PYPI_TOKEN }}
         build: true
     - id: collect_assets
       name: Collect assets
       run: |
         echo "::set-output name=asset_path::$(ls dist/*.whl)"
         echo "::set-output name=asset_name::$(basename dist/*.whl)"
-        git fetch --unshallow --tags
         git log --pretty='format:%d%n- %s%n%b---' $(git tag --sort=v:refname | tail -n2 | head -n1)..HEAD > _CHANGES.md
     - id: create_release
       uses: actions/create-release@v1
