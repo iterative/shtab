@@ -7,4 +7,4 @@ write_to = "shtab/_dist_ver.py"
 write_to_template = "__version__ = '{version}'\n"
 
 [tool.black]
-target-version = ['py27', 'py36']
+target_version = ["py27", "py36", "py38"]

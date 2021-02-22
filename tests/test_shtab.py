@@ -1,8 +1,5 @@
 """
 Tests for `shtab`.
-
-Currently runnable via nosetests, e.g.:
-    shtab$ nose tests -d -v
 """
 import logging
 import subprocess

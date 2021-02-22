@@ -2,31 +2,43 @@ default_language_version:
   python: python3
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.4.0
+  rev: v3.4.0
   hooks:
   - id: check-added-large-files
   - id: check-case-conflict
   - id: check-docstring-first
   - id: check-executables-have-shebangs
   - id: check-toml
+  - id: check-merge-conflict
   - id: check-yaml
+  - id: debug-statements
   - id: end-of-file-fixer
   - id: mixed-line-ending
+  - id: sort-simple-yaml
   - id: trailing-whitespace
-- hooks:
+- repo: local
+  hooks:
+  - id: todo
+    name: Check TODO
+    language: pygrep
+    entry: TODO
+    types: [text]
+    exclude: ^(.pre-commit-config.yaml|.github/workflows/test.yml)$
+    args: [-i]
+- repo: https://gitlab.com/pycqa/flake8
+  rev: 3.8.4
+  hooks:
   - id: flake8
     additional_dependencies:
     - flake8-bugbear
     - flake8-comprehensions
     - flake8-debugger
     - flake8-string-format
-  repo: https://gitlab.com/pycqa/flake8
-  rev: 3.8.4
-- hooks:
-  - id: black
-  repo: https://github.com/psf/black
+- repo: https://github.com/psf/black
   rev: 19.10b0
-- hooks:
+  hooks:
+  - id: black
+- repo: https://github.com/PyCQA/isort
+  rev: 5.7.0
+  hooks:
   - id: isort
-  repo: https://github.com/timothycrosley/isort
-  rev: 5.6.4

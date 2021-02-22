@@ -5,9 +5,10 @@
 When contributing pull requests, it's a good idea to run basic checks locally:
 
 ```bash
-shtab (master)$ pip install .[dev]  # install development dependencies
+# install development dependencies
+shtab (master)$ pip install pre-commit -r requirements-dev.txt
 shtab (master)$ pre-commit install  # install pre-commit checks
-shtab (master)$ python -m tests     # run all tests
+shtab (master)$ pytest              # run all tests
 ```
 
 ## Layout
