@@ -414,7 +414,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
     def format_positional(opt):
         return '"{nargs}:{help}:{pattern}"'.format(
-            nargs={"+": "*", "*": "*"}.get(opt.nargs, ""),
+            nargs={"+": "(*)", "*": "(*):"}.get(opt.nargs, ""),
             help=escape_zsh((opt.help or opt.dest).strip().split("\n")[0]),
             pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
             if hasattr(opt, "complete")
