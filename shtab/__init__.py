@@ -268,12 +268,11 @@ def complete_bash(
 # $1=COMP_WORDS[1]
 _shtab_compgen_files() {
   compgen -f -- $1  # files
-  compgen -d -S '/' -- $1  # recurse into subdirs
 }
 
 # $1=COMP_WORDS[1]
 _shtab_compgen_dirs() {
-  compgen -d -S '/' -- $1  # recurse into subdirs
+  compgen -d -- $1  # recurse into subdirs
 }
 
 # $1=COMP_WORDS[1]
@@ -344,7 +343,7 @@ _shtab_replace_nonword() {
   return 0
 }
 
-complete -o nospace -F {root_prefix} {prog}""",
+complete -o filenames -F {root_prefix} {prog}""",
         commands=" ".join(commands),
         options=" ".join(options),
         preamble=(
