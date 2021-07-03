@@ -81,7 +81,7 @@ def test_prog_override(shell, caplog, capsys):
     captured = capsys.readouterr()
     assert not captured.err
     if shell == "bash":
-        assert "complete -o nospace -F _shtab_shtab foo" in captured.out
+        assert "complete -o filenames -F _shtab_shtab foo" in captured.out
 
     assert not caplog.record_tuples
 
@@ -95,7 +95,7 @@ def test_prog_scripts(shell, caplog, capsys):
     assert not captured.err
     script_py = [i.strip() for i in captured.out.splitlines() if "script.py" in i]
     if shell == "bash":
-        assert script_py == ["complete -o nospace -F _shtab_shtab script.py"]
+        assert script_py == ["complete -o filenames -F _shtab_shtab script.py"]
     elif shell == "zsh":
         assert script_py == [
             "#compdef script.py",
