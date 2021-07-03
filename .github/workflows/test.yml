@@ -10,8 +10,6 @@ jobs:
       with:
         fetch-depth: 0
     - uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
     - name: set PYSHA
       run: echo "PYSHA=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
     - uses: actions/cache@v1
@@ -64,7 +62,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
-        release_name: shtab ${{ github.ref }} stable
+        name: shtab ${{ github.ref }} beta
         body_path: _CHANGES.md
         draft: true
         files: |
