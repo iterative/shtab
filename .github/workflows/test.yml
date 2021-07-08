@@ -10,8 +10,6 @@ jobs:
       with:
         fetch-depth: 0
     - uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
     - name: set PYSHA
       run: echo "PYSHA=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
     - uses: actions/cache@v1
@@ -54,7 +52,8 @@ jobs:
     - id: dist
       uses: casperdcl/deploy-pypi@v2
       with:
-        pip: true
+        requirements: twine setuptools wheel setuptools_scm[toml]
+        build: true
         password: ${{ secrets.PYPI_TOKEN }}
         upload: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') }}
     - name: Changelog
@@ -64,7 +63,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
-        release_name: shtab ${{ github.ref }} stable
+        name: shtab ${{ github.ref }} beta
         body_path: _CHANGES.md
         draft: true
         files: |
