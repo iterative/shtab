@@ -489,6 +489,7 @@ _set_new_action() {
     fi
 
     if [[ "$current_action_nargs" != "*" ]] && \\
+       [[ "$current_action_nargs" != "+" ]] && \\
       (( $word_index-$current_action_index+$optional_action_offset \\
          >= $current_action_nargs )); then
       $current_action_is_positional && let "completed_positional_actions+=1"
