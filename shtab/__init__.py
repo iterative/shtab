@@ -261,11 +261,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         )
                     )
 
-            # Lastly, check for information on nargs.
-            # (Skipping any nargs that are 1, None, '?', or "A..." as these are
-            # considered default.)
-            # NOTE: "A..." seems to be associated with calls to subparsers.
-            # I'm not sure exactly what it means...
+            # Lastly, skip default `nargs` values
             if positional.nargs not in (None, "1", "?"):
                 nargs.append(u"{}_pos_{}_nargs={}".format(prefix, i, positional.nargs))
 
@@ -490,6 +486,7 @@ _set_new_action() {
 
     if [[ "$current_action_nargs" != "*" ]] && \\
        [[ "$current_action_nargs" != "+" ]] && \\
+       [[ "$current_action_nargs" != *"..." ]] && \\
       (( $word_index-$current_action_index+$optional_action_offset \\
          >= $current_action_nargs )); then
       $current_action_is_positional && let "completed_positional_actions+=1"
