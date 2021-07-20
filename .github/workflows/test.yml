@@ -2,7 +2,7 @@ name: Test
 on: [push, pull_request]
 jobs:
   check:
-    if: github.event_name != 'pull_request' || github.head_ref != 'devel'
+    if: github.event_name == 'pull_request' || github.repository_owner != 'iterative'
     name: Check
     runs-on: ubuntu-latest
     steps:
@@ -24,7 +24,7 @@ jobs:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: pre-commit run -a --show-diff-on-failure
   test:
-    if: github.event_name != 'pull_request' || github.head_ref != 'devel'
+    if: github.event_name == 'pull_request' || github.repository_owner != 'iterative'
     name: Test py${{ matrix.python }}
     runs-on: ubuntu-latest
     strategy:
