@@ -358,7 +358,7 @@ complete -o filenames -F {root_prefix} {prog}""",
 
 
 def escape_zsh(string):
-    return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", string)
+    return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", str(string))
 
 
 @mark_completer("zsh")
