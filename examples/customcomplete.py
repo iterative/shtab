@@ -40,7 +40,9 @@ def get_main_parser():
     subparsers.dest = "subcommand"
 
     parser = subparsers.add_parser("completion")
-    shtab.add_argument_to(parser, "shell", parent=main_parser)  # magic!
+    shtab.add_argument_to(
+        parser, "shell", parent=main_parser, preamble=PREAMBLE
+    )  # magic!
 
     parser = subparsers.add_parser("process")
     # `*.txt` file tab completion
