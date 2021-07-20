@@ -575,10 +575,10 @@ def complete(
     )
 
 
-def completion_action(parent=None):
+def completion_action(parent=None, preamble=""):
     class PrintCompletionAction(Action):
         def __call__(self, parser, namespace, values, option_string=None):
-            print(complete(parent or parser, values))
+            print(complete(parent or parser, values, preamble=preamble))
             parser.exit(0)
 
     return PrintCompletionAction
@@ -589,6 +589,7 @@ def add_argument_to(
     option_string="--print-completion",
     help="print shell completion script",
     parent=None,
+    preamble="",
 ):
     """
     parser  : argparse.ArgumentParser
@@ -605,7 +606,7 @@ def add_argument_to(
         "choices": SUPPORTED_SHELLS,
         "default": None,
         "help": help,
-        "action": completion_action(parent),
+        "action": completion_action(parent, preamble),
     }
     if option_string[0][0] != "-":  # subparser mode
         kwargs.update(default=SUPPORTED_SHELLS[0], nargs="?")
