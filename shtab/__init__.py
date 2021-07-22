@@ -409,11 +409,6 @@ _set_parser_defaults() {
   local current_option_strings_var="${prefix}_option_strings[@]"
   current_option_strings=${!current_option_strings_var}
 
-  current_action=""
-  current_action_compgen=""
-  current_action_choices=""
-  current_action_nargs=""
-  current_action_index=""
   completed_positional_actions=0
 
   _set_new_action "pos_${completed_positional_actions}" true
@@ -439,7 +434,8 @@ _set_new_action() {
     current_action_nargs=1
   fi
 
-  current_action_index=$word_index
+  current_action_args_start_index=$(($word_index+1))
+
   current_action_is_positional=$2
 }
 
@@ -456,8 +452,9 @@ _set_new_action() {
   COMPREPLY=()
 
   prefix={root_prefix}
-  word_index=1
+  word_index=0
   _set_parser_defaults
+  word_index=1
 
   # determined what arguments are appropriate for the current state
   # of the arg parser
@@ -468,7 +465,7 @@ _set_new_action() {
 
     # If we encounter a valid subcommand,
     # add it to the prefix and reset the current action
-    if [[ -n $subparsers && "${subparsers[@]}" =~ "${this_word}" ]]; then
+    if [[ -n $subparsers && " ${subparsers[@]} " =~ " ${this_word} " ]]; then
       prefix="${prefix}_$(_shtab_replace_nonword $this_word)"
       _set_parser_defaults
     fi
@@ -477,18 +474,15 @@ _set_new_action() {
     # either because an option string is recognized,
     # or because no more input is expected from the current action,
     # indicating that the next positional action can fill in here.
-    if [[ "${current_option_strings[@]}" =~ "${this_word}" ]]; then
+    if [[ " ${current_option_strings[@]} " =~ " ${this_word} " ]]; then
       _set_new_action $this_word false
-      optional_action_offset=0
-    else
-      optional_action_offset=1
     fi
 
     if [[ "$current_action_nargs" != "*" ]] && \\
        [[ "$current_action_nargs" != "+" ]] && \\
        [[ "$current_action_nargs" != *"..." ]] && \\
-      (( $word_index-$current_action_index+$optional_action_offset \\
-         >= $current_action_nargs )); then
+       (( $word_index+1-$current_action_args_start_index >= \\
+       $current_action_nargs )); then
       $current_action_is_positional && let "completed_positional_actions+=1"
       _set_new_action "pos_${completed_positional_actions}" true
     fi
@@ -497,6 +491,17 @@ _set_new_action() {
   done
 
   # Generate the completions
+
+  # Uncomment below for debugging.
+  # echo ""
+  # echo "Current subparsers: ${subparsers[@]}"
+  # echo "Current option strings: ${current_option_strings[@]}"
+  # echo "Current action: ${current_action}"
+  # echo "Current action nargs: ${current_action_nargs}"
+  # echo "Current action completed arguments:"
+  # echo "  $(( $word_index-$current_action_args_start_index ))"
+  # echo "Current action choices: ${current_action_choices}"
+  # echo "Current action compgen: ${current_action_compgen}"
 
   # If an optional argument has started, use option strings
   if [[ "${completing_word}" == -* ]]; then
