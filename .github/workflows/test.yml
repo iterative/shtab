@@ -56,12 +56,11 @@ jobs:
         build: true
         password: ${{ secrets.PYPI_TOKEN }}
         upload: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
-    - name: Changelog
-      run: git log --pretty='format:%d%n- %s%n%b---' $(git tag --sort=v:refname | tail -n2 | head -n1)..HEAD > _CHANGES.md
     - id: meta
-      name: Metadata
+      name: Changelog
       run: |
-        echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+        echo ::set-output name=tag::${GITHUB_REF#refs/tags/}
+        git log --pretty='format:%d%n- %s%n%b---' $(git tag --sort=v:refname | tail -n2 | head -n1)..HEAD > _CHANGES.md
     - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
       uses: softprops/action-gh-release@v1
       env:

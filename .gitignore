@@ -2,8 +2,7 @@
 /shtab/_dist_ver.py
 
 # Packages
-shtab.egg-info/
-/.eggs/
+/*.egg*/
 /build/
 /dist/
 
