@@ -17,22 +17,28 @@ class Bash(object):
     def __init__(self, init_script=""):
         self.init = init_script
 
-    def test(self, test="1", failure_message=""):
-        """Equivalent to `bash -c '{init}; [[ {test} ]]'`."""
+    def test(self, cmd="1", failure_message=""):
+        """Equivalent to `bash -c '{init}; [[ {cmd} ]]'`."""
         init = self.init + "\n" if self.init else ""
         proc = subprocess.Popen(
-            ["bash", "-c", "{init}[[ {test} ]]".format(init=init, test=test)]
+            [
+                "bash",
+                "-o",
+                "pipefail",
+                "-ec",
+                "{init}[[ {cmd} ]]".format(init=init, cmd=cmd),
+            ]
         )
         stdout, stderr = proc.communicate()
         assert (
-            0 == proc.wait()
+            0 == proc.wait() and not stdout and not stderr
         ), """\
 {}
 {}
 === stdout ===
 {}=== stderr ===
 {}""".format(
-            failure_message, test, stdout or "", stderr or ""
+            failure_message, cmd, stdout or "", stderr or ""
         )
 
     def compgen(self, compgen_cmd, word, expected_completions, failure_message=""):
@@ -111,12 +117,13 @@ def test_prog_scripts(shell, caplog, capsys):
 def test_prefix_override(shell, caplog, capsys):
     with caplog.at_level(logging.INFO):
         main(["-s", shell, "--prefix", "foo", "shtab.main.get_main_parser"])
-
     captured = capsys.readouterr()
+    print(captured.out)
     assert not captured.err
+
     if shell == "bash":
         shell = Bash(captured.out)
-        shell.compgen('-W "$_shtab_foo_options_"', "--h", "--help")
+        shell.compgen('-W "${_shtab_foo_option_strings[*]}"', "--h", "--help")
 
     assert not caplog.record_tuples
 
@@ -130,7 +137,7 @@ def test_complete(shell, caplog):
 
     if shell == "bash":
         shell = Bash(completion)
-        shell.compgen('-W "$_shtab_shtab_options_"', "--h", "--help")
+        shell.compgen('-W "${_shtab_shtab_option_strings[*]}"', "--h", "--help")
 
     assert not caplog.record_tuples
 
@@ -145,7 +152,7 @@ def test_positional_choices(shell, caplog):
 
     if shell == "bash":
         shell = Bash(completion)
-        shell.compgen('-W "$_shtab_test_commands_"', "o", "one")
+        shell.compgen('-W "$_shtab_test_pos_0_choices"', "o", "one")
 
     assert not caplog.record_tuples
 
@@ -161,7 +168,7 @@ def test_custom_complete(shell, caplog):
 
     if shell == "bash":
         shell = Bash(completion)
-        shell.test('"$($_shtab_test_COMPGEN o)" = "one"')
+        shell.test('"$($_shtab_test_pos_0_COMPGEN o)" = "one"')
 
     assert not caplog.record_tuples
 
@@ -179,8 +186,10 @@ def test_subparser_custom_complete(shell, caplog):
 
     if shell == "bash":
         shell = Bash(completion)
-        shell.test('"$($_shtab_test_sub_COMPGEN o)" = "one"')
-        shell.test('-z "$($_shtab_test_COMPGEN o)"')
+        shell.compgen('-W "${_shtab_test_subparsers[*]}"', "s", "sub")
+        shell.compgen('-W "$_shtab_test_pos_0_choices"', "s", "sub")
+        shell.test('"$($_shtab_test_sub_pos_0_COMPGEN o)" = "one"')
+        shell.test('-z "$_shtab_test_COMPGEN"')
 
     assert not caplog.record_tuples
 
@@ -195,7 +204,7 @@ def test_add_argument_to_optional(shell, caplog):
 
     if shell == "bash":
         shell = Bash(completion)
-        shell.compgen('-W "$_shtab_test_options_"', "--s", "--shell")
+        shell.compgen('-W "${_shtab_test_option_strings[*]}"', "--s", "--shell")
 
     assert not caplog.record_tuples
 
@@ -221,9 +230,10 @@ def test_add_argument_to_positional(shell, caplog, capsys):
 
     if shell == "bash":
         shell = Bash(completion)
-        shell.compgen('-W "$_shtab_test_commands_"', "c", "completion")
-        shell.compgen('-W "$_shtab_test_completion"', "ba", "bash")
-        shell.compgen('-W "$_shtab_test_completion"', "z", "zsh")
+        shell.compgen('-W "${_shtab_test_subparsers[*]}"', "c", "completion")
+        shell.compgen('-W "$_shtab_test_pos_0_choices"', "c", "completion")
+        shell.compgen('-W "$_shtab_test_completion_pos_0_choices"', "ba", "bash")
+        shell.compgen('-W "$_shtab_test_completion_pos_0_choices"', "z", "zsh")
 
     assert not caplog.record_tuples
 
