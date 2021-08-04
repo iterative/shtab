@@ -16,7 +16,7 @@ PREAMBLE = {
     "bash": """
 # $1=COMP_WORDS[1]
 _shtab_greeter_compgen_TXTFiles() {
-  compgen -d -S '/' -- $1  # recurse into subdirs
+  compgen -d -- $1  # recurse into subdirs
   compgen -f -X '!*?.txt' -- $1
   compgen -f -X '!*?.TXT' -- $1
 }
