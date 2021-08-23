@@ -177,7 +177,7 @@ def test_custom_complete(shell, caplog):
 def test_subparser_custom_complete(shell, caplog):
     parser = ArgumentParser(prog="test")
     subparsers = parser.add_subparsers()
-    sub = subparsers.add_parser("sub")
+    sub = subparsers.add_parser("sub", help="help message")
     sub.add_argument("posA").complete = {"bash": "_shtab_test_some_func"}
     preamble = {"bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"}
     with caplog.at_level(logging.INFO):
@@ -188,6 +188,31 @@ def test_subparser_custom_complete(shell, caplog):
         shell = Bash(completion)
         shell.compgen('-W "${_shtab_test_subparsers[*]}"', "s", "sub")
         shell.compgen('-W "$_shtab_test_pos_0_choices"', "s", "sub")
+        shell.test('"$($_shtab_test_sub_pos_0_COMPGEN o)" = "one"')
+        shell.test('-z "$_shtab_test_COMPGEN"')
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
+def test_subparser_aliases(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    subparsers = parser.add_subparsers()
+    sub = subparsers.add_parser("sub", aliases=["xsub", "ysub"], help="help message")
+    sub.add_argument("posA").complete = {"bash": "_shtab_test_some_func"}
+    preamble = {"bash": "_shtab_test_some_func() { compgen -W 'one two' -- $1 ;}"}
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell, preamble=preamble)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.compgen('-W "${_shtab_test_subparsers[*]}"', "s", "sub")
+        shell.compgen('-W "$_shtab_test_pos_0_choices"', "s", "sub")
+        shell.compgen('-W "${_shtab_test_subparsers[*]}"', "x", "xsub")
+        shell.compgen('-W "$_shtab_test_pos_0_choices"', "x", "xsub")
+        shell.compgen('-W "${_shtab_test_subparsers[*]}"', "y", "ysub")
+        shell.compgen('-W "$_shtab_test_pos_0_choices"', "y", "ysub")
         shell.test('"$($_shtab_test_sub_pos_0_COMPGEN o)" = "one"')
         shell.test('-z "$_shtab_test_COMPGEN"')
 
@@ -213,7 +238,7 @@ def test_add_argument_to_optional(shell, caplog):
 def test_add_argument_to_positional(shell, caplog, capsys):
     parser = ArgumentParser(prog="test")
     subparsers = parser.add_subparsers()
-    sub = subparsers.add_parser("completion")
+    sub = subparsers.add_parser("completion", help="help message")
     shtab.add_argument_to(sub, "shell", parent=parser)
     from argparse import Namespace
 

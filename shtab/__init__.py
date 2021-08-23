@@ -141,6 +141,16 @@ def wordify(string):
     return string.replace("-", "_").replace(".", " ").replace(" ", "_")
 
 
+def get_public_subcommands(sub):
+    """Get all the publicly-visible subcommands for a given subparser."""
+    # NOTE: public subcommands have their primary name listed in the result of
+    # `_get_subactions()`. We use this to get the parser for each subcommand and
+    # compare all the choices (including aliases!) to the set of known-public
+    # parsers.
+    public_parsers = {id(sub.choices[i.dest]) for i in sub._get_subactions()}
+    return {k for k, v in sub.choices.items() if id(v) in public_parsers}
+
+
 def get_bash_commands(root_parser, root_prefix, choice_functions=None):
     """
     Recursive subcommand parser traversal, returning lists of information on
@@ -204,6 +214,9 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                 # choices (including subparsers & shtab `.complete` functions)
                 log.debug("choices:{}:{}".format(prefix, sorted(positional.choices)))
 
+                if isinstance(positional.choices, dict):
+                    public_cmds = get_public_subcommands(positional)
+
                 this_positional_choices = []
                 for choice in positional.choices:
                     if isinstance(choice, Choice):
@@ -222,7 +235,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                     elif isinstance(positional.choices, dict):
                         # subparser, so append to list of subparsers & recurse
                         log.debug("subcommand:%s", choice)
-                        if positional.choices[choice].add_help:
+                        if choice in public_cmds:
                             discovered_subparsers.append(str(choice))
                             this_positional_choices.append(str(choice))
                             (
@@ -577,8 +590,9 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 root_arguments.append(format_positional(opt))
         else:  # subparser
             log.debug("choices:{}:{}".format(root_prefix, sorted(sub.choices)))
+            public_cmds = get_public_subcommands(sub)
             for cmd, subparser in sub.choices.items():
-                if not subparser.add_help:
+                if cmd not in public_cmds:
                     log.debug("skip:subcommand:%s", cmd)
                     continue
                 log.debug("subcommand:%s", cmd)
