@@ -553,7 +553,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 else (
                     choice_type2fn[opt.choices[0].type]
                     if isinstance(opt.choices[0], Choice)
-                    else "({})".format(" ".join(opt.choices))
+                    else "({})".format(" ".join(map(str, opt.choices)))
                 )
                 if opt.choices
                 else "",
@@ -570,7 +570,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
             else (
                 choice_type2fn[opt.choices[0].type]
                 if isinstance(opt.choices[0], Choice)
-                else "({})".format(" ".join(opt.choices))
+                else "({})".format(" ".join(map(str, opt.choices)))
             )
             if opt.choices
             else "",
