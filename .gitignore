@@ -1,13 +1,13 @@
 *.py[cod]
-/shtab/_dist_ver.py
+__pycache__/
 
 # Packages
+/shtab/_dist_ver.py
 /*.egg*/
 /build/
 /dist/
 
 # Unit test / coverage reports
-/.coverage
-/.pytest_cache/
+/.coverage*
 /coverage.xml
-__pycache__/
+/.pytest_cache/
