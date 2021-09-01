@@ -303,7 +303,7 @@ Alternatives
 
 - `click <https://pypi.org/project/click>`_
 
-  - different framework completely replacing ``argparse``
+  - different framework completely replacing the builtin ``argparse``
   - solves multiple problems (rather than POSIX-style "do one thing well")
 
 Contributions
