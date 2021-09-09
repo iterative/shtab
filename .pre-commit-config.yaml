@@ -21,8 +21,8 @@ repos:
   - id: todo
     name: Check TODO
     language: pygrep
-    entry: TODO
     args: [-i]
+    entry: TODO
     types: [text]
     exclude: ^(.pre-commit-config.yaml|.github/workflows/test.yml)$
 - repo: https://gitlab.com/pycqa/flake8
@@ -36,7 +36,7 @@ repos:
     - flake8-debugger
     - flake8-string-format
 - repo: https://github.com/psf/black
-  rev: 21.7b0
+  rev: 21.8b0
   hooks:
   - id: black
 - repo: https://github.com/PyCQA/isort
