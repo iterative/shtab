@@ -26,5 +26,8 @@ plugins:
     minify_js: true
     minify_html: true
 markdown_extensions:
+- admonition
+- toc:
+    permalink: true
 - pymdownx.superfences
 - pymdownx.tabbed

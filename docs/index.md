@@ -28,10 +28,17 @@
 
 ## Installation
 
-Choose one of:
+=== "pip"
 
-- `pip install shtab`
-- `conda install -c conda-forge shtab`
+    ```sh
+    pip install shtab
+    ```
+
+=== "conda"
+
+    ```sh
+    conda install -c conda-forge shtab
+    ```
 
 `bash` users who have never used any kind of tab completion before should also
 follow the OS-specific instructions below.

@@ -21,9 +21,10 @@ your_cli_app.your_parser_object` somewhere your shell looks for completions.
 
 Below are various examples of enabling `shtab`'s own tab completion scripts.
 
-Note that if both shtab and the module it's completing are globally importable,
-eager usage is an option. "Eager" means automatically updating completions each
-time a terminal is opened.
+!!! info
+    If both shtab and the module it's completing are globally importable, eager
+    usage is an option. "Eager" means automatically updating completions each
+    time a terminal is opened.
 
 === "bash"
 
@@ -76,8 +77,9 @@ time a terminal is opened.
     shtab --shell=zsh shtab.main.get_main_parser > ~/.zsh/completions/_shtab
     ```
 
-See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
-folder for more.
+!!! tip
+    See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
+    folder for more.
 
 Any existing `argparse`-based scripts should be supported with minimal effort.
 For example, starting with this existing code:
@@ -101,20 +103,25 @@ if __name__ == "__main__":
 
 Assuming this code example is installed in `MY_PROG.command.main`, simply run:
 
-```sh
-# bash
-shtab --shell=bash -u MY_PROG.command.main.get_main_parser \
-  | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/MY_PROG
+=== "bash"
 
-# zsh
-shtab --shell=zsh -u MY_PROG.command.main.get_main_parser \
-  | sudo tee /usr/local/share/zsh/site-functions/_MY_PROG
-```
+    ```sh
+    shtab --shell=bash -u MY_PROG.command.main.get_main_parser \
+      | sudo tee "$BASH_COMPLETION_COMPAT_DIR"/MY_PROG
+    ```
+
+=== "zsh"
+
+    ```sh
+    shtab --shell=zsh -u MY_PROG.command.main.get_main_parser \
+      | sudo tee /usr/local/share/zsh/site-functions/_MY_PROG
+    ```
 
 ## Library Usage
 
-See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
-folder for more.
+!!! tip
+    See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
+    folder for more.
 
 Complex projects with subparsers and custom completions for paths matching
 certain patterns (e.g. `--file=*.txt`) are fully supported (see
