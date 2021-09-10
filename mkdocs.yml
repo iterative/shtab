@@ -9,6 +9,17 @@ theme:
   name: material
   logo: https://github.com/iterative/shtab/raw/master/meta/logo.png
   favicon: https://github.com/iterative/shtab/raw/master/meta/logo.png
+  palette:
+  - scheme: default
+    primary: white
+    toggle:
+      icon: material/toggle-switch-off-outline
+      name: Switch to dark mode
+  - scheme: slate
+    primary: orange
+    toggle:
+      icon: material/toggle-switch
+      name: Switch to light mode
 plugins:
 - search
 - minify:
