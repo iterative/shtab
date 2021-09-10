@@ -1,6 +1,4 @@
-![Logo](https://github.com/iterative/shtab/raw/master/meta/logo.png)
-
-# shtab
+![shtab](https://static.iterative.ai/img/shtab/banner.png)
 
 [![Tests](https://github.com/iterative/shtab/workflows/Test/badge.svg)](https://github.com/iterative/shtab/actions)
 [![Coverage](https://codecov.io/gh/iterative/shtab/branch/master/graph/badge.svg)](https://codecov.io/gh/iterative/shtab)

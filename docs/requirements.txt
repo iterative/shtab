@@ -1,5 +1,5 @@
 mkdocs-material
-git+git://github.com/serenecloud/jsmin@python3-only#egg=jsmin
+git+git://github.com/iterative/jsmin@python3-only#egg=jsmin
 mkdocs-minify-plugin>0.1.0
 pymdown-extensions
 pygments
