@@ -35,6 +35,9 @@ renderer:
       href: https://github.com/iterative/shtab/releases
     - title: Issues
       href: https://github.com/iterative/shtab/issues?q=
+  - title: Contributing
+    name: contributing
+    source: ../CONTRIBUTING.md
   - title: Licence
     name: licence
     source: ../LICENCE
