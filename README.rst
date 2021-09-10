@@ -322,23 +322,18 @@ for more guidance.
 |Hits|
 
 .. |Logo| image:: https://github.com/iterative/shtab/blob/master/meta/logo.png
-
 .. |Tests| image:: https://github.com/iterative/shtab/workflows/Test/badge.svg
    :target: https://github.com/iterative/shtab/actions
    :alt: Tests
-
 .. |Coverage| image:: https://codecov.io/gh/iterative/shtab/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/iterative/shtab
    :alt: Coverage
-
 .. |Conda| image:: https://img.shields.io/conda/v/conda-forge/shtab.svg?label=conda&logo=conda-forge
    :target: https://anaconda.org/conda-forge/shtab
    :alt: conda-forge
-
 .. |PyPI| image:: https://img.shields.io/pypi/v/shtab.svg?label=pip&logo=PyPI&logoColor=white
    :target: https://pypi.org/project/shtab
    :alt: PyPI
-
 .. |Hits| image:: https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden
    :target: https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social
    :alt: Hits

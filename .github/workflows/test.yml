@@ -33,6 +33,7 @@ jobs:
         pre-commit run -a flake8 | reviewdog -f=pep8 -name=flake8 -tee -reporter=$REPORTER -filter-mode nofilter
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        EVENT: ${{ github.event_name }}
     - run: pre-commit run -a --show-diff-on-failure
   test:
     if: startsWith(github.ref, 'refs/tags') || github.event_name == 'pull_request' || github.event_name == 'schedule' || github.repository_owner != 'iterative'
