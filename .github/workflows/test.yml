@@ -60,6 +60,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+        token: ${{ secrets.GH_TOKEN }}
     - uses: actions/setup-python@v2
     - id: dist
       uses: casperdcl/deploy-pypi@v2
@@ -83,3 +84,12 @@ jobs:
         draft: true
         files: |
           dist/${{ steps.dist.outputs.whl }}
+    - name: Docs
+      run: |
+        if [[ "$DEPLOY" == true ]]; then
+          mkdocs gh-deploy --force
+        else
+          mkdocs build
+        fi
+      env:
+        DEPLOY: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}

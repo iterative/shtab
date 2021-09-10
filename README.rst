@@ -321,7 +321,7 @@ for more guidance.
 
 |Hits|
 
-.. |Logo| image:: https://github.com/iterative/shtab/blob/master/meta/logo.png
+.. |Logo| image:: https://github.com/iterative/shtab/raw/master/meta/logo.png
 .. |Tests| image:: https://github.com/iterative/shtab/workflows/Test/badge.svg
    :target: https://github.com/iterative/shtab/actions
    :alt: Tests

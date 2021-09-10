@@ -6,6 +6,7 @@ __pycache__/
 /*.egg*/
 /build/
 /dist/
+/site/
 
 # Unit test / coverage reports
 /.coverage*
