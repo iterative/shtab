@@ -86,11 +86,24 @@ jobs:
           dist/${{ steps.dist.outputs.whl }}
     - name: Docs
       run: |
-        pip install -U -r docs/requirements.txt
+        pushd docs
+        pip install -U -r requirements.txt
+        PYTHONPATH=. pydoc-markdown --build --site-dir=../../../dist/site
         if [[ "$DEPLOY" == true ]]; then
-          mkdocs gh-deploy -f docs/mkdocs.yml --force
-        else
-          mkdocs build -f docs/mkdocs.yml
+          mkdir ../pages
+          pushd ../pages
+          cp -r ../.git .
+          git checkout gh-pages
+          git ls-files -z | xargs -0 git rm
+          cp -r ../dist/site/* .
+          touch .nojekyll
+          git add .
+          git config user.name "Olivaw[bot]"
+          git config user.email "64868532+iterative-olivaw@users.noreply.github.com"
+          git commit -m "update static site"
+          git push
+          popd
         fi
+        popd
       env:
         DEPLOY: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
