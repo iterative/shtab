@@ -5,7 +5,7 @@
 [![conda-forge](https://img.shields.io/conda/v/conda-forge/shtab.svg?label=conda&logo=conda-forge)](https://anaconda.org/conda-forge/shtab)
 [![PyPI](https://img.shields.io/pypi/v/shtab.svg?label=pip&logo=PyPI&logoColor=white)](https://pypi.org/project/shtab)
 
-- What: Automatically generate shell tab completion scripts for python CLI apps
+- What: Automatically generate shell tab completion scripts for Python CLI apps
 - Why: Speed & correctness. Alternatives like
   [argcomplete](https://pypi.org/project/argcomplete) and
   [pyzshcomplete](https://pypi.org/project/pyzshcomplete) are slow and have side-effects

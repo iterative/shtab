@@ -32,7 +32,7 @@ than a million, the focus is on readability rather than premature speed
 optimisations. The generated code itself, on the other had, should be fast.
 
 Helper functions such as `replace_format` allows use of curly braces `{}` in
-string snippets without clashing between python's `str.format` and shell
+string snippets without clashing between Python's `str.format` and shell
 parameter expansion.
 
 The generated shell code itself is also meant to be readable.
