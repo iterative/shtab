@@ -1,3 +1,5 @@
+docs_dir: .
+site_dir: ../site
 site_name: shtab documentation
 site_url: https://docs.iterative.ai/shtab/
 site_author: Iterative
@@ -28,6 +30,6 @@ plugins:
 markdown_extensions:
 - admonition
 - toc:
-    permalink: true
+    permalink: '#'
 - pymdownx.superfences
 - pymdownx.tabbed
