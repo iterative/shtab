@@ -86,6 +86,7 @@ jobs:
           dist/${{ steps.dist.outputs.whl }}
     - name: Docs
       run: |
+        pip install -U -r docs/requirements.txt
         if [[ "$DEPLOY" == true ]]; then
           mkdocs gh-deploy --force
         else
