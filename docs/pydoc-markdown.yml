@@ -23,7 +23,7 @@ renderer:
     source: index.md
   - title: Usage
     name: use
-    source: usage.md
+    source: use.md
   - title: Reference
     name: ref
     contents: [shtab.complete, shtab.add_argument_to]
