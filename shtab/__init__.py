@@ -706,11 +706,12 @@ def complete(
     """
     parser  : argparse.ArgumentParser
     shell  : str (bash/zsh)
-    root_prefix  : str, prefix for shell functions to avoid clashes
-      (default: "_{parser.prog}")
-    preamble  : dict, mapping shell to text to prepend to generated script
+    root_prefix  : str
+      prefix for shell functions to avoid clashes (default: "_{parser.prog}")
+    preamble  : dict
+      mapping shell to text to prepend to generated script
       (e.g. `{"bash": "_myprog_custom_function(){ echo hello }"}`)
-    choice_functions  : deprecated.
+    choice_functions  : deprecated
 
     N.B. `parser.add_argument().complete = ...` can be used to define custom
     completions (e.g. filenames). See <../examples/pathcomplete.py>.
@@ -744,10 +745,12 @@ def add_argument_to(
 ):
     """
     parser  : argparse.ArgumentParser
-    option_string  : str or list[str], iff positional (no `-` prefix) then
-      `parser` is assumed to actually be a subparser (subcommand mode)
+    option_string  : str or list[str]
+      iff positional (no `-` prefix) then `parser` is assumed to actually be
+      a subparser (subcommand mode)
     help  : str
-    parent  : argparse.ArgumentParser, required in subcommand mode
+    parent  : argparse.ArgumentParser
+      required in subcommand mode
     """
     if isinstance(
         option_string, str if sys.version_info[0] > 2 else basestring  # NOQA

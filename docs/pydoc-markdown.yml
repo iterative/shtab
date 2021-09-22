@@ -1,0 +1,81 @@
+loaders:
+- type: python
+  search_path: [..]
+processors:
+- type: filter
+- type: pydoc_markdown_shtab.ShtabProcessor
+- type: crossref
+renderer:
+  type: mkdocs
+  markdown:
+    source_linker:
+      type: github
+      repo: iterative/shtab
+      root: ..
+    source_position: before signature
+    source_format: |
+      <span style="float: right; font-size: 75%;">
+      [[view source]]({url})
+      </span>
+  pages:
+  - title: Home
+    name: index
+    source: index.md
+  - title: Usage
+    name: use
+    source: use.md
+  - title: Reference
+    name: ref
+    contents: [shtab.complete, shtab.add_argument_to]
+  - title: External Links
+    children:
+    - title: Source Code
+      href: https://github.com/iterative/shtab
+    - title: Changelog
+      href: https://github.com/iterative/shtab/releases
+    - title: Issues
+      href: https://github.com/iterative/shtab/issues?q=
+  - title: Contributing
+    name: contributing
+    source: ../CONTRIBUTING.md
+  - title: Licence
+    name: licence
+    source: ../LICENCE
+  mkdocs_config:
+    site_name: shtab documentation
+    site_description: Automagic shell tab completion for Python CLI applications
+    site_url: https://docs.iterative.ai/shtab/
+    site_author: Iterative
+    repo_name: iterative/shtab
+    repo_url: https://github.com/iterative/shtab
+    copyright: |
+      &copy; Casper da Costa-Luis <a href="https://github.com/casperdcl">@casperdcl</a> 2021
+
+    extra:
+      generator: false
+    theme:
+      name: material
+      logo: https://github.com/iterative/shtab/raw/master/meta/logo.png
+      favicon: https://github.com/iterative/shtab/raw/master/meta/logo.png
+      palette:
+      - scheme: default
+        primary: white
+        toggle:
+          icon: material/toggle-switch-off-outline
+          name: Switch to dark mode
+      - scheme: slate
+        primary: orange
+        toggle:
+          icon: material/toggle-switch
+          name: Switch to light mode
+    plugins:
+    - search
+    - minify:
+        minify_js: true
+        minify_html: true
+    markdown_extensions:
+    - admonition
+    - toc:
+        permalink: '#'
+    - pymdownx.superfences
+    - pymdownx.tabbed

@@ -5,7 +5,7 @@ shtab
 
 |Tests| |Coverage| |Conda| |PyPI|
 
-- What: Automatically generate shell tab completion scripts for python CLI apps
+- What: Automatically generate shell tab completion scripts for Python CLI apps
 - Why: Speed & correctness. Alternatives like
   `argcomplete <https://pypi.org/project/argcomplete>`_ and
   `pyzshcomplete <https://pypi.org/project/pyzshcomplete>`_ are slow and have
@@ -321,7 +321,7 @@ for more guidance.
 
 |Hits|
 
-.. |Logo| image:: https://github.com/iterative/shtab/blob/master/meta/logo.png
+.. |Logo| image:: https://github.com/iterative/shtab/raw/master/meta/logo.png
 .. |Tests| image:: https://github.com/iterative/shtab/workflows/Test/badge.svg
    :target: https://github.com/iterative/shtab/actions
    :alt: Tests
