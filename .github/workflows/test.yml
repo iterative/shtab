@@ -4,15 +4,14 @@ on:
   pull_request:
   schedule:
   - cron: '0 9 * * 1'  # M H d m w (Mondays at 9:00)
+  workflow_dispatch:
 jobs:
   check:
-    if: startsWith(github.ref, 'refs/tags') || github.event_name == 'pull_request' || github.event_name == 'schedule' || github.repository_owner != 'iterative'
+    if: github.event_name != 'pull_request' || github.repository_owner != 'iterative'
     name: Check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
     - uses: actions/setup-python@v2
     - name: set PYSHA
       run: echo "PYSHA=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
@@ -22,7 +21,8 @@ jobs:
         key: pre-commit|${{ env.PYSHA }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - run: pip install -U pre-commit
     - uses: reviewdog/action-setup@v1
-    - if: github.event_name != 'schedule'
+    - if: github.event_name == 'push' || github.event_name == 'pull_request'
+      name: comment
       run: |
         if [[ $EVENT == pull_request ]]; then
           REPORTER=github-pr-review
@@ -31,12 +31,13 @@ jobs:
         fi
         pre-commit run -a todo | reviewdog -efm="%f:%l: %m" -name=TODO -tee -reporter=$REPORTER -filter-mode nofilter
         pre-commit run -a flake8 | reviewdog -f=pep8 -name=flake8 -tee -reporter=$REPORTER -filter-mode nofilter
+        pre-commit run -a mypy | reviewdog -efm="%f:%l: %m" -name=mypy -tee -reporter=$REPORTER -filter-mode nofilter
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         EVENT: ${{ github.event_name }}
     - run: pre-commit run -a --show-diff-on-failure
   test:
-    if: startsWith(github.ref, 'refs/tags') || github.event_name == 'pull_request' || github.event_name == 'schedule' || github.repository_owner != 'iterative'
+    if: github.event_name != 'pull_request' || github.repository_owner != 'iterative'
     name: Test py${{ matrix.python }}
     runs-on: ubuntu-latest
     strategy:
@@ -53,8 +54,8 @@ jobs:
     - run: pytest
     - uses: codecov/codecov-action@v1
   deploy:
-    name: PyPI Deploy
     needs: [check, test]
+    name: PyPI Deploy
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -90,7 +91,7 @@ jobs:
         pip install -U -r requirements.txt
         PYTHONPATH=. pydoc-markdown --build --site-dir=../../../dist/site
         popd
-    - if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
+    - if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') || github.event_name == 'workflow_dispatch' }}
       uses: casperdcl/push-dir@v1
       with:
         message: update static site
