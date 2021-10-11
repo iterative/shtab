@@ -50,7 +50,13 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - run: pip install -U -r requirements-dev.txt
+    - name: Install
+      run: |
+        if [[ ${{ matrix.python }} == '2.7' ]]; then
+          pip install -U pytest-cov 'pytest-timeout<2'
+        else
+          pip install -U -r requirements-dev.txt
+        fi
     - run: pytest
     - uses: codecov/codecov-action@v1
   deploy:
