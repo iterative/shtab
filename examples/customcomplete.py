@@ -39,12 +39,12 @@ def get_main_parser():
     subparsers.required = True
     subparsers.dest = "subcommand"
 
-    parser = subparsers.add_parser("completion")
+    parser = subparsers.add_parser("completion", help="print tab completion")
     shtab.add_argument_to(
         parser, "shell", parent=main_parser, preamble=PREAMBLE
     )  # magic!
 
-    parser = subparsers.add_parser("process")
+    parser = subparsers.add_parser("process", help="parse files")
     # `*.txt` file tab completion
     parser.add_argument("input_txt", nargs="?").complete = TXT_FILE
     # file tab completion builtin shortcut
