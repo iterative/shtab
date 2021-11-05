@@ -20,6 +20,8 @@ Features
 
   - ``bash``
   - ``zsh``
+  - ``tcsh``
+    - Incomplete due to shell limitations, but functional
 
 - Supports
 
