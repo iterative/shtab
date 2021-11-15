@@ -91,6 +91,7 @@ jobs:
         draft: true
         files: |
           dist/${{ steps.dist.outputs.whl }}
+          dist/${{ steps.dist.outputs.targz }}
     - name: Docs
       run: |
         pushd docs
