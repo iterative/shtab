@@ -21,7 +21,6 @@ Features
   - ``bash``
   - ``zsh``
   - ``tcsh``
-    - Incomplete due to shell limitations, but functional
 
 - Supports
 
@@ -315,7 +314,6 @@ Please do open issues & pull requests! Some ideas:
 
 - support ``fish``
 - support ``powershell``
-- support ``tcsh``
 
 See
 `CONTRIBUTING.md <https://github.com/iterative/shtab/tree/master/CONTRIBUTING.md>`_

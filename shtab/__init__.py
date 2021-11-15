@@ -33,16 +33,8 @@ log = logging.getLogger(__name__)
 SUPPORTED_SHELLS = []
 _SUPPORTED_COMPLETERS = {}
 CHOICE_FUNCTIONS = {
-    "file": {
-        "bash": "_shtab_compgen_files",
-        "zsh": "_files",
-        "tcsh": "f",                                 # Not strictly a function...
-    },
-    "directory": {
-        "bash": "_shtab_compgen_dirs",
-        "zsh": "_files -/",
-        "tcsh": "d",                                 # Not strictly a function...
-    }}
+    "file": {"bash": "_shtab_compgen_files", "zsh": "_files", "tcsh": "f"},
+    "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d"}}
 FILE = CHOICE_FUNCTIONS["file"]
 DIRECTORY = DIR = CHOICE_FUNCTIONS["directory"]
 FLAG_OPTION = (

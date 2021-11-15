@@ -26,9 +26,8 @@ def get_main_parser():
         action="store_true",
         help="raise errors if `parser` is not found in $PYTHONPATH",
     )
-    parser.add_argument("-v", "--verbose", dest="loglevel",
-                        action="store_const", default=logging.INFO, const=logging.DEBUG,
-                        help="Log debug information")
+    parser.add_argument("--verbose", dest="loglevel", action="store_const", default=logging.INFO,
+                        const=logging.DEBUG, help="Log debug information")
     return parser
 
 
