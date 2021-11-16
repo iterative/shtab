@@ -52,6 +52,7 @@ def get_main_parser():
 
     main_parser.add_argument('suffix', choices=['json', 'csv'], default='json',
                              help="Output format")
+    main_parser.add_argument('--skipped-argument', help=argparse.SUPPRESS)
     parser.set_defaults(func=process)
     return main_parser
 
