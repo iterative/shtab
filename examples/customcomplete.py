@@ -8,10 +8,7 @@ import argparse
 
 import shtab  # for completion magic
 
-TXT_FILE = {
-    "bash": "_shtab_greeter_compgen_TXTFiles",
-    "zsh": "_files -g '(*.txt|*.TXT)'",
-}
+TXT_FILE = {"bash": "_shtab_greeter_compgen_TXTFiles", "zsh": "_files -g '(*.txt|*.TXT)'"}
 PREAMBLE = {
     "bash": """
 # $1=COMP_WORDS[1]
@@ -20,16 +17,12 @@ _shtab_greeter_compgen_TXTFiles() {
   compgen -f -X '!*?.txt' -- $1
   compgen -f -X '!*?.TXT' -- $1
 }
-""",
-    "zsh": "",
-}
+""", "zsh": ""}
 
 
 def process(args):
-    print(
-        "received <input_txt>=%r --input-file=%r --output-name=%r"
-        % (args.input_txt, args.input_file, args.output_name)
-    )
+    print("received <input_txt>=%r --input-file=%r --output-name=%r" %
+          (args.input_txt, args.input_file, args.output_name))
 
 
 def get_main_parser():
@@ -40,9 +33,7 @@ def get_main_parser():
     subparsers.dest = "subcommand"
 
     parser = subparsers.add_parser("completion", help="print tab completion")
-    shtab.add_argument_to(
-        parser, "shell", parent=main_parser, preamble=PREAMBLE
-    )  # magic!
+    shtab.add_argument_to(parser, "shell", parent=main_parser, preamble=PREAMBLE) # magic!
 
     parser = subparsers.add_parser("process", help="parse files")
     # `*.txt` file tab completion
@@ -52,11 +43,11 @@ def get_main_parser():
     parser.add_argument(
         "-o",
         "--output-name",
-        help=(
-            "output file name. Completes directory names to avoid users"
-            " accidentally overwriting existing files."
-        ),
-    ).complete = shtab.DIRECTORY  # directory tab completion builtin shortcut
+        help=("output file name. Completes directory names to avoid users"
+              " accidentally overwriting existing files."),
+    ).complete = shtab.DIRECTORY
+    # directory tab completion builtin shortcut
+
     parser.set_defaults(func=process)
     return main_parser
 

@@ -21,39 +21,25 @@ class Bash(object):
     def test(self, cmd="1", failure_message=""):
         """Equivalent to `bash -c '{init}; [[ {cmd} ]]'`."""
         init = self.init + "\n" if self.init else ""
-        proc = subprocess.Popen(
-            [
-                "bash",
-                "-o",
-                "pipefail",
-                "-ec",
-                "{init}[[ {cmd} ]]".format(init=init, cmd=cmd),
-            ]
-        )
+        proc = subprocess.Popen([
+            "bash", "-o", "pipefail", "-ec", "{init}[[ {cmd} ]]".format(init=init, cmd=cmd)])
         stdout, stderr = proc.communicate()
-        assert (
-            0 == proc.wait() and not stdout and not stderr
-        ), """\
+        assert (0 == proc.wait() and not stdout and not stderr), """\
 {}
 {}
 === stdout ===
 {}=== stderr ===
-{}""".format(
-            failure_message, cmd, stdout or "", stderr or ""
-        )
+{}""".format(failure_message, cmd, stdout or "", stderr or "")
 
     def compgen(self, compgen_cmd, word, expected_completions, failure_message=""):
         self.test(
-            '"$(echo $(compgen {} -- "{}"))" = "{}"'.format(
-                compgen_cmd, word, expected_completions
-            ),
+            '"$(echo $(compgen {} -- "{}"))" = "{}"'.format(compgen_cmd, word,
+                                                            expected_completions),
             failure_message,
         )
 
 
-@pytest.mark.parametrize(
-    "init,test", [("export FOO=1", '"$FOO" -eq 1'), ("", '-z "$FOO"')]
-)
+@pytest.mark.parametrize("init,test", [("export FOO=1", '"$FOO" -eq 1'), ("", '-z "$FOO"')])
 def test_bash(init, test):
     shell = Bash(init)
     shell.test(test)
@@ -104,10 +90,7 @@ def test_prog_scripts(shell, caplog, capsys):
     if shell == "bash":
         assert script_py == ["complete -o filenames -F _shtab_shtab script.py"]
     elif shell == "zsh":
-        assert script_py == [
-            "#compdef script.py",
-            "_describe 'script.py commands' _commands",
-        ]
+        assert script_py == ["#compdef script.py", "_describe 'script.py commands' _commands"]
     else:
         raise NotImplementedError(shell)
 

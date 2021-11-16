@@ -11,14 +11,12 @@ Arguments:
   <you>  : Your name [default: Anon]
   <me>  : My name [default: Casper]
 """
-import sys  # NOQA
-
 import argopt
 
 import shtab
 
 parser = argopt.argopt(__doc__)
-shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!
+shtab.add_argument_to(parser, ["-s", "--print-completion"]) # magic!
 if __name__ == "__main__":
     args = parser.parse_args()
 

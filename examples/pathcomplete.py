@@ -12,7 +12,8 @@ import shtab  # for completion magic
 
 def get_main_parser():
     parser = argparse.ArgumentParser(prog="pathcomplete")
-    shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!
+    shtab.add_argument_to(parser, ["-s", "--print-completion"]) # magic!
+
     # file & directory tab complete
     parser.add_argument("file", nargs="?").complete = shtab.FILE
     parser.add_argument("--dir", default=".").complete = shtab.DIRECTORY

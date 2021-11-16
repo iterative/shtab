@@ -277,7 +277,7 @@ object from `docopt <https://pypi.org/project/docopt>`_ syntax:
       <you>  : Your name [default: Anon]
       <me>  : My name [default: Casper]
     """
-    import sys, argopt, shtab  # NOQA
+    import argopt, shtab
 
     parser = argopt.argopt(__doc__)
     shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!

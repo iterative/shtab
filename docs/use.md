@@ -172,7 +172,7 @@ Add direct support to scripts for a little more configurability:
       <you>  : Your name [default: Anon]
       <me>  : My name [default: Casper]
     """
-    import sys, argopt, shtab  # NOQA
+    import argopt, shtab
 
     parser = argopt.argopt(__doc__)
     shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!

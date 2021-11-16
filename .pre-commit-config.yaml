@@ -37,11 +37,12 @@ repos:
     - flake8-debugger
     - flake8-isort
     - flake8-string-format
-- repo: https://github.com/psf/black
-  rev: 21.9b0
+- repo: https://github.com/google/yapf
+  rev: v0.31.0
   hooks:
-  - id: black
+  - id: yapf
+    args: [-i]
 - repo: https://github.com/PyCQA/isort
-  rev: 5.9.3
+  rev: 5.10.1
   hooks:
   - id: isort

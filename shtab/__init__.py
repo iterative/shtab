@@ -26,22 +26,14 @@ except ImportError:
         __version__ = get_version(root="..", relative_to=__file__)
     except (ImportError, LookupError):
         __version__ = "UNKNOWN"
-__all__ = [
-    "complete",
-    "add_argument_to",
-    "SUPPORTED_SHELLS",
-    "FILE",
-    "DIRECTORY",
-    "DIR",
-]
+__all__ = ["complete", "add_argument_to", "SUPPORTED_SHELLS", "FILE", "DIRECTORY", "DIR"]
 log = logging.getLogger(__name__)
 
 SUPPORTED_SHELLS = []
 _SUPPORTED_COMPLETERS = {}
 CHOICE_FUNCTIONS = {
     "file": {"bash": "_shtab_compgen_files", "zsh": "_files"},
-    "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/"},
-}
+    "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/"}}
 FILE = CHOICE_FUNCTIONS["file"]
 DIRECTORY = DIR = CHOICE_FUNCTIONS["directory"]
 FLAG_OPTION = (
@@ -53,7 +45,7 @@ FLAG_OPTION = (
 )
 OPTION_END = _HelpAction, _VersionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
-RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])")  # excessive but safe
+RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])") # excessive but safe
 
 
 def mark_completer(shell):
@@ -70,9 +62,8 @@ def get_completer(shell):
     try:
         return _SUPPORTED_COMPLETERS[shell]
     except KeyError:
-        raise NotImplementedError(
-            "shell (%s) must be in {%s}" % (shell, ",".join(SUPPORTED_SHELLS))
-        )
+        raise NotImplementedError("shell (%s) must be in {%s}" %
+                                  (shell, ",".join(SUPPORTED_SHELLS)))
 
 
 @total_ordering
@@ -82,7 +73,6 @@ class Choice(object):
 
     >>> ArgumentParser.add_argument(..., choices=[Choice("<type>")])
     """
-
     def __init__(self, choice_type, required=False):
         """
         See below for parameters.
@@ -123,11 +113,8 @@ class Required(object):
 
 
 def complete2pattern(opt_complete, shell, choice_type2fn):
-    return (
-        opt_complete.get(shell, "")
-        if isinstance(opt_complete, dict)
-        else choice_type2fn[opt_complete]
-    )
+    return (opt_complete.get(shell, "")
+            if isinstance(opt_complete, dict) else choice_type2fn[opt_complete])
 
 
 def wordify(string):
@@ -161,11 +148,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
     def get_option_strings(parser):
         """Flattened list of all `parser`'s option strings."""
         return sum(
-            (
-                opt.option_strings
-                for opt in parser._get_optional_actions()
-                if opt.help != SUPPRESS
-            ),
+            (opt.option_strings for opt in parser._get_optional_actions() if opt.help != SUPPRESS),
             [],
         )
 
@@ -192,13 +175,8 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
 
             if hasattr(positional, "complete"):
                 # shtab `.complete = ...` functions
-                compgens.append(
-                    u"{}_pos_{}_COMPGEN={}".format(
-                        prefix,
-                        i,
-                        complete2pattern(positional.complete, "bash", choice_type2fn),
-                    )
-                )
+                compgens.append(u"{}_pos_{}_COMPGEN={}".format(
+                    prefix, i, complete2pattern(positional.complete, "bash", choice_type2fn)))
 
             if positional.choices:
                 # choices (including subparsers & shtab `.complete` functions)
@@ -209,16 +187,9 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                     if isinstance(choice, Choice):
                         # append special completion type to `compgens`
                         # NOTE: overrides `.complete` attribute
-                        log.debug(
-                            "Choice.{}:{}:{}".format(
-                                choice.type, prefix, positional.dest
-                            )
-                        )
-                        compgens.append(
-                            u"{}_pos_{}_COMPGEN={}".format(
-                                prefix, i, choice_type2fn[choice.type]
-                            )
-                        )
+                        log.debug("Choice.{}:{}:{}".format(choice.type, prefix, positional.dest))
+                        compgens.append(u"{}_pos_{}_COMPGEN={}".format(
+                            prefix, i, choice_type2fn[choice.type]))
                     elif isinstance(positional.choices, dict):
                         # subparser, so append to list of subparsers & recurse
                         log.debug("subcommand:%s", choice)
@@ -248,30 +219,21 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         this_positional_choices.append(str(choice))
 
                 if this_positional_choices:
-                    choices.append(
-                        u"{}_pos_{}_choices='{}'".format(
-                            prefix, i, " ".join(this_positional_choices)
-                        )
-                    )
+                    choices.append(u"{}_pos_{}_choices='{}'".format(
+                        prefix, i, " ".join(this_positional_choices)))
 
             # skip default `nargs` values
             if positional.nargs not in (None, "1", "?"):
                 nargs.append(u"{}_pos_{}_nargs={}".format(prefix, i, positional.nargs))
 
         if discovered_subparsers:
-            subparsers.append(
-                u"{}_subparsers=('{}')".format(
-                    prefix, "' '".join(discovered_subparsers)
-                )
-            )
+            subparsers.append(u"{}_subparsers=('{}')".format(prefix,
+                                                             "' '".join(discovered_subparsers)))
             log.debug("subcommands:{}:{}".format(prefix, discovered_subparsers))
 
         # optional arguments
-        option_strings.append(
-            u"{}_option_strings=('{}')".format(
-                prefix, "' '".join(get_option_strings(parser))
-            )
-        )
+        option_strings.append(u"{}_option_strings=('{}')".format(
+            prefix, "' '".join(get_option_strings(parser))))
         for optional in parser._get_optional_actions():
             if optional == SUPPRESS:
                 continue
@@ -279,13 +241,9 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             for option_string in optional.option_strings:
                 if hasattr(optional, "complete"):
                     # shtab `.complete = ...` functions
-                    compgens.append(
-                        u"{}_{}_COMPGEN={}".format(
-                            prefix,
-                            wordify(option_string),
-                            complete2pattern(optional.complete, "bash", choice_type2fn),
-                        )
-                    )
+                    compgens.append(u"{}_{}_COMPGEN={}".format(
+                        prefix, wordify(option_string),
+                        complete2pattern(optional.complete, "bash", choice_type2fn)))
 
                 if optional.choices:
                     # choices (including shtab `.complete` functions)
@@ -294,38 +252,21 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         # append special completion type to `compgens`
                         # NOTE: overrides `.complete` attribute
                         if isinstance(choice, Choice):
-                            log.debug(
-                                "Choice.{}:{}:{}".format(
-                                    choice.type, prefix, optional.dest
-                                )
-                            )
-                            compgens.append(
-                                u"{}_{}_COMPGEN={}".format(
-                                    prefix,
-                                    wordify(option_string),
-                                    choice_type2fn[choice.type],
-                                )
-                            )
+                            log.debug("Choice.{}:{}:{}".format(choice.type, prefix, optional.dest))
+                            compgens.append(u"{}_{}_COMPGEN={}".format(
+                                prefix, wordify(option_string), choice_type2fn[choice.type]))
                         else:
                             # simple choice
                             this_optional_choices.append(str(choice))
 
                     if this_optional_choices:
-                        choices.append(
-                            u"{}_{}_choices='{}'".format(
-                                prefix,
-                                wordify(option_string),
-                                " ".join(this_optional_choices),
-                            )
-                        )
+                        choices.append(u"{}_{}_choices='{}'".format(
+                            prefix, wordify(option_string), " ".join(this_optional_choices)))
 
                 # Check for nargs.
                 if optional.nargs is not None and optional.nargs != 1:
-                    nargs.append(
-                        u"{}_{}_nargs={}".format(
-                            prefix, wordify(option_string), optional.nargs
-                        )
-                    )
+                    nargs.append(u"{}_{}_nargs={}".format(prefix, wordify(option_string),
+                                                          optional.nargs))
 
         # append recursion results
         subparsers.extend(sub_subparsers)
@@ -348,16 +289,14 @@ def complete_bash(parser, root_prefix=None, preamble="", choice_functions=None):
     """
     root_prefix = wordify("_shtab_" + (root_prefix or parser.prog))
     subparsers, option_strings, compgens, choices, nargs = get_bash_commands(
-        parser, root_prefix, choice_functions=choice_functions
-    )
+        parser, root_prefix, choice_functions=choice_functions)
 
     # References:
     # - https://www.gnu.org/software/bash/manual/html_node/
     #   Programmable-Completion.html
     # - https://opensource.com/article/18/3/creating-bash-completion-script
     # - https://stackoverflow.com/questions/12933362
-    return Template(
-        """\
+    return Template("""\
 #!/usr/bin/env bash
 # AUTOMATCALLY GENERATED by `shtab`
 
@@ -485,18 +424,14 @@ ${root_prefix}() {
   return 0
 }
 
-complete -o filenames -F ${root_prefix} ${prog}"""
-    ).safe_substitute(
+complete -o filenames -F ${root_prefix} ${prog}""").safe_substitute(
         subparsers="\n".join(subparsers),
         option_strings="\n".join(option_strings),
         compgens="\n".join(compgens),
         choices="\n".join(choices),
         nargs="\n".join(nargs),
-        preamble=(
-            "\n# Custom Preamble\n" + preamble + "\n# End Custom Preamble\n"
-            if preamble
-            else ""
-        ),
+        preamble=("\n# Custom Preamble\n" + preamble +
+                  "\n# End Custom Preamble\n" if preamble else ""),
         root_prefix=root_prefix,
         prog=parser.prog,
     )
@@ -515,60 +450,36 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     """
     root_prefix = wordify("_shtab_" + (root_prefix or parser.prog))
     root_arguments = []
-    subcommands = {}  # {cmd: {"help": help, "arguments": [arguments]}}
+    subcommands = {} # {cmd: {"help": help, "arguments": [arguments]}}
 
     choice_type2fn = {k: v["zsh"] for k, v in CHOICE_FUNCTIONS.items()}
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
     def format_optional(opt):
-        return (
-            (
-                '{nargs}{options}"[{help}]"'
-                if isinstance(opt, FLAG_OPTION)
-                else '{nargs}{options}"[{help}]:{dest}:{pattern}"'
-            )
-            .format(
-                nargs=(
-                    '"(- :)"'
-                    if isinstance(opt, OPTION_END)
-                    else '"*"'
-                    if isinstance(opt, OPTION_MULTI)
-                    else ""
-                ),
-                options=(
-                    "{{{}}}".format(",".join(opt.option_strings))
-                    if len(opt.option_strings) > 1
-                    else '"{}"'.format("".join(opt.option_strings))
-                ),
+        return (('{nargs}{options}"[{help}]"' if isinstance(
+            opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
+                nargs=('"(- :)"' if isinstance(opt, OPTION_END) else
+                       '"*"' if isinstance(opt, OPTION_MULTI) else ""),
+                options=("{{{}}}".format(",".join(opt.option_strings))
+                         if len(opt.option_strings) > 1 else '"{}"'.format("".join(
+                             opt.option_strings))),
                 help=escape_zsh(opt.help or ""),
                 dest=opt.dest,
-                pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
-                if hasattr(opt, "complete")
-                else (
-                    choice_type2fn[opt.choices[0].type]
-                    if isinstance(opt.choices[0], Choice)
-                    else "({})".format(" ".join(map(str, opt.choices)))
-                )
-                if opt.choices
-                else "",
-            )
-            .replace('""', "")
-        )
+                pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
+                    opt, "complete") else
+                (choice_type2fn[opt.choices[0].type] if isinstance(opt.choices[0], Choice) else
+                 "({})".format(" ".join(map(str, opt.choices)))) if opt.choices else "",
+            ).replace('""', ""))
 
     def format_positional(opt):
         return '"{nargs}:{help}:{pattern}"'.format(
             nargs={"+": "(*)", "*": "(*):"}.get(opt.nargs, ""),
             help=escape_zsh((opt.help or opt.dest).strip().split("\n")[0]),
-            pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
-            if hasattr(opt, "complete")
-            else (
-                choice_type2fn[opt.choices[0].type]
-                if isinstance(opt.choices[0], Choice)
-                else "({})".format(" ".join(map(str, opt.choices)))
-            )
-            if opt.choices
-            else "",
+            pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
+                opt, "complete") else
+            (choice_type2fn[opt.choices[0].type] if isinstance(opt.choices[0], Choice) else
+             "({})".format(" ".join(map(str, opt.choices)))) if opt.choices else "",
         )
 
     for sub in parser._get_positional_actions():
@@ -577,7 +488,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
             opt = sub
             if opt.help != SUPPRESS:
                 root_arguments.append(format_positional(opt))
-        else:  # subparser
+        else:      # subparser
             log.debug("choices:{}:{}".format(root_prefix, sorted(sub.choices)))
             public_cmds = get_public_subcommands(sub)
             for cmd, subparser in sub.choices.items():
@@ -588,18 +499,13 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
                 # optionals
                 arguments = [
-                    format_optional(opt)
-                    for opt in subparser._get_optional_actions()
-                    if opt.help != SUPPRESS
-                ]
+                    format_optional(opt) for opt in subparser._get_optional_actions()
+                    if opt.help != SUPPRESS]
 
                 # subcommand positionals
                 subsubs = sum(
-                    (
-                        list(opt.choices)
-                        for opt in subparser._get_positional_actions()
-                        if isinstance(opt.choices, dict)
-                    ),
+                    (list(opt.choices) for opt in subparser._get_positional_actions()
+                     if isinstance(opt.choices, dict)),
                     [],
                 )
                 if subsubs:
@@ -607,16 +513,12 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
                 # positionals
                 arguments.extend(
-                    format_positional(opt)
-                    for opt in subparser._get_positional_actions()
-                    if not isinstance(opt.choices, dict)
-                    if opt.help != SUPPRESS
-                )
+                    format_positional(opt) for opt in subparser._get_positional_actions()
+                    if not isinstance(opt.choices, dict) if opt.help != SUPPRESS)
 
                 subcommands[cmd] = {
                     "help": (subparser.description or "").strip().split("\n")[0],
-                    "arguments": arguments,
-                }
+                    "arguments": arguments}
                 log.debug("subcommands:%s:%s", cmd, subcommands[cmd])
 
     log.debug("subcommands:%s:%s", root_prefix, sorted(subcommands))
@@ -627,8 +529,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     #   - https://mads-hartmann.com/2017/08/06/
     #     writing-zsh-completion-scripts.html
     #   - http://www.linux-mag.com/id/1106/
-    return Template(
-        """\
+    return Template("""\
 #compdef ${prog}
 
 # AUTOMATCALLY GENERATED by `shtab`
@@ -657,48 +558,29 @@ _arguments \\
 
 case $words[1] in
   ${commands_case}
-esac"""
-    ).safe_substitute(
+esac""").safe_substitute(
         root_prefix=root_prefix,
         prog=parser.prog,
-        commands="\n    ".join(
-            '"{}:{}"'.format(cmd, escape_zsh(subcommands[cmd]["help"]))
-            for cmd in sorted(subcommands)
-        ),
+        commands="\n    ".join('"{}:{}"'.format(cmd, escape_zsh(subcommands[cmd]["help"]))
+                               for cmd in sorted(subcommands)),
         root_arguments=" \\\n  ".join(root_arguments),
         root_options="\n  ".join(
-            format_optional(opt)
-            for opt in parser._get_optional_actions()
-            if opt.help != SUPPRESS
-        ),
-        commands_case="\n  ".join(
-            "{cmd_orig}) _arguments ${root_prefix}_{cmd} ;;".format(
-                cmd_orig=cmd, cmd=wordify(cmd), root_prefix=root_prefix
-            )
-            for cmd in sorted(subcommands)
-        ),
-        subcommands="\n".join(
-            """
+            format_optional(opt) for opt in parser._get_optional_actions()
+            if opt.help != SUPPRESS),
+        commands_case="\n  ".join("{cmd_orig}) _arguments ${root_prefix}_{cmd} ;;".format(
+            cmd_orig=cmd, cmd=wordify(cmd), root_prefix=root_prefix)
+                                  for cmd in sorted(subcommands)),
+        subcommands="\n".join("""
 {root_prefix}_{cmd}=(
   {arguments}
-)""".format(
-                root_prefix=root_prefix,
-                cmd=wordify(cmd),
-                arguments="\n  ".join(subcommands[cmd]["arguments"]),
-            )
-            for cmd in sorted(subcommands)
-        ),
-        preamble=(
-            "\n# Custom Preamble\n" + preamble + "\n# End Custom Preamble\n"
-            if preamble
-            else ""
-        ),
+)""".format(root_prefix=root_prefix, cmd=wordify(cmd), arguments="\n  ".join(
+            subcommands[cmd]["arguments"])) for cmd in sorted(subcommands)),
+        preamble=("\n# Custom Preamble\n" + preamble +
+                  "\n# End Custom Preamble\n" if preamble else ""),
     )
 
 
-def complete(
-    parser, shell="bash", root_prefix=None, preamble="", choice_functions=None
-):
+def complete(parser, shell="bash", root_prefix=None, preamble="", choice_functions=None):
     """
     parser  : argparse.ArgumentParser
     shell  : str (bash/zsh)
@@ -749,16 +631,14 @@ def add_argument_to(
       required in subcommand mode
     """
     if isinstance(
-        option_string, str if sys.version_info[0] > 2 else basestring  # NOQA
+            option_string,
+            str if sys.version_info[0] > 2 else basestring          # NOQA
     ):
         option_string = [option_string]
     kwargs = {
-        "choices": SUPPORTED_SHELLS,
-        "default": None,
-        "help": help,
-        "action": completion_action(parent, preamble),
-    }
-    if option_string[0][0] != "-":  # subparser mode
+        "choices": SUPPORTED_SHELLS, "default": None, "help": help,
+        "action": completion_action(parent, preamble)}
+    if option_string[0][0] != "-":                                  # subparser mode
         kwargs.update(default=SUPPORTED_SHELLS[0], nargs="?")
         assert parent is not None, "subcommand mode: parent required"
     parser.add_argument(*option_string, **kwargs)
