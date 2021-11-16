@@ -50,7 +50,7 @@ def get_main_parser():
     ).complete = shtab.DIRECTORY
     # directory tab completion builtin shortcut
 
-    main_parser.add_argument('--suffix', choices=['json', 'csv'], default='json',
+    main_parser.add_argument('suffix', choices=['json', 'csv'], default='json',
                              help="Output format")
     parser.set_defaults(func=process)
     return main_parser

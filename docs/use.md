@@ -77,6 +77,30 @@ Below are various examples of enabling `shtab`'s own tab completion scripts.
     shtab --shell=zsh shtab.main.get_main_parser > ~/.zsh/completions/_shtab
     ```
 
+=== "tcsh"
+
+    `tcsh` does not have support for lazy loading shell completion, this will
+    need to be loaded just like any other initialization script.
+
+    ```csh
+    shtab --shell=tcsh shtab.main.get_main_parser --error-unimportable \
+      | sudo tee /etc/profile.d/shtab.completion.csh
+    ```
+
+=== "Eager tcsh"
+
+    There are a few options:
+
+    ```sh
+    # Install locally
+    echo 'shtab --shell=tcsh shtab.main.get_main_parser | source /dev/stdin` \
+      >> ~/.cshrc
+
+    # Install system-wide
+    echo 'shtab --shell=tcsh shtab.main.get_main_parser | source /dev/stdin' \
+      | sudo tee /etc/profile.d/eager-completion.csh
+    ```
+
 !!! tip
     See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
     folder for more.
