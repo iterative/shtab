@@ -79,10 +79,7 @@ Below are various examples of enabling `shtab`'s own tab completion scripts.
 
 === "tcsh"
 
-    `tcsh` does not have support for lazy loading shell completion, this will
-    need to be loaded just like any other initialization script.
-
-    ```csh
+    ```sh
     shtab --shell=tcsh shtab.main.get_main_parser --error-unimportable \
       | sudo tee /etc/profile.d/shtab.completion.csh
     ```
@@ -93,7 +90,7 @@ Below are various examples of enabling `shtab`'s own tab completion scripts.
 
     ```sh
     # Install locally
-    echo 'shtab --shell=tcsh shtab.main.get_main_parser | source /dev/stdin` \
+    echo 'shtab --shell=tcsh shtab.main.get_main_parser | source /dev/stdin' \
       >> ~/.cshrc
 
     # Install system-wide
