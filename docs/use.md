@@ -138,6 +138,13 @@ Assuming this code example is installed in `MY_PROG.command.main`, simply run:
       | sudo tee /usr/local/share/zsh/site-functions/_MY_PROG
     ```
 
+=== "tcsh"
+
+    ```sh
+    shtab --shell=tcsh -u MY_PROG.command.main.get_main_parser \
+      | sudo tee /etc/profile.d/MY_PROG.completion.csh
+    ```
+
 ## Library Usage
 
 !!! tip
