@@ -20,6 +20,7 @@ Features
 
   - ``bash``
   - ``zsh``
+  - ``tcsh``
 
 - Supports
 
@@ -313,7 +314,6 @@ Please do open issues & pull requests! Some ideas:
 
 - support ``fish``
 - support ``powershell``
-- support ``tcsh``
 
 See
 `CONTRIBUTING.md <https://github.com/iterative/shtab/tree/master/CONTRIBUTING.md>`_

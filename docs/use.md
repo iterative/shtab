@@ -7,8 +7,8 @@ There are two ways of using `shtab`:
     - end-users execute `shtab your_cli_app.your_parser_object`
 - [Library Usage](#library-usage): as a library integrated into your CLI application
     - adds a couple of lines to your application
-    - argument mode: end-users execute `your_cli_app --print-completion {bash,zsh}`
-    - subparser mode: end-users execute `your_cli_app completion {bash,zsh}`
+    - argument mode: end-users execute `your_cli_app --print-completion {bash,zsh,tcsh}`
+    - subparser mode: end-users execute `your_cli_app completion {bash,zsh,tcsh}`
 
 ## CLI Usage
 
@@ -75,6 +75,27 @@ Below are various examples of enabling `shtab`'s own tab completion scripts.
     mkdir -p ~/.zsh/completions
     fpath=($fpath ~/.zsh/completions)  # must be before `compinit` lines
     shtab --shell=zsh shtab.main.get_main_parser > ~/.zsh/completions/_shtab
+    ```
+
+=== "tcsh"
+
+    ```sh
+    shtab --shell=tcsh shtab.main.get_main_parser --error-unimportable \
+      | sudo tee /etc/profile.d/shtab.completion.csh
+    ```
+
+=== "Eager tcsh"
+
+    There are a few options:
+
+    ```sh
+    # Install locally
+    echo 'shtab --shell=tcsh shtab.main.get_main_parser | source /dev/stdin' \
+      >> ~/.cshrc
+
+    # Install system-wide
+    echo 'shtab --shell=tcsh shtab.main.get_main_parser | source /dev/stdin' \
+      | sudo tee /etc/profile.d/eager-completion.csh
     ```
 
 !!! tip

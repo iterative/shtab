@@ -8,7 +8,9 @@ import argparse
 
 import shtab  # for completion magic
 
-TXT_FILE = {"bash": "_shtab_greeter_compgen_TXTFiles", "zsh": "_files -g '(*.txt|*.TXT)'"}
+TXT_FILE = {
+    "bash": "_shtab_greeter_compgen_TXTFiles", "zsh": "_files -g '(*.txt|*.TXT)'",
+    "tcsh": "f:*.txt"}
 PREAMBLE = {
     "bash": """
 # $1=COMP_WORDS[1]
@@ -17,7 +19,7 @@ _shtab_greeter_compgen_TXTFiles() {
   compgen -f -X '!*?.txt' -- $1
   compgen -f -X '!*?.TXT' -- $1
 }
-""", "zsh": ""}
+""", "zsh": "", "tcsh": ""}
 
 
 def process(args):
@@ -48,6 +50,8 @@ def get_main_parser():
     ).complete = shtab.DIRECTORY
     # directory tab completion builtin shortcut
 
+    main_parser.add_argument('suffix', choices=['json', 'csv'], default='json',
+                             help="Output format")
     parser.set_defaults(func=process)
     return main_parser
 

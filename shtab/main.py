@@ -26,12 +26,15 @@ def get_main_parser():
         action="store_true",
         help="raise errors if `parser` is not found in $PYTHONPATH",
     )
+    parser.add_argument("--verbose", dest="loglevel", action="store_const", default=logging.INFO,
+                        const=logging.DEBUG, help="Log debug information")
     return parser
 
 
 def main(argv=None):
     parser = get_main_parser()
     args = parser.parse_args(argv)
+    logging.basicConfig(level=args.loglevel)
     log.debug(args)
 
     module, other_parser = args.parser.rsplit(".", 1)
