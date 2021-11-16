@@ -641,7 +641,7 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 if not requirements and isinstance(positional.choices, dict):
                     for subcmd, subparser in positional.choices.items():
                         log.debug('%s| | SubParser: %s', log_prefix, subcmd)
-                        recurse_parser(subparser, positional_idx, [*requirements, subcmd])
+                        recurse_parser(subparser, positional_idx, [r for r in requirements] + [subcmd])
 
     recurse_parser(parser, 0)
 
@@ -658,7 +658,7 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
                     '[ "$cmd[{}]" == "{}" ]'.format(iidx, n) for iidx, n in enumerate(nn, start=2)]
                 if arg.choices:
                     nlist.append('( {}echo "{}" || false )'.format(
-                        ' && '.join([*checks, '']),                 # Append the separator
+                        ' && '.join([c for c in checks] + ['']),                 # Append the separator
                         '\\n'.join(arg.choices),
                     ))
 
