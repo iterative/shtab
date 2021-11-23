@@ -624,14 +624,15 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
         for optional in cparser._get_optional_actions():
             log.debug('%s| Optional: %s', log_prefix, optional.dest)
-            # Mingle all optional arguments for all subparsers
-            for optional_str in optional.option_strings:
-                log.debug('%s| | %s', log_prefix, optional_str)
-                if optional_str.startswith('--'):
-                    optionals_double.add(optional_str[2:])
-                elif optional_str.startswith('-'):
-                    optionals_single.add(optional_str[1:])
-                specials.extend(get_specials(optional, 'n', optional_str))
+            if optional.help != SUPPRESS:
+                # Mingle all optional arguments for all subparsers
+                for optional_str in optional.option_strings:
+                    log.debug('%s| | %s', log_prefix, optional_str)
+                    if optional_str.startswith('--'):
+                        optionals_double.add(optional_str[2:])
+                    elif optional_str.startswith('-'):
+                        optionals_single.add(optional_str[1:])
+                    specials.extend(get_specials(optional, 'n', optional_str))
 
         for positional in cparser._get_positional_actions():
             if positional.help != SUPPRESS:

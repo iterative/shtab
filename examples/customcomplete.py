@@ -23,8 +23,9 @@ _shtab_greeter_compgen_TXTFiles() {
 
 
 def process(args):
-    print("received <input_txt>=%r --input-file=%r --output-name=%r" %
-          (args.input_txt, args.input_file, args.output_name))
+    print(
+        "received <input_txt>=%r [<suffix>=%r] --input-file=%r --output-name=%r --hidden-opt=%r" %
+        (args.input_txt, args.suffix, args.input_file, args.output_name, args.hidden_opt))
 
 
 def get_main_parser():
@@ -39,7 +40,7 @@ def get_main_parser():
 
     parser = subparsers.add_parser("process", help="parse files")
     # `*.txt` file tab completion
-    parser.add_argument("input_txt", nargs="?").complete = TXT_FILE
+    parser.add_argument("input_txt", nargs='?').complete = TXT_FILE
     # file tab completion builtin shortcut
     parser.add_argument("-i", "--input-file").complete = shtab.FILE
     parser.add_argument(
@@ -50,8 +51,9 @@ def get_main_parser():
     ).complete = shtab.DIRECTORY
     # directory tab completion builtin shortcut
 
-    main_parser.add_argument('suffix', choices=['json', 'csv'], default='json',
-                             help="Output format")
+    parser.add_argument("suffix", choices=['json', 'csv'], default='json', nargs='?',
+                        help="Output format")
+    parser.add_argument("--hidden-opt", action='store_true', help=argparse.SUPPRESS)
     parser.set_defaults(func=process)
     return main_parser
 
