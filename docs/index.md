@@ -74,8 +74,15 @@ follow the OS-specific instructions below.
 
 ## FAQs
 
-Not working? Make sure that `shtab` and the application you're trying to
-complete are both accessible from your environment.
+Not working?
+
+- Make sure that `shtab` and the application you're trying to complete are both accessible from your environment.
+- Make sure that `prog` is set:
+    - if using [`options.entry_points.console_scripts=MY_PROG=...`](https://setuptools.pypa.io/en/latest/userguide/entry_point.html), then ensure the main parser's `prog` matches `argparse.ArgumentParser(prog="MY_PROG")` or override it using `shtab MY_PROG.get_main_parser --prog=MY_PROG`.
+    - if executing a script file `./MY_PROG.py` (with a [shebang](<https://en.wikipedia.org/wiki/Shebang_(Unix)>) `#!/usr/bin/env python`) directly, then use `argparse.ArgumentParser(prog="MY_PROG.py")` or override it using `shtab MY_PROG.get_main_parser --prog=MY_PROG.py`.
+- Make sure that all arguments have `help` messages (`parser.add_argument('positional', help="documented; i.e. not hidden")`).
+- [Ask a general question on StackOverflow](https://stackoverflow.com/questions/tagged/shtab).
+- [Report bugs and open feature requests on GitHub][GH-issue].
 
 "Eager" installation (completions are re-generated upon login/terminal start) is
 recommended. Naturally, `shtab` and the CLI application to complete should be
@@ -100,7 +107,7 @@ application. Use `-u, --error-unimportable` to noisily complain.
 
 ## Contributions
 
-Please do open issues & pull requests! Some ideas:
+Please do open [issues][GH-issue] & [pull requests][GH-pr]! Some ideas:
 
 - support `fish`
 - support `powershell`
@@ -110,3 +117,6 @@ See
 for more guidance.
 
 [![Hits](https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden)](https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social)
+
+[GH-issue]: https://github.com/iterative/shtab/issues
+[GH-pr]: https://github.com/iterative/shtab/pulls
