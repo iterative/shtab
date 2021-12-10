@@ -105,7 +105,7 @@ Below are various examples of enabling `shtab`'s own tab completion scripts.
 Any existing `argparse`-based scripts should be supported with minimal effort.
 For example, starting with this existing code:
 
-```{.py title="main.py" linenums="1"}
+```{.py title="main.py" linenums="1" #main.py}
 #!/usr/bin/env python
 import argparse
 
