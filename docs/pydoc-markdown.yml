@@ -68,6 +68,8 @@ renderer:
         toggle:
           icon: material/toggle-switch
           name: Switch to light mode
+      features:
+      - content.tabs.link
     plugins:
     - search
     - minify:
@@ -78,4 +80,5 @@ renderer:
     - toc:
         permalink: '#'
     - pymdownx.superfences
-    - pymdownx.tabbed
+    - pymdownx.tabbed:
+        alternate_style: true
