@@ -3,4 +3,4 @@ git+git://github.com/iterative/jsmin@python3-only#egg=jsmin
 mkdocs-minify-plugin
 pydoc-markdown>=4
 pygments
-pymdown-extensions
+pymdown-extensions>=9

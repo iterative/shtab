@@ -105,7 +105,7 @@ Below are various examples of enabling `shtab`'s own tab completion scripts.
 Any existing `argparse`-based scripts should be supported with minimal effort.
 For example, starting with this existing code:
 
-```{.py linenums="1"}
+```{.py title="main.py" linenums="1"}
 #!/usr/bin/env python
 import argparse
 
@@ -162,7 +162,7 @@ Add direct support to scripts for a little more configurability:
 
 === "argparse"
 
-    ```{.py linenums="1" hl_lines="7 9-10"}
+    ```{.py title="pathcomplete.py" linenums="1" hl_lines="7 9-10"}
     #!/usr/bin/env python
     import argparse
     import shtab  # for completion magic
@@ -186,7 +186,7 @@ Add direct support to scripts for a little more configurability:
     Simply use [argopt](https://pypi.org/project/argopt) to create a parser
     object from [docopt](https://pypi.org/project/docopt) syntax:
 
-    ```{.py linenums="1" hl_lines="17"}
+    ```{.py title="docopt-greeter.py" linenums="1" hl_lines="17"}
     #!/usr/bin/env python
     """Greetings and partings.
 
