@@ -3,7 +3,6 @@ from __future__ import print_function
 import logging
 import re
 import sys
-import typing as t
 from argparse import (
     SUPPRESS,
     Action,
@@ -18,6 +17,9 @@ from argparse import (
 from collections import defaultdict
 from functools import total_ordering
 from string import Template
+from typing import Any, Dict, List
+from typing import Optional as Opt
+from typing import Union
 
 # version detector. Precedence: installed dist, git, 'UNKNOWN'
 try:
@@ -32,9 +34,9 @@ except ImportError:
 __all__ = ["complete", "add_argument_to", "SUPPORTED_SHELLS", "FILE", "DIRECTORY", "DIR"]
 log = logging.getLogger(__name__)
 
-SUPPORTED_SHELLS: t.List[str] = []
+SUPPORTED_SHELLS: List[str] = []
 _SUPPORTED_COMPLETERS = {}
-CHOICE_FUNCTIONS: t.Dict[str, t.Dict[str, str]] = {
+CHOICE_FUNCTIONS: Dict[str, Dict[str, str]] = {
     "file": {"bash": "_shtab_compgen_files", "zsh": "_files", "tcsh": "f"},
     "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d"}}
 FILE = CHOICE_FUNCTIONS["file"]
@@ -687,16 +689,16 @@ complete ${prog} \\
         optionals_special_str=' \\\n        '.join(specials))
 
 
-def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: t.Optional[str] = None,
-             preamble: str = "", choice_functions: t.Optional[t.Any] = None) -> str:
+def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] = None,
+             preamble: Union[str, Dict] = "", choice_functions: Opt[Any] = None) -> str:
     """
     parser  : argparse.ArgumentParser
     shell  : str (bash/zsh)
     root_prefix  : str or `None`
       prefix for shell functions to avoid clashes (default: "_{parser.prog}")
-    preamble  : str
-      text to prepend to generated script
-      (e.g. `"_myprog_custom_function(){ echo hello }"`)
+    preamble  : dict or str
+      mapping shell to text to prepend to generated script
+      (e.g. `{"bash": "_myprog_custom_function(){ echo hello }"}`)
     choice_functions  : deprecated
 
     N.B. `parser.add_argument().complete = ...` can be used to define custom
