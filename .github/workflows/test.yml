@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [2.7, 3.6, 3.9]
+        python: [3.6, 3.9]
     steps:
     - uses: actions/checkout@v2
       with:
@@ -51,12 +51,7 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
     - name: Install
-      run: |
-        if [[ ${{ matrix.python }} == '2.7' ]]; then
-          pip install -U pytest-cov 'pytest-timeout<2'
-        else
-          pip install -U -r requirements-dev.txt
-        fi
+      run: pip install -U -r requirements-dev.txt
     - run: pytest
     - uses: codecov/codecov-action@v1
   deploy:
