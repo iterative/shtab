@@ -37,6 +37,7 @@ repos:
     - flake8-debugger
     - flake8-isort
     - flake8-string-format
+    - flake8-type-annotations
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v0.930
   hooks:
