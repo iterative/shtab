@@ -6,6 +6,7 @@ import sys
 from argparse import (
     SUPPRESS,
     Action,
+    ArgumentParser,
     _AppendAction,
     _AppendConstAction,
     _CountAction,
@@ -16,6 +17,9 @@ from argparse import (
 from collections import defaultdict
 from functools import total_ordering
 from string import Template
+from typing import Any, Dict, List
+from typing import Optional as Opt
+from typing import Union
 
 # version detector. Precedence: installed dist, git, 'UNKNOWN'
 try:
@@ -30,9 +34,9 @@ except ImportError:
 __all__ = ["complete", "add_argument_to", "SUPPORTED_SHELLS", "FILE", "DIRECTORY", "DIR"]
 log = logging.getLogger(__name__)
 
-SUPPORTED_SHELLS = []
+SUPPORTED_SHELLS: List[str] = []
 _SUPPORTED_COMPLETERS = {}
-CHOICE_FUNCTIONS = {
+CHOICE_FUNCTIONS: Dict[str, Dict[str, str]] = {
     "file": {"bash": "_shtab_compgen_files", "zsh": "_files", "tcsh": "f"},
     "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d"}}
 FILE = CHOICE_FUNCTIONS["file"]
@@ -74,7 +78,7 @@ class Choice(object):
 
     >>> ArgumentParser.add_argument(..., choices=[Choice("<type>")])
     """
-    def __init__(self, choice_type, required=False):
+    def __init__(self, choice_type: str, required: bool = False) -> None:
         """
         See below for parameters.
 
@@ -84,18 +88,18 @@ class Choice(object):
         self.required = required
         self.type = choice_type
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.type + ("" if self.required else "?")
 
-    def __cmp__(self, other):
+    def __cmp__(self, other: object) -> int:
         if self.required:
             return 0 if other else -1
         return 0
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.__cmp__(other) == 0
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         return self.__cmp__(other) < 0
 
 
@@ -113,12 +117,12 @@ class Required(object):
     DIR = DIRECTORY = [Choice("directory", True)]
 
 
-def complete2pattern(opt_complete, shell, choice_type2fn):
+def complete2pattern(opt_complete, shell, choice_type2fn) -> bool:
     return (opt_complete.get(shell, "")
             if isinstance(opt_complete, dict) else choice_type2fn[opt_complete])
 
 
-def wordify(string):
+def wordify(string: str) -> str:
     """Replace non-word chars [-. ] with underscores [_]"""
     return string.replace("-", "_").replace(".", " ").replace(" ", "_")
 
@@ -683,13 +687,14 @@ complete ${prog} \\
         optionals_special_str=' \\\n        '.join(specials))
 
 
-def complete(parser, shell="bash", root_prefix=None, preamble="", choice_functions=None):
+def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] = None,
+             preamble: Union[str, Dict] = "", choice_functions: Opt[Any] = None) -> str:
     """
     parser  : argparse.ArgumentParser
     shell  : str (bash/zsh)
-    root_prefix  : str
+    root_prefix  : str or `None`
       prefix for shell functions to avoid clashes (default: "_{parser.prog}")
-    preamble  : dict
+    preamble  : dict or str
       mapping shell to text to prepend to generated script
       (e.g. `{"bash": "_myprog_custom_function(){ echo hello }"}`)
     choice_functions  : deprecated
