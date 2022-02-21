@@ -557,8 +557,8 @@ local context state line curcontext="$curcontext"
 _arguments \\
   $$${root_prefix}_options_ \\
   ${root_arguments} \\
-  ': :${root_prefix}_commands_' \\
-  '*::args:->args'
+  '(-): :${root_prefix}_commands_' \\
+  '(-)*::args:->args'
 
 case $words[1] in
   ${commands_case}
