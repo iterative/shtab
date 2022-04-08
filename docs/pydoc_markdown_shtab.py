@@ -8,6 +8,10 @@ class ShtabProcessor(PydocmdProcessor):
         if not getattr(node, "docstring", None):
             return super()._process(node)
         # convert parameter lists to markdown list
-        node.docstring = re.sub(r"^(\w+)\s{2,}(:.*?)$", r"* __\1__*\2*  ", node.docstring,
-                                flags=re.M)
+        node.docstring.content = re.sub(
+            r"^(\w+)\s{2,}(:.*?)$",
+            r"* __\1__*\2*  ",
+            node.docstring.content,
+            flags=re.M,
+        )
         return super()._process(node)
