@@ -499,11 +499,11 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
         paths = paths or []
         subcmds = []
         for sub in parser._get_positional_actions():
+            if sub.help == SUPPRESS or not sub.choices:
+                continue
             if not sub.choices or not isinstance(sub.choices, dict):
                 # positional argument
-                opt = sub
-                if opt.help != SUPPRESS:
-                    all_commands[prefix]["arguments"].append(format_positional(opt))
+                all_commands[prefix]["arguments"].append(format_positional(sub))
             else:  # subparser
                 log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
                 public_cmds = get_public_subcommands(sub)
