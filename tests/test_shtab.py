@@ -90,7 +90,9 @@ def test_prog_scripts(shell, caplog, capsys):
     if shell == "bash":
         assert script_py == ["complete -o filenames -F _shtab_shtab script.py"]
     elif shell == "zsh":
-        assert script_py == ["#compdef script.py", "_describe 'script.py commands' _commands"]
+        assert script_py == [
+            "#compdef script.py", "'*::: :->script.py'", "script.py)",
+            "_describe 'script.py commands' _commands"]
     elif shell == "tcsh":
         assert script_py == ["complete script.py \\"]
     else:
