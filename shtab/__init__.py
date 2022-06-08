@@ -421,10 +421,16 @@ ${root_prefix}() {
     COMPREPLY=( $(compgen -W "${current_option_strings[*]}" -- "${completing_word}") )
   else
     # use choices & compgen
+    # call current_action_compgen without a subshell to support compopt
     local IFS=$'\\n'
+    tmpfile="$(mktemp)"
+    [ -n "${current_action_compgen}" ] && \\
+        "${current_action_compgen}" "${completing_word}" > "$tmpfile"
+    mapfile current_action_compreply < "$tmpfile"
+    rm "$tmpfile"
+
     COMPREPLY=( $(compgen -W "${current_action_choices}" -- "${completing_word}") \\
-                $([ -n "${current_action_compgen}" ] \\
-                  && "${current_action_compgen}" "${completing_word}") )
+        ${current_action_compreply[@]} )
   fi
 
   return 0
