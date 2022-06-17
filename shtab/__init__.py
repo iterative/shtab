@@ -42,6 +42,7 @@ CHOICE_FUNCTIONS: Dict[str, Dict[str, str]] = {
     "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d"}}
 FILE = CHOICE_FUNCTIONS["file"]
 DIRECTORY = DIR = CHOICE_FUNCTIONS["directory"]
+DEFAULT_FUNCTIONS = {"bash": FILE["bash"], "zsh": "_default", "tcsh": FILE["tcsh"]}
 FLAG_OPTION = (
     _StoreConstAction,
     _HelpAction,
@@ -134,7 +135,7 @@ def get_public_subcommands(sub):
     return {k for k, v in sub.choices.items() if id(v) in public_parsers}
 
 
-def get_bash_commands(root_parser, root_prefix, choice_functions=None):
+def get_bash_commands(root_parser, root_prefix, default_complete, choice_functions=None):
     """
     Recursive subcommand parser traversal, returning lists of information on
     commands (formatted for output to the completions script).
@@ -179,10 +180,11 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             if positional.help == SUPPRESS:
                 continue
 
-            if hasattr(positional, "complete"):
+            positional_complete = getattr(positional, "complete", {"bash": default_complete})
+            if positional_complete:
                 # shtab `.complete = ...` functions
                 compgens.append(u"{}_pos_{}_COMPGEN={}".format(
-                    prefix, i, complete2pattern(positional.complete, "bash", choice_type2fn)))
+                    prefix, i, complete2pattern(positional_complete, "bash", choice_type2fn)))
 
             if positional.choices:
                 # choices (including subparsers & shtab `.complete` functions)
@@ -287,7 +289,8 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
 
 
 @mark_completer("bash")
-def complete_bash(parser, root_prefix=None, preamble="", choice_functions=None):
+def complete_bash(parser, root_prefix=None, preamble="", default_complete="",
+                  choice_functions=None):
     """
     Returns bash syntax autocompletion script.
 
@@ -295,7 +298,7 @@ def complete_bash(parser, root_prefix=None, preamble="", choice_functions=None):
     """
     root_prefix = wordify("_shtab_" + (root_prefix or parser.prog))
     subparsers, option_strings, compgens, choices, nargs = get_bash_commands(
-        parser, root_prefix, choice_functions=choice_functions)
+        parser, root_prefix, default_complete, choice_functions=choice_functions)
 
     # References:
     # - https://www.gnu.org/software/bash/manual/html_node/
@@ -448,7 +451,8 @@ def escape_zsh(string):
 
 
 @mark_completer("zsh")
-def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
+def complete_zsh(parser, root_prefix=None, preamble="", default_complete="",
+                 choice_functions=None):
     """
     Returns zsh syntax autocompletion script.
 
@@ -484,7 +488,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
             pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
                 opt, "complete") else
             (choice_type2fn[opt.choices[0].type] if isinstance(opt.choices[0], Choice) else
-             "({})".format(" ".join(map(str, opt.choices)))) if opt.choices else "",
+             "({})".format(" ".join(map(str, opt.choices)))) if opt.choices else default_complete,
         )
 
     # {cmd: {"help": help, "arguments": [arguments]}}
@@ -634,7 +638,8 @@ ${root_prefix} "$@\"""").safe_substitute(
 
 
 @mark_completer("tcsh")
-def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
+def complete_tcsh(parser, root_prefix=None, preamble="", default_complete="",
+                  choice_functions=None):
     """
     Return tcsh syntax autocompletion script.
 
@@ -657,14 +662,12 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 arg_sel,
                 choice_strs,
             )
-        elif hasattr(arg, "complete"):
-            complete_fn = complete2pattern(arg.complete, 'tcsh', choice_type2fn)
-            if complete_fn:
-                yield "'{}/{}/{}/'".format(
-                    arg_type,
-                    arg_sel,
-                    complete_fn,
-                )
+        else:
+            arg_complete = getattr(arg, "complete", default_complete)
+            if arg_complete:
+                complete_fn = complete2pattern(arg_complete, 'tcsh', choice_type2fn)
+                if complete_fn:
+                    yield "'{}/{}/{}/'".format(arg_type, arg_sel, complete_fn)
 
     def recurse_parser(cparser, positional_idx, requirements=None):
         log_prefix = '| ' * positional_idx
@@ -737,7 +740,8 @@ complete ${prog} \\
 
 
 def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] = None,
-             preamble: Union[str, Dict] = "", choice_functions: Opt[Any] = None) -> str:
+             preamble: Union[str, Dict] = "", default_complete: Union[str, Dict] = "",
+             choice_functions: Opt[Any] = None) -> str:
     """
     parser  : argparse.ArgumentParser
     shell  : str (bash/zsh)
@@ -746,6 +750,8 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
     preamble  : dict or str
       mapping shell to text to prepend to generated script
       (e.g. `{"bash": "_myprog_custom_function(){ echo hello }"}`)
+    default_complete  : dict or str
+      mapping shell to text to fallback on when positional `.complete` is undefined
     choice_functions  : deprecated
 
     N.B. `parser.add_argument().complete = ...` can be used to define custom
@@ -753,19 +759,24 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
     """
     if isinstance(preamble, dict):
         preamble = preamble.get(shell, "")
+    if isinstance(default_complete, dict):
+        default_complete = default_complete.get(shell, "")
     completer = get_completer(shell)
     return completer(
         parser,
         root_prefix=root_prefix,
         preamble=preamble,
+        default_complete=default_complete,
         choice_functions=choice_functions,
     )
 
 
-def completion_action(parent=None, preamble=""):
+def completion_action(parent=None, preamble="", default_complete=""):
     class PrintCompletionAction(Action):
         def __call__(self, parser, namespace, values, option_string=None):
-            print(complete(parent or parser, values, preamble=preamble))
+            print(
+                complete(parent or parser, values, preamble=preamble,
+                         default_complete=default_complete))
             parser.exit(0)
 
     return PrintCompletionAction
@@ -777,6 +788,7 @@ def add_argument_to(
     help="print shell completion script",
     parent=None,
     preamble="",
+    default_complete="",
 ):
     """
     parser  : argparse.ArgumentParser
@@ -794,7 +806,7 @@ def add_argument_to(
         option_string = [option_string]
     kwargs = {
         "choices": SUPPORTED_SHELLS, "default": None, "help": help,
-        "action": completion_action(parent, preamble)}
+        "action": completion_action(parent, preamble, default_complete)}
     if option_string[0][0] != "-":                                  # subparser mode
         kwargs.update(default=SUPPORTED_SHELLS[0], nargs="?")
         assert parent is not None, "subcommand mode: parent required"
