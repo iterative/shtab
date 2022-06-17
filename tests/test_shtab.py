@@ -197,11 +197,11 @@ def test_subparser_aliases(shell, caplog):
     if shell == "bash":
         shell = Bash(completion)
         shell.compgen('-W "${_shtab_test_subparsers[*]}"', "s", "sub")
-        shell.compgen('-W "$_shtab_test_pos_0_choices"', "s", "sub")
+        shell.compgen('-W "${_shtab_test_pos_0_choices[*]}"', "s", "sub")
         shell.compgen('-W "${_shtab_test_subparsers[*]}"', "x", "xsub")
-        shell.compgen('-W "$_shtab_test_pos_0_choices"', "x", "xsub")
+        shell.compgen('-W "${_shtab_test_pos_0_choices[*]}"', "x", "xsub")
         shell.compgen('-W "${_shtab_test_subparsers[*]}"', "y", "ysub")
-        shell.compgen('-W "$_shtab_test_pos_0_choices"', "y", "ysub")
+        shell.compgen('-W "${_shtab_test_pos_0_choices[*]}"', "y", "ysub")
         shell.test('"$($_shtab_test_sub_pos_0_COMPGEN o)" = "one"')
         shell.test('-z "$_shtab_test_COMPGEN"')
 
@@ -245,9 +245,9 @@ def test_add_argument_to_positional(shell, caplog, capsys):
     if shell == "bash":
         shell = Bash(completion)
         shell.compgen('-W "${_shtab_test_subparsers[*]}"', "c", "completion")
-        shell.compgen('-W "$_shtab_test_pos_0_choices"', "c", "completion")
-        shell.compgen('-W "$_shtab_test_completion_pos_0_choices"', "ba", "bash")
-        shell.compgen('-W "$_shtab_test_completion_pos_0_choices"', "z", "zsh")
+        shell.compgen('-W "${_shtab_test_pos_0_choices[*]}"', "c", "completion")
+        shell.compgen('-W "${_shtab_test_completion_pos_0_choices[*]}"', "ba", "bash")
+        shell.compgen('-W "${_shtab_test_completion_pos_0_choices[*]}"', "z", "zsh")
 
     assert not caplog.record_tuples
 
