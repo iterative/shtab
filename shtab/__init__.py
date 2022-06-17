@@ -161,7 +161,6 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
     def recurse(parser, prefix):
         """recurse through subparsers, appending to the return lists"""
         subparsers = []
-        option_strings = []
         compgens = []
         choices = []
         nargs = []
@@ -181,21 +180,22 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
 
             if hasattr(positional, "complete"):
                 # shtab `.complete = ...` functions
-                compgens.append(u"{}_pos_{}_COMPGEN={}".format(
-                    prefix, i, complete2pattern(positional.complete, "bash", choice_type2fn)))
+                compgens.append(
+                    f'{prefix}_pos_{i}_COMPGEN={complete2pattern(positional.complete, "bash", choice_type2fn)}'
+                )
+
 
             if positional.choices:
                 # choices (including subparsers & shtab `.complete` functions)
-                log.debug("choices:{}:{}".format(prefix, sorted(positional.choices)))
+                log.debug(f"choices:{prefix}:{sorted(positional.choices)}")
 
                 this_positional_choices = []
                 for choice in positional.choices:
                     if isinstance(choice, Choice):
                         # append special completion type to `compgens`
                         # NOTE: overrides `.complete` attribute
-                        log.debug("Choice.{}:{}:{}".format(choice.type, prefix, positional.dest))
-                        compgens.append(u"{}_pos_{}_COMPGEN={}".format(
-                            prefix, i, choice_type2fn[choice.type]))
+                        log.debug(f"Choice.{choice.type}:{prefix}:{positional.dest}")
+                        compgens.append(f"{prefix}_pos_{i}_COMPGEN={choice_type2fn[choice.type]}")
                     elif isinstance(positional.choices, dict):
                         # subparser, so append to list of subparsers & recurse
                         log.debug("subcommand:%s", choice)
@@ -211,8 +211,9 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                                 new_nargs,
                             ) = recurse(
                                 positional.choices[choice],
-                                prefix + "_" + wordify(choice),
+                                f"{prefix}_{wordify(choice)}",
                             )
+
                             sub_subparsers.extend(new_subparsers)
                             sub_option_strings.extend(new_option_strings)
                             sub_compgens.extend(new_compgens)
@@ -230,16 +231,19 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
 
             # skip default `nargs` values
             if positional.nargs not in (None, "1", "?"):
-                nargs.append(u"{}_pos_{}_nargs={}".format(prefix, i, positional.nargs))
+                nargs.append(f"{prefix}_pos_{i}_nargs={positional.nargs}")
 
         if discovered_subparsers:
             subparsers.append(u"{}_subparsers=('{}')".format(prefix,
                                                              "' '".join(discovered_subparsers)))
-            log.debug("subcommands:{}:{}".format(prefix, discovered_subparsers))
+            log.debug(f"subcommands:{prefix}:{discovered_subparsers}")
 
-        # optional arguments
-        option_strings.append(u"{}_option_strings=('{}')".format(
-            prefix, "' '".join(get_option_strings(parser))))
+        option_strings = [
+            u"{}_option_strings=('{}')".format(
+                prefix, "' '".join(get_option_strings(parser))
+            )
+        ]
+
         for optional in parser._get_optional_actions():
             if optional == SUPPRESS:
                 continue
@@ -247,9 +251,10 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             for option_string in optional.option_strings:
                 if hasattr(optional, "complete"):
                     # shtab `.complete = ...` functions
-                    compgens.append(u"{}_{}_COMPGEN={}".format(
-                        prefix, wordify(option_string),
-                        complete2pattern(optional.complete, "bash", choice_type2fn)))
+                    compgens.append(
+                        f'{prefix}_{wordify(option_string)}_COMPGEN={complete2pattern(optional.complete, "bash", choice_type2fn)}'
+                    )
+
 
                 if optional.choices:
                     # choices (including shtab `.complete` functions)
@@ -258,9 +263,11 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         # append special completion type to `compgens`
                         # NOTE: overrides `.complete` attribute
                         if isinstance(choice, Choice):
-                            log.debug("Choice.{}:{}:{}".format(choice.type, prefix, optional.dest))
-                            compgens.append(u"{}_{}_COMPGEN={}".format(
-                                prefix, wordify(option_string), choice_type2fn[choice.type]))
+                            log.debug(f"Choice.{choice.type}:{prefix}:{optional.dest}")
+                            compgens.append(
+                                f"{prefix}_{wordify(option_string)}_COMPGEN={choice_type2fn[choice.type]}"
+                            )
+
                         else:
                             # simple choice
                             this_optional_choices.append(str(choice))
@@ -271,8 +278,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
 
                 # Check for nargs.
                 if optional.nargs is not None and optional.nargs != 1:
-                    nargs.append(u"{}_{}_nargs={}".format(prefix, wordify(option_string),
-                                                          optional.nargs))
+                    nargs.append(f"{prefix}_{wordify(option_string)}_nargs={optional.nargs}")
 
         # append recursion results
         subparsers.extend(sub_subparsers)
@@ -462,29 +468,53 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
         choice_type2fn.update(choice_functions)
 
     def format_optional(opt):
-        return (('{nargs}{options}"[{help}]"' if isinstance(
-            opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
-                nargs=('"(- :)"' if isinstance(opt, OPTION_END) else
-                       '"*"' if isinstance(opt, OPTION_MULTI) else ""),
-                options=("{{{}}}".format(",".join(opt.option_strings))
-                         if len(opt.option_strings) > 1 else '"{}"'.format("".join(
-                             opt.option_strings))),
+        return (
+            (
+                '{nargs}{options}"[{help}]"'
+                if isinstance(opt, FLAG_OPTION)
+                else '{nargs}{options}"[{help}]:{dest}:{pattern}"'
+            )
+            .format(
+                nargs=(
+                    '"(- :)"'
+                    if isinstance(opt, OPTION_END)
+                    else '"*"'
+                    if isinstance(opt, OPTION_MULTI)
+                    else ""
+                ),
+                options=(
+                    "{{{}}}".format(",".join(opt.option_strings))
+                    if len(opt.option_strings) > 1
+                    else '"{}"'.format("".join(opt.option_strings))
+                ),
                 help=escape_zsh(opt.help or ""),
                 dest=opt.dest,
-                pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
-                    opt, "complete") else
-                (choice_type2fn[opt.choices[0].type] if isinstance(opt.choices[0], Choice) else
-                 "({})".format(" ".join(map(str, opt.choices)))) if opt.choices else "",
-            ).replace('""', ""))
+                pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
+                if hasattr(opt, "complete")
+                else (
+                    choice_type2fn[opt.choices[0].type]
+                    if isinstance(opt.choices[0], Choice)
+                    else f'({" ".join(map(str, opt.choices))})'
+                )
+                if opt.choices
+                else "",
+            )
+            .replace('""', "")
+        )
 
     def format_positional(opt):
         return '"{nargs}:{help}:{pattern}"'.format(
             nargs={"+": "(*)", "*": "(*):"}.get(opt.nargs, ""),
             help=escape_zsh((opt.help or opt.dest).strip().split("\n")[0]),
-            pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
-                opt, "complete") else
-            (choice_type2fn[opt.choices[0].type] if isinstance(opt.choices[0], Choice) else
-             "({})".format(" ".join(map(str, opt.choices)))) if opt.choices else "",
+            pattern=complete2pattern(opt.complete, "zsh", choice_type2fn)
+            if hasattr(opt, "complete")
+            else (
+                choice_type2fn[opt.choices[0].type]
+                if isinstance(opt.choices[0], Choice)
+                else f'({" ".join(map(str, opt.choices))})'
+            )
+            if opt.choices
+            else "",
         )
 
     # {cmd: {"help": help, "arguments": [arguments]}}
@@ -502,11 +532,11 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
         for sub in parser._get_positional_actions():
             if sub.help == SUPPRESS or not sub.choices:
                 continue
-            if not sub.choices or not isinstance(sub.choices, dict):
+            if not isinstance(sub.choices, dict):
                 # positional argument
                 all_commands[prefix]["arguments"].append(format_positional(sub))
             else:  # subparser
-                log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
+                log.debug(f"choices:{prefix}:{sorted(sub.choices)}")
                 public_cmds = get_public_subcommands(sub)
                 for cmd, subparser in sub.choices.items():
                     if cmd not in public_cmds:
@@ -524,7 +554,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                         format_positional(opt) for opt in subparser._get_positional_actions()
                         if not isinstance(opt.choices, dict) if opt.help != SUPPRESS)
 
-                    new_pref = prefix + "_" + wordify(cmd)
+                    new_pref = f"{prefix}_{wordify(cmd)}"
                     options = all_commands[new_pref] = {
                         "cmd": cmd, "help": (subparser.description or "").strip().split("\n")[0],
                         "arguments": arguments, "paths": [*paths, cmd]}
@@ -588,8 +618,11 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
     def command_list(prefix, options):
         name = " ".join([prog, *options["paths"]])
-        commands = "\n    ".join('"{}:{}"'.format(cmd, escape_zsh(opt["help"]))
-                                 for cmd, opt in sorted(options["commands"].items()))
+        commands = "\n    ".join(
+            f'"{cmd}:{escape_zsh(opt["help"])}"'
+            for cmd, opt in sorted(options["commands"].items())
+        )
+
         return """
 {prefix}_commands() {{
   local _commands=(
@@ -652,19 +685,12 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
     def get_specials(arg, arg_type, arg_sel):
         if arg.choices:
             choice_strs = ' '.join(map(str, arg.choices))
-            yield "'{}/{}/({})/'".format(
-                arg_type,
-                arg_sel,
-                choice_strs,
-            )
+            yield f"'{arg_type}/{arg_sel}/({choice_strs})/'"
         elif hasattr(arg, "complete"):
-            complete_fn = complete2pattern(arg.complete, 'tcsh', choice_type2fn)
-            if complete_fn:
-                yield "'{}/{}/{}/'".format(
-                    arg_type,
-                    arg_sel,
-                    complete_fn,
-                )
+            if complete_fn := complete2pattern(
+                arg.complete, 'tcsh', choice_type2fn
+            ):
+                yield f"'{arg_type}/{arg_sel}/{complete_fn}/'"
 
     def recurse_parser(cparser, positional_idx, requirements=None):
         log_prefix = '| ' * positional_idx
