@@ -225,8 +225,8 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         this_positional_choices.append(str(choice))
 
                 if this_positional_choices:
-                    choices.append(u"{}_pos_{}_choices='{}'".format(
-                        prefix, i, " ".join(this_positional_choices)))
+                    choices.append(u"{}_pos_{}_choices=('{}')".format(
+                        prefix, i, "' '".join(this_positional_choices)))
 
             # skip default `nargs` values
             if positional.nargs not in (None, "1", "?"):
@@ -266,8 +266,8 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                             this_optional_choices.append(str(choice))
 
                     if this_optional_choices:
-                        choices.append(u"{}_{}_choices='{}'".format(
-                            prefix, wordify(option_string), " ".join(this_optional_choices)))
+                        choices.append(u"{}_{}_choices=('{}')".format(
+                            prefix, wordify(option_string), "' '".join(this_optional_choices)))
 
                 # Check for nargs.
                 if optional.nargs is not None and optional.nargs != 1:
@@ -421,8 +421,9 @@ ${root_prefix}() {
     COMPREPLY=( $(compgen -W "${current_option_strings[*]}" -- "${completing_word}") )
   else
     # use choices & compgen
-    COMPREPLY=( $(compgen -W "${current_action_choices}" -- "${completing_word}"; \\
-                  [ -n "${current_action_compgen}" ] \\
+    local IFS=$'\\n'
+    COMPREPLY=( $(compgen -W "${current_action_choices}" -- "${completing_word}") \\
+                $([ -n "${current_action_compgen}" ] \\
                   && "${current_action_compgen}" "${completing_word}") )
   fi
 
