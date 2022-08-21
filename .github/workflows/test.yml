@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   check:
-    if: github.event_name != 'pull_request' || github.repository_owner != 'iterative'
+    if: github.event_name != 'pull_request' || !contains('OWNER,MEMBER,COLLABORATOR', github.event.pull_request.author_association)
     name: Check
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +37,7 @@ jobs:
         EVENT: ${{ github.event_name }}
     - run: pre-commit run -a --show-diff-on-failure
   test:
-    if: github.event_name != 'pull_request' || github.repository_owner != 'iterative'
+    if: github.event_name != 'pull_request' || !contains('OWNER,MEMBER,COLLABORATOR', github.event.pull_request.author_association)
     name: Test py${{ matrix.python }}
     runs-on: ubuntu-latest
     strategy:
