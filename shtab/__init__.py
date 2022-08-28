@@ -4,6 +4,7 @@ import logging
 import re
 import sys
 from argparse import (
+    REMAINDER,
     SUPPRESS,
     Action,
     ArgumentParser,
@@ -57,6 +58,14 @@ FLAG_OPTION = (
 )
 OPTION_END = _HelpAction, _VersionAction, _PrintCompletionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
+
+
+def is_opt_end(opt):
+    return isinstance(opt, OPTION_END) or opt.nargs == REMAINDER
+
+
+def is_opt_multiline(opt):
+    return isinstance(opt, OPTION_MULTI)
 
 
 def mark_completer(shell):
@@ -471,8 +480,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     def format_optional(opt):
         return (('{nargs}{options}"[{help}]"' if isinstance(
             opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
-                nargs=('"(- : *)"' if isinstance(opt, OPTION_END) else
-                       '"*"' if isinstance(opt, OPTION_MULTI) else ""),
+                nargs=('"(- : *)"' if is_opt_end(opt) else '"*"' if is_opt_multiline(opt) else ""),
                 options=("{{{}}}".format(",".join(opt.option_strings))
                          if len(opt.option_strings) > 1 else '"{}"'.format("".join(
                              opt.option_strings))),
