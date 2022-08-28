@@ -35,6 +35,12 @@ except ImportError:
 __all__ = ["complete", "add_argument_to", "SUPPORTED_SHELLS", "FILE", "DIRECTORY", "DIR"]
 log = logging.getLogger(__name__)
 
+
+class _PrintCompletionAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        raise NotImplementedError
+
+
 SUPPORTED_SHELLS: List[str] = []
 _SUPPORTED_COMPLETERS = {}
 CHOICE_FUNCTIONS: Dict[str, Dict[str, str]] = {
@@ -49,7 +55,7 @@ FLAG_OPTION = (
     _AppendConstAction,
     _CountAction,
 )
-OPTION_END = _HelpAction, _VersionAction
+OPTION_END = _HelpAction, _VersionAction, _PrintCompletionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
 
 
@@ -465,7 +471,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     def format_optional(opt):
         return (('{nargs}{options}"[{help}]"' if isinstance(
             opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
-                nargs=('"(- :)"' if isinstance(opt, OPTION_END) else
+                nargs=('"(- : *)"' if isinstance(opt, OPTION_END) else
                        '"*"' if isinstance(opt, OPTION_MULTI) else ""),
                 options=("{{{}}}".format(",".join(opt.option_strings))
                          if len(opt.option_strings) > 1 else '"{}"'.format("".join(
@@ -766,7 +772,7 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
 
 
 def completion_action(parent=None, preamble=""):
-    class PrintCompletionAction(Action):
+    class PrintCompletionAction(_PrintCompletionAction):
         def __call__(self, parser, namespace, values, option_string=None):
             print(complete(parent or parser, values, preamble=preamble))
             parser.exit(0)
