@@ -1,10 +1,10 @@
 loaders:
-- type: python
-  search_path: [..]
+  - type: python
+    search_path: [..]
 processors:
-- type: filter
-- type: pydoc_markdown_shtab.ShtabProcessor
-- type: crossref
+  - type: filter
+  - type: pydoc_markdown_shtab.ShtabProcessor
+  - type: crossref
 renderer:
   type: mkdocs
   markdown:
@@ -18,29 +18,29 @@ renderer:
       [[view source]]({url})
       </span>
   pages:
-  - title: Home
-    name: index
-    source: index.md
-  - title: Usage
-    name: use
-    source: use.md
-  - title: Reference
-    name: ref
-    contents: [shtab.complete, shtab.add_argument_to]
-  - title: External Links
-    children:
-    - title: Source Code
-      href: https://github.com/iterative/shtab
-    - title: Changelog
-      href: https://github.com/iterative/shtab/releases
-    - title: Issues
-      href: https://github.com/iterative/shtab/issues?q=
-  - title: Contributing
-    name: contributing
-    source: ../CONTRIBUTING.md
-  - title: Licence
-    name: licence
-    source: ../LICENCE
+    - title: Home
+      name: index
+      source: index.md
+    - title: Usage
+      name: use
+      source: use.md
+    - title: Reference
+      name: ref
+      contents: [shtab.complete, shtab.add_argument_to]
+    - title: External Links
+      children:
+        - title: Source Code
+          href: https://github.com/iterative/shtab
+        - title: Changelog
+          href: https://github.com/iterative/shtab/releases
+        - title: Issues
+          href: https://github.com/iterative/shtab/issues?q=
+    - title: Contributing
+      name: contributing
+      source: ../CONTRIBUTING.md
+    - title: Licence
+      name: licence
+      source: ../LICENCE
   mkdocs_config:
     site_name: shtab documentation
     site_description: Automagic shell tab completion for Python CLI applications
@@ -58,27 +58,27 @@ renderer:
       logo: https://github.com/iterative/shtab/raw/master/meta/logo.png
       favicon: https://github.com/iterative/shtab/raw/master/meta/logo.png
       palette:
-      - scheme: default
-        primary: white
-        toggle:
-          icon: material/toggle-switch-off-outline
-          name: Switch to dark mode
-      - scheme: slate
-        primary: orange
-        toggle:
-          icon: material/toggle-switch
-          name: Switch to light mode
+        - scheme: default
+          primary: white
+          toggle:
+            icon: material/toggle-switch-off-outline
+            name: Switch to dark mode
+        - scheme: slate
+          primary: orange
+          toggle:
+            icon: material/toggle-switch
+            name: Switch to light mode
       features:
-      - content.tabs.link
+        - content.tabs.link
     plugins:
-    - search
-    - minify:
-        minify_js: true
-        minify_html: true
+      - search
+      - minify:
+          minify_js: true
+          minify_html: true
     markdown_extensions:
-    - admonition
-    - toc:
-        permalink: '#'
-    - pymdownx.superfences
-    - pymdownx.tabbed:
-        alternate_style: true
+      - admonition
+      - toc:
+          permalink: "#"
+      - pymdownx.superfences
+      - pymdownx.tabbed:
+          alternate_style: true

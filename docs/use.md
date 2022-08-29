@@ -3,12 +3,12 @@
 There are two ways of using `shtab`:
 
 - [CLI Usage](#cli-usage): `shtab`'s own CLI interface for external applications
-    - may not require any code modifications whatsoever
-    - end-users execute `shtab your_cli_app.your_parser_object`
+  - may not require any code modifications whatsoever
+  - end-users execute `shtab your_cli_app.your_parser_object`
 - [Library Usage](#library-usage): as a library integrated into your CLI application
-    - adds a couple of lines to your application
-    - argument mode: end-users execute `your_cli_app --print-completion {bash,zsh,tcsh}`
-    - subparser mode: end-users execute `your_cli_app completion {bash,zsh,tcsh}`
+  - adds a couple of lines to your application
+  - argument mode: end-users execute `your_cli_app --print-completion {bash,zsh,tcsh}`
+  - subparser mode: end-users execute `your_cli_app completion {bash,zsh,tcsh}`
 
 ## CLI Usage
 
@@ -16,15 +16,14 @@ The only requirement is that external CLI applications provide an importable
 `argparse.ArgumentParser` object (or alternatively an importable function which
 returns a parser object). This may require a trivial code change.
 
-Once that's done, simply put the output of `shtab --shell=your_shell
-your_cli_app.your_parser_object` somewhere your shell looks for completions.
+Once that's done, simply put the output of `shtab --shell=your_shell your_cli_app.your_parser_object` somewhere your shell looks for completions.
 
 Below are various examples of enabling `shtab`'s own tab completion scripts.
 
 !!! info
-    If both shtab and the module it's completing are globally importable, eager
-    usage is an option. "Eager" means automatically updating completions each
-    time a terminal is opened.
+If both shtab and the module it's completing are globally importable, eager
+usage is an option. "Eager" means automatically updating completions each
+time a terminal is opened.
 
 === "bash"
 
@@ -99,8 +98,8 @@ Below are various examples of enabling `shtab`'s own tab completion scripts.
     ```
 
 !!! tip
-    See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
-    folder for more.
+See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
+folder for more.
 
 Any existing `argparse`-based scripts should be supported with minimal effort.
 For example, starting with this existing code:
@@ -148,8 +147,8 @@ Assuming this code example is installed in `MY_PROG.command.main`, simply run:
 ## Library Usage
 
 !!! tip
-    See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
-    folder for more.
+See the [examples/](https://github.com/iterative/shtab/tree/master/examples)
+folder for more.
 
 Complex projects with subparsers and custom completions for paths matching
 certain patterns (e.g. `--file=*.txt`) are fully supported (see

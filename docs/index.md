@@ -14,18 +14,18 @@
 ## Features
 
 - Outputs tab completion scripts for
-    - `bash`
-    - `zsh`
-    - `tcsh`
--   Supports
-    - [argparse](https://docs.python.org/library/argparse)
-    - [docopt](https://pypi.org/project/docopt) (via [argopt](https://pypi.org/project/argopt))
+  - `bash`
+  - `zsh`
+  - `tcsh`
+- Supports
+  - [argparse](https://docs.python.org/library/argparse)
+  - [docopt](https://pypi.org/project/docopt) (via [argopt](https://pypi.org/project/argopt))
 - Supports arguments, options and subparsers
 - Supports choices (e.g. `--say={hello,goodbye}`)
 - Supports file and directory path completion
 - Supports custom path completion (e.g. `--file={*.txt}`)
 
-------------------------------------------------------------------------
+---
 
 ## Installation
 
@@ -78,11 +78,11 @@ Not working?
 
 - Make sure that `shtab` and the application you're trying to complete are both accessible from your environment.
 - Make sure that `prog` is set:
-    - if using [`options.entry_points.console_scripts=MY_PROG=...`](https://setuptools.pypa.io/en/latest/userguide/entry_point.html), then ensure the main parser's `prog` matches `argparse.ArgumentParser(prog="MY_PROG")` or override it using `shtab MY_PROG.get_main_parser --prog=MY_PROG`.
-    - if executing a script file `./MY_PROG.py` (with a [shebang](<https://en.wikipedia.org/wiki/Shebang_(Unix)>) `#!/usr/bin/env python`) directly, then use `argparse.ArgumentParser(prog="MY_PROG.py")` or override it using `shtab MY_PROG.get_main_parser --prog=MY_PROG.py`.
+  - if using [`options.entry_points.console_scripts=MY_PROG=...`](https://setuptools.pypa.io/en/latest/userguide/entry_point.html), then ensure the main parser's `prog` matches `argparse.ArgumentParser(prog="MY_PROG")` or override it using `shtab MY_PROG.get_main_parser --prog=MY_PROG`.
+  - if executing a script file `./MY_PROG.py` (with a [shebang](<https://en.wikipedia.org/wiki/Shebang_(Unix)>) `#!/usr/bin/env python`) directly, then use `argparse.ArgumentParser(prog="MY_PROG.py")` or override it using `shtab MY_PROG.get_main_parser --prog=MY_PROG.py`.
 - Make sure that all arguments have `help` messages (`parser.add_argument('positional', help="documented; i.e. not hidden")`).
 - [Ask a general question on StackOverflow](https://stackoverflow.com/questions/tagged/shtab).
-- [Report bugs and open feature requests on GitHub][GH-issue].
+- [Report bugs and open feature requests on GitHub][gh-issue].
 
 "Eager" installation (completions are re-generated upon login/terminal start) is
 recommended. Naturally, `shtab` and the CLI application to complete should be
@@ -96,18 +96,18 @@ application. Use `-u, --error-unimportable` to noisily complain.
 ## Alternatives
 
 - [argcomplete](https://pypi.org/project/argcomplete)
-    - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
-    - only provides `bash` completion
+  - executes the underlying script _every_ time `<TAB>` is pressed (slow and has side-effects)
+  - only provides `bash` completion
 - [pyzshcomplete](https://pypi.org/project/pyzshcomplete)
-    - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
-    - only provides `zsh` completion
+  - executes the underlying script _every_ time `<TAB>` is pressed (slow and has side-effects)
+  - only provides `zsh` completion
 - [click](https://pypi.org/project/click)
-    - different framework completely replacing the builtin `argparse`
-    - solves multiple problems (rather than POSIX-style "do one thing well")
+  - different framework completely replacing the builtin `argparse`
+  - solves multiple problems (rather than POSIX-style "do one thing well")
 
 ## Contributions
 
-Please do open [issues][GH-issue] & [pull requests][GH-pr]! Some ideas:
+Please do open [issues][gh-issue] & [pull requests][gh-pr]! Some ideas:
 
 - support `fish`
 - support `powershell`
@@ -118,5 +118,5 @@ for more guidance.
 
 [![Hits](https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden)](https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social)
 
-[GH-issue]: https://github.com/iterative/shtab/issues
-[GH-pr]: https://github.com/iterative/shtab/pulls
+[gh-issue]: https://github.com/iterative/shtab/issues
+[gh-pr]: https://github.com/iterative/shtab/pulls
