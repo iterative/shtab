@@ -236,7 +236,7 @@ def test_add_argument_to_positional(shell, caplog, capsys):
         with pytest.raises(SystemExit) as exc:
             sub._actions[-1](sub, Namespace(), shell)
             assert exc.type == SystemExit
-            assert exc.vaue.code == 0
+            assert exc.value.code == 0
     completion, err = capsys.readouterr()
     print(completion)
     assert completion_manual == completion.rstrip()
