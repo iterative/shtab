@@ -550,13 +550,14 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     def command_case(prefix, options):
         name = options["cmd"]
         commands = options["commands"]
-        case_fmt_on_no_sub = """{name}) _arguments -C ${prefix}_{name}_options ;;"""
-        case_fmt_on_sub = """{name}) {prefix}_{name} ;;"""
+        case_fmt_on_no_sub = """{name}) _arguments -C ${prefix}_{name_wordify}_options ;;"""
+        case_fmt_on_sub = """{name}) {prefix}_{name_wordify} ;;"""
 
         cases = []
         for _, options in sorted(commands.items()):
             fmt = case_fmt_on_sub if options.get("commands") else case_fmt_on_no_sub
-            cases.append(fmt.format(name=options["cmd"], prefix=prefix))
+            cases.append(
+                fmt.format(name=options["cmd"], name_wordify=wordify(options["cmd"]), prefix=prefix))
         cases = "\n\t".expandtabs(8).join(cases)
 
         return """\
