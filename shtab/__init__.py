@@ -124,8 +124,8 @@ def complete2pattern(opt_complete, shell, choice_type2fn) -> bool:
 
 
 def wordify(string: str) -> str:
-    """Replace non-word chars [-. ] with underscores [_]"""
-    return string.replace("-", "_").replace(".", " ").replace(" ", "_")
+    """Replace non-word chars [-. :] with underscores [_]"""
+    return re.compile(r"[-.\s:]").sub("_", string)
 
 
 def get_public_subcommands(sub):
@@ -588,7 +588,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
     def command_list(prefix, options):
         name = " ".join([prog, *options["paths"]])
-        commands = "\n    ".join('"{}:{}"'.format(cmd, escape_zsh(opt["help"]))
+        commands = "\n    ".join('"{}:{}"'.format(escape_zsh(cmd), escape_zsh(opt["help"]))
                                  for cmd, opt in sorted(options["commands"].items()))
         return """
 {prefix}_commands() {{
