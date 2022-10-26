@@ -51,7 +51,6 @@ FLAG_OPTION = (
 )
 OPTION_END = _HelpAction, _VersionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
-RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])") # excessive but safe
 
 
 def mark_completer(shell):
@@ -444,7 +443,8 @@ complete -o filenames -F ${root_prefix} ${prog}""").safe_substitute(
 
 
 def escape_zsh(string):
-    return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", str(string))
+    # excessive but safe
+    return re.sub(r"([^\w\s.,()-])", r"\\\1", str(string))
 
 
 @mark_completer("zsh")
