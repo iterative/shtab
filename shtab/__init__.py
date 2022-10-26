@@ -51,7 +51,6 @@ FLAG_OPTION = (
 )
 OPTION_END = _HelpAction, _VersionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
-RE_ZSH_SPECIAL_CHARS = re.compile(r"([^\w\s.,()-])") # excessive but safe
 
 
 def mark_completer(shell):
@@ -124,8 +123,8 @@ def complete2pattern(opt_complete, shell, choice_type2fn) -> bool:
 
 
 def wordify(string: str) -> str:
-    """Replace non-word chars [-. ] with underscores [_]"""
-    return string.replace("-", "_").replace(".", " ").replace(" ", "_")
+    """Replace non-word chars [-. :] with underscores [_]"""
+    return re.sub(r"[-.\s:]", "_", string)
 
 
 def get_public_subcommands(sub):
@@ -444,7 +443,8 @@ complete -o filenames -F ${root_prefix} ${prog}""").safe_substitute(
 
 
 def escape_zsh(string):
-    return RE_ZSH_SPECIAL_CHARS.sub(r"\\\1", str(string))
+    # excessive but safe
+    return re.sub(r"([^\w\s.,()-])", r"\\\1", str(string))
 
 
 @mark_completer("zsh")
@@ -588,7 +588,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
     def command_list(prefix, options):
         name = " ".join([prog, *options["paths"]])
-        commands = "\n    ".join('"{}:{}"'.format(cmd, escape_zsh(opt["help"]))
+        commands = "\n    ".join('"{}:{}"'.format(escape_zsh(cmd), escape_zsh(opt["help"]))
                                  for cmd, opt in sorted(options["commands"].items()))
         return """
 {prefix}_commands() {{
