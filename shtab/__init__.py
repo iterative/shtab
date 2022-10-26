@@ -125,7 +125,7 @@ def complete2pattern(opt_complete, shell, choice_type2fn) -> bool:
 
 def wordify(string: str) -> str:
     """Replace non-word chars [-. :] with underscores [_]"""
-    return re.compile(r"[-.\s:]").sub("_", string)
+    return re.sub(r"[-.\s:]", "_", string)
 
 
 def get_public_subcommands(sub):
