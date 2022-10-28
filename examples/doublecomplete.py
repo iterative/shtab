@@ -15,7 +15,7 @@ def get_main_parser():
     main_parser.add_argument('positional1', help='Positional #1')
 
     main_parser.add_argument('--double-one', help='A double-hyphen option')
-    main_parser.add_argument('-s', help=argparse.SUPPRESS)  # A single-hypen option, suppressed
+    main_parser.add_argument('-s', help=argparse.SUPPRESS) # A single-hypen option, suppressed
 
     return main_parser
 
