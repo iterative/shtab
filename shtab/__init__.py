@@ -655,6 +655,8 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
     """
     Return tcsh syntax autocompletion script.
 
+    `root_prefix` is ignored, tcsh has no support for functions.
+
     See `complete` for arguments.
     """
     optionals_single = set()
@@ -720,7 +722,7 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 if arg.choices:
                     nlist.append('( {}echo "{}" || false )'.format(
                         ' && '.join(checks + ['']),                 # Append the separator
-                        '\\n'.join(arg.choices),
+                        r'\n'.join(arg.choices),
                     ))
 
             # Ugly hack
@@ -745,8 +747,8 @@ complete ${prog} \\
         'p/*/()/'""").safe_substitute(
         preamble=("\n# Custom Preamble\n" + preamble +
                   "\n# End Custom Preamble\n" if preamble else ""), root_prefix=root_prefix,
-        prog=parser.prog, optionals_double_str=' '.join(optionals_double),
-        optionals_single_str=' '.join(optionals_single),
+        prog=parser.prog, optionals_double_str=' '.join(sorted(optionals_double)),
+        optionals_single_str=' '.join(sorted(optionals_single)),
         optionals_special_str=' \\\n        '.join(specials))
 
 
