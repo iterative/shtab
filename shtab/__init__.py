@@ -537,7 +537,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                         format_positional(opt) for opt in subparser._get_positional_actions()
                         if not isinstance(opt.choices, dict) if opt.help != SUPPRESS)
 
-                    new_pref = prefix + "_" + wordify(cmd)
+                    new_pref = f"{prefix}_{wordify(cmd)}"
                     options = all_commands[new_pref] = {
                         "cmd": cmd, "help": (subparser.description or "").strip().split("\n")[0],
                         "arguments": arguments, "paths": [*paths, cmd]}
