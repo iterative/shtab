@@ -352,7 +352,7 @@ _set_new_action() {
   local current_action_compgen_var=${current_action}_COMPGEN
   current_action_compgen="${!current_action_compgen_var}"
 
-  local current_action_choices_var="${current_action}_choices"
+  local current_action_choices_var="${current_action}_choices[@]"
   current_action_choices="${!current_action_choices_var}"
 
   local current_action_nargs_var="${current_action}_nargs"
@@ -420,10 +420,11 @@ ${root_prefix}() {
     COMPREPLY=( $(compgen -W "${current_option_strings[*]}" -- "${completing_word}") )
   else
     # use choices & compgen
-    local IFS=$'\\n'
-    COMPREPLY=( $(compgen -W "${current_action_choices}" -- "${completing_word}") \\
-                $([ -n "${current_action_compgen}" ] \\
+    local IFS=$'\\n' # items may contain spaces, so delimit using newline
+    COMPREPLY=( $([ -n "${current_action_compgen}" ] \\
                   && "${current_action_compgen}" "${completing_word}") )
+    unset IFS
+    COMPREPLY+=( $(compgen -W "${current_action_choices[*]}" -- "${completing_word}") )
   fi
 
   return 0
