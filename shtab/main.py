@@ -15,7 +15,10 @@ def get_main_parser():
     parser = argparse.ArgumentParser(prog="shtab")
     add_argument_to(parser)
     parser.add_argument("parser", help="importable parser (or fuction returning parser)")
-    parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}"
+    )
+
     parser.add_argument("-s", "--shell", default=SUPPORTED_SHELLS[0], choices=SUPPORTED_SHELLS)
     parser.add_argument("--prefix", help="prepended to generated functions to avoid clashes")
     parser.add_argument("--preamble", help="prepended to generated script")
