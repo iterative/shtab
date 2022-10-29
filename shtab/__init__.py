@@ -420,9 +420,11 @@ ${root_prefix}() {
     COMPREPLY=( $(compgen -W "${current_option_strings[*]}" -- "${completing_word}") )
   else
     # use choices & compgen
-    COMPREPLY=( $(compgen -W "${current_action_choices[*]}" -- "${completing_word}") \\
-                $([ -n "${current_action_compgen}" ] \\
+    local IFS=$'\\n' # items may contain spaces, so delimit using newline
+    COMPREPLY=( $([ -n "${current_action_compgen}" ] \\
                   && "${current_action_compgen}" "${completing_word}") )
+    unset IFS
+    COMPREPLY+=( $(compgen -W "${current_action_choices[*]}" -- "${completing_word}") )
   fi
 
   return 0
