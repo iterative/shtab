@@ -6,13 +6,14 @@ import os
 import sys
 from importlib import import_module
 
-from . import SUPPORTED_SHELLS, __version__, complete
+from . import SUPPORTED_SHELLS, __version__, add_argument_to, complete
 
 log = logging.getLogger(__name__)
 
 
 def get_main_parser():
     parser = argparse.ArgumentParser(prog="shtab")
+    add_argument_to(parser)
     parser.add_argument("parser", help="importable parser (or fuction returning parser)")
     parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
     parser.add_argument("-s", "--shell", default=SUPPORTED_SHELLS[0], choices=SUPPORTED_SHELLS)
