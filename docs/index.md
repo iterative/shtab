@@ -1,7 +1,7 @@
 ![shtab](https://static.iterative.ai/img/shtab/banner.png)
 
 [![Tests](https://github.com/iterative/shtab/workflows/Test/badge.svg)](https://github.com/iterative/shtab/actions)
-[![Coverage](https://codecov.io/gh/iterative/shtab/branch/master/graph/badge.svg)](https://codecov.io/gh/iterative/shtab)
+[![Coverage](https://codecov.io/gh/iterative/shtab/branch/main/graph/badge.svg)](https://codecov.io/gh/iterative/shtab)
 [![conda-forge](https://img.shields.io/conda/v/conda-forge/shtab.svg?label=conda&logo=conda-forge)](https://anaconda.org/conda-forge/shtab)
 [![PyPI](https://img.shields.io/pypi/v/shtab.svg?label=pip&logo=PyPI&logoColor=white)](https://pypi.org/project/shtab)
 
@@ -113,7 +113,7 @@ Please do open [issues][GH-issue] & [pull requests][GH-pr]! Some ideas:
 - support `powershell`
 
 See
-[CONTRIBUTING.md](https://github.com/iterative/shtab/tree/master/CONTRIBUTING.md)
+[CONTRIBUTING.md](https://github.com/iterative/shtab/tree/main/CONTRIBUTING.md)
 for more guidance.
 
 [![Hits](https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden)](https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social)

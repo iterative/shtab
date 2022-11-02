@@ -102,16 +102,16 @@ Please do open `issues <https://github.com/iterative/shtab/issues>`_ & `pull req
 - support ``powershell``
 
 See
-`CONTRIBUTING.md <https://github.com/iterative/shtab/tree/master/CONTRIBUTING.md>`_
+`CONTRIBUTING.md <https://github.com/iterative/shtab/tree/main/CONTRIBUTING.md>`_
 for more guidance.
 
 |Hits|
 
-.. |Logo| image:: https://github.com/iterative/shtab/raw/master/meta/logo.png
+.. |Logo| image:: https://github.com/iterative/shtab/raw/main/meta/logo.png
 .. |Tests| image:: https://github.com/iterative/shtab/workflows/Test/badge.svg
    :target: https://github.com/iterative/shtab/actions
    :alt: Tests
-.. |Coverage| image:: https://codecov.io/gh/iterative/shtab/branch/master/graph/badge.svg
+.. |Coverage| image:: https://codecov.io/gh/iterative/shtab/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/iterative/shtab
    :alt: Coverage
 .. |Conda| image:: https://img.shields.io/conda/v/conda-forge/shtab.svg?label=conda&logo=conda-forge

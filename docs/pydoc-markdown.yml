@@ -55,8 +55,8 @@ renderer:
       generator: false
     theme:
       name: material
-      logo: https://github.com/iterative/shtab/raw/master/meta/logo.png
-      favicon: https://github.com/iterative/shtab/raw/master/meta/logo.png
+      logo: https://github.com/iterative/shtab/raw/main/meta/logo.png
+      favicon: https://github.com/iterative/shtab/raw/main/meta/logo.png
       palette:
       - scheme: default
         primary: white
