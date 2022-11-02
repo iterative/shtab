@@ -723,8 +723,8 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
             specials.append("'p@{}@`set cmd=($COMMAND_LINE); {}`@'".format(
                 str(idx), ' || '.join(nlist)))
 
-    if len(optionals_double) > 0:
-        if len(optionals_single) == 0:
+    if optionals_double:
+        if not optionals_single:
             # Hack: Don't add a space after completing "--" from "-"
             optionals_single = ['-', '-']
         else:
