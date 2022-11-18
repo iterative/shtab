@@ -4,7 +4,10 @@ import logging
 import re
 import sys
 from argparse import (
+    ONE_OR_MORE,
+    REMAINDER,
     SUPPRESS,
+    ZERO_OR_MORE,
     Action,
     ArgumentParser,
     _AppendAction,
@@ -49,7 +52,13 @@ FLAG_OPTION = (
     _AppendConstAction,
     _CountAction,
 )
-OPTION_END = _HelpAction, _VersionAction
+
+
+class _ShtabPrintCompletionAction(Action):
+    pass
+
+
+OPTION_END = _HelpAction, _VersionAction, _ShtabPrintCompletionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
 
 
@@ -462,11 +471,16 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
+    def is_opt_end(opt):
+        return isinstance(opt, OPTION_END) or opt.nargs == REMAINDER
+
+    def is_opt_multiline(opt):
+        return isinstance(opt, OPTION_MULTI)
+
     def format_optional(opt):
         return (('{nargs}{options}"[{help}]"' if isinstance(
             opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
-                nargs=('"(- :)"' if isinstance(opt, OPTION_END) else
-                       '"*"' if isinstance(opt, OPTION_MULTI) else ""),
+                nargs=('"(- : *)"' if is_opt_end(opt) else '"*"' if is_opt_multiline(opt) else ""),
                 options=("{{{}}}".format(",".join(opt.option_strings))
                          if len(opt.option_strings) > 1 else '"{}"'.format("".join(
                              opt.option_strings))),
@@ -480,7 +494,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
     def format_positional(opt):
         return '"{nargs}:{help}:{pattern}"'.format(
-            nargs={"+": "(*)", "*": "(*):"}.get(opt.nargs, ""),
+            nargs={ONE_OR_MORE: "(*)", ZERO_OR_MORE: "(*):", REMAINDER: "(-)*"}.get(opt.nargs, ""),
             help=escape_zsh((opt.help or opt.dest).strip().split("\n")[0]),
             pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
                 opt, "complete") else
@@ -492,10 +506,12 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     all_commands = {
         root_prefix: {
             "cmd": prog, "arguments": [
-                format_optional(opt) for opt in parser._get_optional_actions()
-                if opt.help != SUPPRESS], "help": (parser.description
-                                                   or "").strip().split("\n")[0], "commands": [],
-            "paths": []}}
+                format_optional(opt)
+                for opt in parser._get_optional_actions() if opt.help != SUPPRESS] + [
+                    format_positional(opt) for opt in parser._get_positional_actions()
+                    if opt.help != SUPPRESS and opt.choices is None],
+            "help": (parser.description
+                     or "").strip().split("\n")[0], "commands": [], "paths": []}}
 
     def recurse(parser, prefix, paths=None):
         paths = paths or []
@@ -564,11 +580,12 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
         return """\
 {prefix}() {{
-  local context state line curcontext="$curcontext"
+  local context state line curcontext="$curcontext" one_or_more='(-)*' remainder='(*)'
 
-  _arguments -C ${prefix}_options \\
-    ': :{prefix}_commands' \\
-    '*::: :->{name}'
+  if ((${{{prefix}_options[(I)${{(q)one_or_more}}*]}} + ${{{prefix}_options[(I)${{(q)remainder}}*]}} == 0)); then  # noqa: E501
+    {prefix}_options+=(': :{prefix}_commands' '*::: :->{name}')
+  fi
+  _arguments -C ${prefix}_options
 
   case $state in
     {name})
@@ -766,7 +783,7 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
 
 
 def completion_action(parent=None, preamble=""):
-    class PrintCompletionAction(Action):
+    class PrintCompletionAction(_ShtabPrintCompletionAction):
         def __call__(self, parser, namespace, values, option_string=None):
             print(complete(parent or parser, values, preamble=preamble))
             parser.exit(0)
