@@ -24,17 +24,20 @@ class Bash(object):
         proc = subprocess.Popen([
             "bash", "-o", "pipefail", "-ec", "{init}[[ {cmd} ]]".format(init=init, cmd=cmd)])
         stdout, stderr = proc.communicate()
-        assert (0 == proc.wait() and not stdout and not stderr), """\
+        assert (
+            proc.wait() == 0 and not stdout and not stderr
+        ), """\
 {}
 {}
 === stdout ===
 {}=== stderr ===
-{}""".format(failure_message, cmd, stdout or "", stderr or "")
+{}""".format(
+            failure_message, cmd, stdout or "", stderr or ""
+        )
 
     def compgen(self, compgen_cmd, word, expected_completions, failure_message=""):
         self.test(
-            '"$(echo $(compgen {} -- "{}"))" = "{}"'.format(compgen_cmd, word,
-                                                            expected_completions),
+            f'"$(echo $(compgen {compgen_cmd} -- "{word}"))" = "{expected_completions}"',
             failure_message,
         )
 
