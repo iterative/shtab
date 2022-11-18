@@ -38,11 +38,6 @@ except ImportError:
 __all__ = ["complete", "add_argument_to", "SUPPORTED_SHELLS", "FILE", "DIRECTORY", "DIR"]
 log = logging.getLogger(__name__)
 
-
-class _PrintCompletionAction(Action):
-    pass
-
-
 SUPPORTED_SHELLS: List[str] = []
 _SUPPORTED_COMPLETERS = {}
 CHOICE_FUNCTIONS: Dict[str, Dict[str, str]] = {
@@ -57,16 +52,14 @@ FLAG_OPTION = (
     _AppendConstAction,
     _CountAction,
 )
-OPTION_END = _HelpAction, _VersionAction, _PrintCompletionAction
+
+
+class _ShtabPrintCompletionAction(Action):
+    pass
+
+
+OPTION_END = _HelpAction, _VersionAction, _ShtabPrintCompletionAction
 OPTION_MULTI = _AppendAction, _AppendConstAction, _CountAction
-
-
-def is_opt_end(opt):
-    return isinstance(opt, OPTION_END) or opt.nargs == REMAINDER
-
-
-def is_opt_multiline(opt):
-    return isinstance(opt, OPTION_MULTI)
 
 
 def mark_completer(shell):
@@ -478,6 +471,12 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
+    def is_opt_end(opt):
+        return isinstance(opt, OPTION_END) or opt.nargs == REMAINDER
+
+    def is_opt_multiline(opt):
+        return isinstance(opt, OPTION_MULTI)
+
     def format_optional(opt):
         return (('{nargs}{options}"[{help}]"' if isinstance(
             opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
@@ -784,7 +783,7 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
 
 
 def completion_action(parent=None, preamble=""):
-    class PrintCompletionAction(_PrintCompletionAction):
+    class PrintCompletionAction(_ShtabPrintCompletionAction):
         def __call__(self, parser, namespace, values, option_string=None):
             print(complete(parent or parser, values, preamble=preamble))
             parser.exit(0)
