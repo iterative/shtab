@@ -52,7 +52,7 @@ jobs:
     - name: Install
       run: pip install -U -r requirements-dev.txt
     - run: pytest
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v3
   deploy:
     needs: [check, test]
     name: PyPI Deploy
