@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import logging
 import re
-import sys
 from argparse import (
     ONE_OR_MORE,
     REMAINDER,
@@ -807,15 +806,12 @@ def add_argument_to(
     parent  : argparse.ArgumentParser
       required in subcommand mode
     """
-    if isinstance(
-            option_string,
-            str if sys.version_info[0] > 2 else basestring          # NOQA
-    ):
+    if isinstance(option_string, str):
         option_string = [option_string]
     kwargs = {
         "choices": SUPPORTED_SHELLS, "default": None, "help": help,
         "action": completion_action(parent, preamble)}
-    if option_string[0][0] != "-":                                  # subparser mode
+    if option_string[0][0] != "-": # subparser mode
         kwargs.update(default=SUPPORTED_SHELLS[0], nargs="?")
         assert parent is not None, "subcommand mode: parent required"
     parser.add_argument(*option_string, **kwargs)

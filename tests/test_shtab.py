@@ -3,7 +3,6 @@ Tests for `shtab`.
 """
 import logging
 import subprocess
-import sys
 from argparse import ArgumentParser
 
 import pytest
@@ -183,7 +182,6 @@ def test_subparser_custom_complete(shell, caplog):
 
 
 @fix_shell
-@pytest.mark.skipif(sys.version_info[0] == 2, reason="requires Python 3.x")
 def test_subparser_aliases(shell, caplog):
     parser = ArgumentParser(prog="test")
     subparsers = parser.add_subparsers()
