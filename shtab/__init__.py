@@ -78,7 +78,7 @@ def get_completer(shell):
 
 
 @total_ordering
-class Choice(object):
+class Choice:
     """
     Placeholder to mark a special completion `<type>`.
 
@@ -109,14 +109,14 @@ class Choice(object):
         return self.__cmp__(other) < 0
 
 
-class Optional(object):
+class Optional:
     """Example: `ArgumentParser.add_argument(..., choices=Optional.FILE)`."""
 
     FILE = [Choice("file")]
     DIR = DIRECTORY = [Choice("directory")]
 
 
-class Required(object):
+class Required:
     """Example: `ArgumentParser.add_argument(..., choices=Required.FILE)`."""
 
     FILE = [Choice("file", True)]
@@ -186,20 +186,20 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
 
             if hasattr(positional, "complete"):
                 # shtab `.complete = ...` functions
-                compgens.append(u"{}_pos_{}_COMPGEN={}".format(
+                compgens.append("{}_pos_{}_COMPGEN={}".format(
                     prefix, i, complete2pattern(positional.complete, "bash", choice_type2fn)))
 
             if positional.choices:
                 # choices (including subparsers & shtab `.complete` functions)
-                log.debug("choices:{}:{}".format(prefix, sorted(positional.choices)))
+                log.debug(f"choices:{prefix}:{sorted(positional.choices)}")
 
                 this_positional_choices = []
                 for choice in positional.choices:
                     if isinstance(choice, Choice):
                         # append special completion type to `compgens`
                         # NOTE: overrides `.complete` attribute
-                        log.debug("Choice.{}:{}:{}".format(choice.type, prefix, positional.dest))
-                        compgens.append(u"{}_pos_{}_COMPGEN={}".format(
+                        log.debug(f"Choice.{choice.type}:{prefix}:{positional.dest}")
+                        compgens.append("{}_pos_{}_COMPGEN={}".format(
                             prefix, i, choice_type2fn[choice.type]))
                     elif isinstance(positional.choices, dict):
                         # subparser, so append to list of subparsers & recurse
@@ -230,20 +230,20 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         this_positional_choices.append(str(choice))
 
                 if this_positional_choices:
-                    choices.append(u"{}_pos_{}_choices=('{}')".format(
+                    choices.append("{}_pos_{}_choices=('{}')".format(
                         prefix, i, "' '".join(this_positional_choices)))
 
             # skip default `nargs` values
             if positional.nargs not in (None, "1", "?"):
-                nargs.append(u"{}_pos_{}_nargs={}".format(prefix, i, positional.nargs))
+                nargs.append(f"{prefix}_pos_{i}_nargs={positional.nargs}")
 
         if discovered_subparsers:
-            subparsers.append(u"{}_subparsers=('{}')".format(prefix,
-                                                             "' '".join(discovered_subparsers)))
-            log.debug("subcommands:{}:{}".format(prefix, discovered_subparsers))
+            subparsers.append("{}_subparsers=('{}')".format(prefix,
+                                                            "' '".join(discovered_subparsers)))
+            log.debug(f"subcommands:{prefix}:{discovered_subparsers}")
 
         # optional arguments
-        option_strings.append(u"{}_option_strings=('{}')".format(
+        option_strings.append("{}_option_strings=('{}')".format(
             prefix, "' '".join(get_option_strings(parser))))
         for optional in parser._get_optional_actions():
             if optional == SUPPRESS:
@@ -252,7 +252,7 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             for option_string in optional.option_strings:
                 if hasattr(optional, "complete"):
                     # shtab `.complete = ...` functions
-                    compgens.append(u"{}_{}_COMPGEN={}".format(
+                    compgens.append("{}_{}_COMPGEN={}".format(
                         prefix, wordify(option_string),
                         complete2pattern(optional.complete, "bash", choice_type2fn)))
 
@@ -263,21 +263,21 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                         # append special completion type to `compgens`
                         # NOTE: overrides `.complete` attribute
                         if isinstance(choice, Choice):
-                            log.debug("Choice.{}:{}:{}".format(choice.type, prefix, optional.dest))
-                            compgens.append(u"{}_{}_COMPGEN={}".format(
+                            log.debug(f"Choice.{choice.type}:{prefix}:{optional.dest}")
+                            compgens.append("{}_{}_COMPGEN={}".format(
                                 prefix, wordify(option_string), choice_type2fn[choice.type]))
                         else:
                             # simple choice
                             this_optional_choices.append(str(choice))
 
                     if this_optional_choices:
-                        choices.append(u"{}_{}_choices=('{}')".format(
+                        choices.append("{}_{}_choices=('{}')".format(
                             prefix, wordify(option_string), "' '".join(this_optional_choices)))
 
                 # Check for nargs.
                 if optional.nargs is not None and optional.nargs != 1:
-                    nargs.append(u"{}_{}_nargs={}".format(prefix, wordify(option_string),
-                                                          optional.nargs))
+                    nargs.append("{}_{}_nargs={}".format(prefix, wordify(option_string),
+                                                         optional.nargs))
 
         # append recursion results
         subparsers.extend(sub_subparsers)
@@ -520,7 +520,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 # positional argument
                 all_commands[prefix]["arguments"].append(format_positional(sub))
             else:  # subparser
-                log.debug("choices:{}:{}".format(prefix, sorted(sub.choices)))
+                log.debug(f"choices:{prefix}:{sorted(sub.choices)}")
                 public_cmds = get_public_subcommands(sub)
                 for cmd, subparser in sub.choices.items():
                     if cmd not in public_cmds:
@@ -724,8 +724,7 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
             # Multiple requirements
             nlist = []
             for nn, arg in ndict.items():
-                checks = [
-                    '[ "$cmd[{}]" == "{}" ]'.format(iidx, n) for iidx, n in enumerate(nn, start=2)]
+                checks = [f'[ "$cmd[{iidx}]" == "{n}" ]' for iidx, n in enumerate(nn, start=2)]
                 if arg.choices:
                     nlist.append('( {}echo "{}" || false )'.format(
                         ' && '.join(checks + ['']),                 # Append the separator

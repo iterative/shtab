@@ -13,15 +13,14 @@ from shtab.main import get_main_parser, main
 fix_shell = pytest.mark.parametrize("shell", shtab.SUPPORTED_SHELLS)
 
 
-class Bash(object):
+class Bash:
     def __init__(self, init_script=""):
         self.init = init_script
 
     def test(self, cmd="1", failure_message=""):
         """Equivalent to `bash -c '{init}; [[ {cmd} ]]'`."""
         init = self.init + "\n" if self.init else ""
-        proc = subprocess.Popen([
-            "bash", "-o", "pipefail", "-ec", "{init}[[ {cmd} ]]".format(init=init, cmd=cmd)])
+        proc = subprocess.Popen(["bash", "-o", "pipefail", "-ec", f"{init}[[ {cmd} ]]"])
         stdout, stderr = proc.communicate()
         assert (0 == proc.wait() and not stdout and not stderr), """\
 {}
