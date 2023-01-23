@@ -3,7 +3,6 @@ Tests for `shtab`.
 """
 import logging
 import subprocess
-import sys
 from argparse import ArgumentParser
 
 import pytest
@@ -14,15 +13,14 @@ from shtab.main import get_main_parser, main
 fix_shell = pytest.mark.parametrize("shell", shtab.SUPPORTED_SHELLS)
 
 
-class Bash(object):
+class Bash:
     def __init__(self, init_script=""):
         self.init = init_script
 
     def test(self, cmd="1", failure_message=""):
         """Equivalent to `bash -c '{init}; [[ {cmd} ]]'`."""
         init = self.init + "\n" if self.init else ""
-        proc = subprocess.Popen([
-            "bash", "-o", "pipefail", "-ec", "{init}[[ {cmd} ]]".format(init=init, cmd=cmd)])
+        proc = subprocess.Popen(["bash", "-o", "pipefail", "-ec", f"{init}[[ {cmd} ]]"])
         stdout, stderr = proc.communicate()
         assert (0 == proc.wait() and not stdout and not stderr), """\
 {}
@@ -183,7 +181,6 @@ def test_subparser_custom_complete(shell, caplog):
 
 
 @fix_shell
-@pytest.mark.skipif(sys.version_info[0] == 2, reason="requires Python 3.x")
 def test_subparser_aliases(shell, caplog):
     parser = ArgumentParser(prog="test")
     subparsers = parser.add_subparsers()
