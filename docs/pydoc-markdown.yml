@@ -57,6 +57,7 @@ renderer:
       name: material
       logo: https://github.com/iterative/shtab/raw/main/meta/logo.png
       favicon: https://github.com/iterative/shtab/raw/main/meta/logo.png
+      features: [content.tabs.link]
       palette:
       - scheme: default
         primary: white
@@ -68,8 +69,6 @@ renderer:
         toggle:
           icon: material/toggle-switch
           name: Switch to light mode
-      features:
-      - content.tabs.link
     plugins:
     - search
     - minify:
