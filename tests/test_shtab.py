@@ -65,6 +65,24 @@ def test_main(shell, caplog):
 
 
 @fix_shell
+def test_main_self_completion(shell, caplog, capsys):
+    with caplog.at_level(logging.INFO):
+        try:
+            main(["--print-completion", shell])
+        except SystemExit:
+            pass
+
+    captured = capsys.readouterr()
+    assert not captured.err
+    expected = {
+        "bash": "complete -o filenames -F _shtab_shtab shtab", "zsh": "_shtab_shtab_commands()",
+        "tcsh": "complete shtab"}
+    assert expected[shell] in captured.out
+
+    assert not caplog.record_tuples
+
+
+@fix_shell
 def test_prog_override(shell, caplog, capsys):
     with caplog.at_level(logging.INFO):
         main(["-s", shell, "--prog", "foo", "shtab.main.get_main_parser"])
