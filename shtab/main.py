@@ -11,7 +11,6 @@ log = logging.getLogger(__name__)
 
 def get_main_parser():
     parser = argparse.ArgumentParser(prog="shtab")
-    add_argument_to(parser)
     parser.add_argument("parser", help="importable parser (or function returning parser)")
     parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
     parser.add_argument("-s", "--shell", default=SUPPORTED_SHELLS[0], choices=SUPPORTED_SHELLS)
@@ -27,6 +26,7 @@ def get_main_parser():
     )
     parser.add_argument("--verbose", dest="loglevel", action="store_const", default=logging.INFO,
                         const=logging.DEBUG, help="Log debug information")
+    add_argument_to(parser) # add `--print-completion` option (dogfooding)
     return parser
 
 
