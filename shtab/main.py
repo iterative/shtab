@@ -26,7 +26,7 @@ def get_main_parser():
     )
     parser.add_argument("--verbose", dest="loglevel", action="store_const", default=logging.INFO,
                         const=logging.DEBUG, help="Log debug information")
-    add_argument_to(parser) # add `--print-completion` option (dogfooding)
+    add_argument_to(parser, "--print-own-completion", help="print shtab's own completion")
     return parser
 
 

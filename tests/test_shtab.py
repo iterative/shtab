@@ -68,7 +68,7 @@ def test_main(shell, caplog):
 def test_main_self_completion(shell, caplog, capsys):
     with caplog.at_level(logging.INFO):
         try:
-            main(["--print-completion", shell])
+            main(["--print-own-completion", shell])
         except SystemExit:
             pass
 
