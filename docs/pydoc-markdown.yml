@@ -5,6 +5,9 @@ processors:
 - type: filter
 - type: pydoc_markdown_shtab.ShtabProcessor
 - type: crossref
+hooks:
+  pre-render:
+  - sed 's#](./#](https://github.com/iterative/shtab/tree/main/#g' ../CONTRIBUTING.md > contributing.md
 renderer:
   type: mkdocs
   markdown:
@@ -37,7 +40,7 @@ renderer:
       href: https://github.com/iterative/shtab/issues?q=
   - title: Contributing
     name: contributing
-    source: ../CONTRIBUTING.md
+    source: contributing.md
   - title: Licence
     name: licence
     source: ../LICENCE
