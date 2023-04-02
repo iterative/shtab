@@ -4,7 +4,7 @@ import os
 import sys
 from importlib import import_module
 
-from . import SUPPORTED_SHELLS, __version__, complete
+from . import SUPPORTED_SHELLS, __version__, add_argument_to, complete
 
 log = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ def get_main_parser():
     )
     parser.add_argument("--verbose", dest="loglevel", action="store_const", default=logging.INFO,
                         const=logging.DEBUG, help="Log debug information")
+    add_argument_to(parser, "--print-own-completion", help="print shtab's own completion")
     return parser
 
 
