@@ -755,14 +755,15 @@ complete ${prog} \\
 def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] = None,
              preamble: Union[str, Dict] = "", choice_functions: Opt[Any] = None) -> str:
     """
-    parser  : argparse.ArgumentParser
-    shell  : str (bash/zsh)
-    root_prefix  : str or `None`
+    shell:
+      bash/zsh/tcsh
+    root_prefix:
       prefix for shell functions to avoid clashes (default: "_{parser.prog}")
-    preamble  : dict or str
+    preamble:
       mapping shell to text to prepend to generated script
       (e.g. `{"bash": "_myprog_custom_function(){ echo hello }"}`)
-    choice_functions  : deprecated
+    choice_functions:
+      *deprecated*
 
     N.B. `parser.add_argument().complete = ...` can be used to define custom
     completions (e.g. filenames). See <../examples/pathcomplete.py>.
@@ -795,12 +796,10 @@ def add_argument_to(
     preamble: Union[str, Dict] = "",
 ):
     """
-    parser  : argparse.ArgumentParser
-    option_string  : str or list[str]
+    option_string:
       iff positional (no `-` prefix) then `parser` is assumed to actually be
       a subparser (subcommand mode)
-    help  : str
-    parent  : argparse.ArgumentParser
+    parent:
       required in subcommand mode
     """
     if isinstance(option_string, str):
