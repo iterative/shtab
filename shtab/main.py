@@ -24,8 +24,14 @@ def get_main_parser():
         action="store_true",
         help="raise errors if `parser` is not found in $PYTHONPATH",
     )
-    parser.add_argument("--verbose", dest="loglevel", action="store_const", default=logging.INFO,
-                        const=logging.DEBUG, help="Log debug information")
+    parser.add_argument(
+        "--verbose",
+        dest="loglevel",
+        action="store_const",
+        default=logging.INFO,
+        const=logging.DEBUG,
+        help="Log debug information",
+    )
     add_argument_to(parser, "--print-own-completion", help="print shtab's own completion")
     return parser
 
@@ -53,5 +59,9 @@ def main(argv=None):
     if args.prog:
         other_parser.prog = args.prog
     print(
-        complete(other_parser, shell=args.shell, root_prefix=args.prefix
-                 or args.parser.split(".", 1)[0], preamble=args.preamble))
+        complete(
+            other_parser,
+            shell=args.shell,
+            root_prefix=args.prefix or args.parser.split(".", 1)[0],
+            preamble=args.preamble,
+        ))
