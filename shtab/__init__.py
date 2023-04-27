@@ -20,7 +20,7 @@ from itertools import starmap
 from string import Template
 from typing import Any, Dict, List
 from typing import Optional as Opt
-from typing import Union
+from typing import Sequence, Union
 
 # version detector. Precedence: installed dist, git, 'UNKNOWN'
 try:
@@ -32,7 +32,9 @@ except ImportError:
         __version__ = get_version(root="..", relative_to=__file__)
     except (ImportError, LookupError):
         __version__ = "UNKNOWN"
-__all__ = ["complete", "add_argument_to", "SUPPORTED_SHELLS", "FILE", "DIRECTORY", "DIR"]
+__all__ = [
+    "complete", "add_argument_to", "SUPPORTED_SHELLS", "FILE", "DIRECTORY", "DIR",
+    "custom_choices"]
 log = logging.getLogger(__name__)
 
 SUPPORTED_SHELLS: List[str] = []
@@ -107,6 +109,27 @@ class Choice:
 
     def __lt__(self, other: object) -> bool:
         return self.__cmp__(other) < 0
+
+
+class CustomChoices:
+    def __init__(self, choices: Sequence[str]) -> None:
+        self.choices = tuple(choices)
+        assert all(isinstance(c, str) for c in self.choices)
+
+    def bash_choices(self, prefix: str, option_string: str) -> str:
+        name = f"{prefix}_{wordify(option_string)}_choices"
+        value = "(" + " ".join(f"'{c}'" for c in self.choices) + ")"
+        return f"{name}={value}"
+
+    def zsh_choices(self) -> str:
+        return "(" + " ".join(self.choices) + ")"
+
+    def tcsh_choices(self) -> str:
+        return "(" + " ".join(self.choices) + ")"
+
+
+def custom_choices(choices: List[str]) -> CustomChoices:
+    return CustomChoices(choices)
 
 
 class Optional:
@@ -251,9 +274,12 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
             for option_string in optional.option_strings:
                 if hasattr(optional, "complete"):
                     # shtab `.complete = ...` functions
-                    comp_pattern_str = complete2pattern(optional.complete, "bash", choice_type2fn)
-                    compgens.append(
-                        f"{prefix}_{wordify(option_string)}_COMPGEN={comp_pattern_str}")
+                    if isinstance(optional.complete, CustomChoices):
+                        choices.append(optional.complete.bash_choices(prefix, option_string))
+                    else:
+                        comp_pattern_str = complete2pattern(optional.complete, "bash", choice_type2fn)
+                        compgens.append(
+                            f"{prefix}_{wordify(option_string)}_COMPGEN={comp_pattern_str}")
 
                 if optional.choices:
                     # choices (including shtab `.complete` functions)
@@ -475,18 +501,28 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
         return isinstance(opt, OPTION_MULTI)
 
     def format_optional(opt):
-        return (('{nargs}{options}"[{help}]"' if isinstance(
-            opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
-                nargs=('"(- : *)"' if is_opt_end(opt) else '"*"' if is_opt_multiline(opt) else ""),
-                options=("{{{}}}".format(",".join(opt.option_strings)) if len(opt.option_strings)
-                         > 1 else '"{}"'.format("".join(opt.option_strings))),
-                help=escape_zsh(opt.help or ""),
-                dest=opt.dest,
-                pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
-                    opt, "complete") else
-                (choice_type2fn[opt.choices[0].type] if isinstance(opt.choices[0], Choice) else
-                 "({})".format(" ".join(map(str, opt.choices)))) if opt.choices else "",
-            ).replace('""', ""))
+        nargs = ('"(- : *)"' if is_opt_end(opt) else '"*"' if is_opt_multiline(opt) else "")
+        options = ("{{{}}}".format(",".join(opt.option_strings))
+                   if len(opt.option_strings) > 1 else '"{}"'.format("".join(opt.option_strings)))
+        pattern = ""
+        if hasattr(opt, "complete"):
+            if isinstance(opt.complete, CustomChoices):
+                pattern = opt.complete.zsh_choices()
+            else:
+                pattern = complete2pattern(opt.complete, "zsh", choice_type2fn)
+        elif opt.choices:
+            if isinstance(opt.choices[0], Choice):
+                pattern = choice_type2fn[opt.choices[0].type]
+            else:
+                pattern = "({})".format(" ".join(map(str, opt.choices)))
+        return ('{nargs}{options}"[{help}]"' if isinstance(opt, FLAG_OPTION) else
+                '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
+                    nargs=nargs,
+                    options=options,
+                    help=escape_zsh(opt.help or ""),
+                    dest=opt.dest,
+                    pattern=pattern,
+                ).replace('""', "")
 
     def format_positional(opt):
         return '"{nargs}:{help}:{pattern}"'.format(
@@ -674,7 +710,10 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
             choice_strs = ' '.join(map(str, arg.choices))
             yield f"'{arg_type}/{arg_sel}/({choice_strs})/'"
         elif hasattr(arg, 'complete'):
-            complete_fn = complete2pattern(arg.complete, 'tcsh', choice_type2fn)
+            if isinstance(arg.complete, CustomChoices):
+                complete_fn = arg.complete.tcsh_choices()
+            else:
+                complete_fn = complete2pattern(arg.complete, 'tcsh', choice_type2fn)
             if complete_fn:
                 yield f"'{arg_type}/{arg_sel}/{complete_fn}/'"
 
