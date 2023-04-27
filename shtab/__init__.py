@@ -20,7 +20,7 @@ from itertools import starmap
 from string import Template
 from typing import Any, Dict, List
 from typing import Optional as Opt
-from typing import Sequence, Union
+from typing import Union
 
 # version detector. Precedence: installed dist, git, 'UNKNOWN'
 try:
@@ -112,8 +112,8 @@ class Choice:
 
 
 class CustomChoices:
-    def __init__(self, choices: Sequence[str]) -> None:
-        self.choices = tuple(choices)
+    def __init__(self, *choices: str) -> None:
+        self.choices = choices
         assert all(isinstance(c, str) for c in self.choices)
 
     def bash_choices(self, prefix: str, option_string: str) -> str:
@@ -128,8 +128,8 @@ class CustomChoices:
         return "(" + " ".join(self.choices) + ")"
 
 
-def custom_choices(choices: List[str]) -> CustomChoices:
-    return CustomChoices(choices)
+def custom_choices(*choices: str) -> CustomChoices:
+    return CustomChoices(*choices)
 
 
 class Optional:
@@ -277,7 +277,8 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
                     if isinstance(optional.complete, CustomChoices):
                         choices.append(optional.complete.bash_choices(prefix, option_string))
                     else:
-                        comp_pattern_str = complete2pattern(optional.complete, "bash", choice_type2fn)
+                        comp_pattern_str = complete2pattern(optional.complete, "bash",
+                                                            choice_type2fn)
                         compgens.append(
                             f"{prefix}_{wordify(option_string)}_COMPGEN={comp_pattern_str}")
 

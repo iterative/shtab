@@ -201,7 +201,7 @@ def test_subparser_custom_complete(shell, caplog):
 def test_custom_choices(shell, caplog):
     parser = ArgumentParser(prog="test")
     action = parser.add_argument("--optA")
-    action.complete = shtab.custom_choices(["yes", "no", "maybe"])
+    action.complete = shtab.custom_choices("yes", "no", "maybe")
     with caplog.at_level(logging.INFO):
         completion = shtab.complete(parser, shell=shell)
     print(completion)
