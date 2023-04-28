@@ -563,7 +563,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     def command_case(prefix, options):
         name = options["cmd"]
         commands = options["commands"]
-        case_fmt_on_no_sub = """{name}) _arguments -C ${prefix}_{name_wordify}_options ;;"""
+        case_fmt_on_no_sub = """{name}) _arguments -C -s ${prefix}_{name_wordify}_options ;;"""
         case_fmt_on_sub = """{name}) {prefix}_{name_wordify} ;;"""
 
         cases = []
@@ -581,7 +581,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
   if ((${{{prefix}_options[(I)${{(q)one_or_more}}*]}} + ${{{prefix}_options[(I)${{(q)remainder}}*]}} == 0)); then  # noqa: E501
     {prefix}_options+=(': :{prefix}_commands' '*::: :->{name}')
   fi
-  _arguments -C ${prefix}_options
+  _arguments -C -s ${prefix}_options
 
   case $state in
     {name})
