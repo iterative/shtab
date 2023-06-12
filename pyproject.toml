@@ -6,7 +6,10 @@ write_to = "shtab/_dist_ver.py"
 write_to_template = "__version__ = '{version}'\n"
 
 [tool.setuptools.packages.find]
-exclude = ["docs", "tests"]
+exclude = ["docs", "tests", "examples"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["logo.png"]
 
 [project.urls]
 documentation = "https://docs.iterative.ai/shtab"
