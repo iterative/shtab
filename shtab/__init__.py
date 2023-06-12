@@ -478,9 +478,8 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
         return (('{nargs}{options}"[{help}]"' if isinstance(
             opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
                 nargs=('"(- : *)"' if is_opt_end(opt) else '"*"' if is_opt_multiline(opt) else ""),
-                options=("{{{}}}".format(",".join(opt.option_strings))
-                         if len(opt.option_strings) > 1 else '"{}"'.format("".join(
-                             opt.option_strings))),
+                options=("{{{}}}".format(",".join(opt.option_strings)) if len(opt.option_strings)
+                         > 1 else '"{}"'.format("".join(opt.option_strings))),
                 help=escape_zsh(opt.help or ""),
                 dest=opt.dest,
                 pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
