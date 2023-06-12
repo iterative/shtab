@@ -11,10 +11,7 @@ class ShtabProcessor(PydocmdProcessor):
         node.docstring.content = re.sub(r"^(\w+)(:.*?)$", r"* __\1__\2", node.docstring.content,
                                         flags=re.M)
         # fix code cross-references
-        node.docstring.content = re.sub(
-            r"<../(\S+)>",
-            r"[\1](https://github.com/iterative/shtab/tree/main/\1)",
-            node.docstring.content,
-            flags=re.M,
-        )
+        node.docstring.content = re.sub(r"<../(\S+)>",
+                                        r"[\1](https://github.com/iterative/shtab/tree/main/\1)",
+                                        node.docstring.content, flags=re.M)
         return super()._process(node)
