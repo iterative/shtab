@@ -52,7 +52,7 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
     - name: Install
-      run: pip install -U -r requirements-dev.txt
+      run: pip install -U -e .[dev]
     - run: pytest
     - uses: codecov/codecov-action@v3
   deploy:
@@ -70,7 +70,6 @@ jobs:
     - id: dist
       uses: casperdcl/deploy-pypi@v2
       with:
-        requirements: twine setuptools wheel setuptools_scm[toml]
         build: true
         password: ${{ secrets.PYPI_TOKEN }}
         upload: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
