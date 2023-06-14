@@ -720,9 +720,9 @@ def complete_tcsh(parser, root_prefix=None, preamble="", choice_functions=None):
             for nn, arg in ndict.items():
                 checks = [f'[ "$cmd[{iidx}]" == "{n}" ]' for iidx, n in enumerate(nn, start=2)]
                 if arg.choices:
-                    nlist.append('( {}echo "{}" || false )'.format(
-                        ' && '.join(checks + ['']),                 # Append the separator
-                        r'\n'.join(arg.choices),
+                    nlist.append("( {}echo {} || false )".format(
+                        ' && '.join(checks + ['']),               # Append the separator
+                        ' '.join(rf"'{c}'" for c in arg.choices),
                     ))
 
             # Ugly hack
