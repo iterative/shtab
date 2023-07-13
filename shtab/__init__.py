@@ -474,13 +474,15 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     def is_opt_multiline(opt):
         return isinstance(opt, OPTION_MULTI)
 
-    def format_optional(opt):
+    def format_optional(opt, parser):
+        formatter = parser._get_formatter()
+        formatter._width = 1000000
         return (('{nargs}{options}"[{help}]"' if isinstance(
             opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
                 nargs=('"(- : *)"' if is_opt_end(opt) else '"*"' if is_opt_multiline(opt) else ""),
                 options=("{{{}}}".format(",".join(opt.option_strings)) if len(opt.option_strings)
                          > 1 else '"{}"'.format("".join(opt.option_strings))),
-                help=escape_zsh(opt.help or ""),
+                help=escape_zsh(formatter._expand_help(opt) if opt.help else ""),
                 dest=opt.dest,
                 pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
                     opt, "complete") else
@@ -488,10 +490,13 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                  "({})".format(" ".join(map(str, opt.choices)))) if opt.choices else "",
             ).replace('""', ""))
 
-    def format_positional(opt):
+    def format_positional(opt, parser):
+        formatter = parser._get_formatter()
+        formatter._width = 1000000
         return '"{nargs}:{help}:{pattern}"'.format(
             nargs={ONE_OR_MORE: "(*)", ZERO_OR_MORE: "(*):", REMAINDER: "(-)*"}.get(opt.nargs, ""),
-            help=escape_zsh((opt.help or opt.dest).strip().split("\n")[0]),
+            help=escape_zsh(
+                (formatter._expand_help(opt) if opt.help else opt.dest).strip().split("\n")[0]),
             pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
                 opt, "complete") else
             (choice_type2fn[opt.choices[0].type] if isinstance(opt.choices[0], Choice) else
@@ -502,9 +507,9 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
     all_commands = {
         root_prefix: {
             "cmd": prog, "arguments": [
-                format_optional(opt)
+                format_optional(opt, parser)
                 for opt in parser._get_optional_actions() if opt.help != SUPPRESS] + [
-                    format_positional(opt) for opt in parser._get_positional_actions()
+                    format_positional(opt, parser) for opt in parser._get_positional_actions()
                     if opt.help != SUPPRESS and opt.choices is None],
             "help": (parser.description
                      or "").strip().split("\n")[0], "commands": [], "paths": []}}
@@ -517,7 +522,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                 continue
             if not sub.choices or not isinstance(sub.choices, dict):
                 # positional argument
-                all_commands[prefix]["arguments"].append(format_positional(sub))
+                all_commands[prefix]["arguments"].append(format_positional(sub, parser))
             else:  # subparser
                 log.debug(f"choices:{prefix}:{sorted(sub.choices)}")
                 public_cmds = get_public_subcommands(sub)
@@ -529,17 +534,22 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
                     # optionals
                     arguments = [
-                        format_optional(opt) for opt in subparser._get_optional_actions()
+                        format_optional(opt, parser) for opt in subparser._get_optional_actions()
                         if opt.help != SUPPRESS]
 
                     # positionals
                     arguments.extend(
-                        format_positional(opt) for opt in subparser._get_positional_actions()
+                        format_positional(opt, parser)
+                        for opt in subparser._get_positional_actions()
                         if not isinstance(opt.choices, dict) if opt.help != SUPPRESS)
 
                     new_pref = f"{prefix}_{wordify(cmd)}"
+                    formatter = subparser._get_formatter()
+                    formatter._width = 1000000
+                    desc = subparser.description
                     options = all_commands[new_pref] = {
-                        "cmd": cmd, "help": (subparser.description or "").strip().split("\n")[0],
+                        "cmd": cmd, "help": (formatter._format_text(desc)
+                                             if desc else "").strip().split("\n")[0],
                         "arguments": arguments, "paths": [*paths, cmd]}
                     new_subcmds = recurse(subparser, new_pref, [*paths, cmd])
                     options["commands"] = {
