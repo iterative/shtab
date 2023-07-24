@@ -60,8 +60,8 @@ There are two ways of using ``shtab``:
 - `Library Usage <https://docs.iterative.ai/shtab/use/#library-usage>`_: as a library integrated into your CLI application
 
   - adds a couple of lines to your application
-  - argument mode: end-users execute ``your_cli_app --print-completion {bash,zsh}``
-  - subparser mode: end-users execute ``your_cli_app completion {bash,zsh}``
+  - argument mode: end-users execute ``your_cli_app --print-completion {bash,zsh,tcsh}``
+  - subparser mode: end-users execute ``your_cli_app completion {bash,zsh,tcsh}``
 
 Examples
 --------
