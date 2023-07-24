@@ -540,14 +540,17 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
                         for opt in subparser._get_positional_actions()
                         if not isinstance(opt.choices, dict) if opt.help != SUPPRESS)
 
-                    new_pref = f"{prefix}_{wordify(cmd)}"
+                    # help text
                     formatter = subparser._get_formatter()
-                    formatter._width = 1000000
-                    desc = subparser.description
+                    backup_width = formatter._width
+                    formatter._width = 1234567 # large number to effectively disable wrapping
+                    desc = formatter._format_text(subparser.description or "").strip()
+                    formatter._width = backup_width
+
+                    new_pref = f"{prefix}_{wordify(cmd)}"
                     options = all_commands[new_pref] = {
-                        "cmd": cmd, "help": (formatter._format_text(desc)
-                                             if desc else "").strip().split("\n")[0],
-                        "arguments": arguments, "paths": [*paths, cmd]}
+                        "cmd": cmd, "help": desc.split("\n")[0], "arguments": arguments,
+                        "paths": [*paths, cmd]}
                     new_subcmds = recurse(subparser, new_pref, [*paths, cmd])
                     options["commands"] = {
                         all_commands[pref]["cmd"]: all_commands[pref]
