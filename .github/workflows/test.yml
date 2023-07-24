@@ -80,7 +80,7 @@ jobs:
         tag="${GITHUB_REF#refs/tags/}"
         gh release create --title "shtab $tag beta" --draft --notes "$changelog" "$tag" dist/${{ steps.dist.outputs.whl }} dist/${{ steps.dist.outputs.targz }}
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
     - name: Docs
       run: |
         pushd docs
