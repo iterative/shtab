@@ -1,9 +1,10 @@
 ![shtab](https://static.iterative.ai/img/shtab/banner.png)
 
-[![Tests](https://github.com/iterative/shtab/workflows/Test/badge.svg)](https://github.com/iterative/shtab/actions)
+[![Downloads](https://img.shields.io/pypi/dm/shtab.svg?label=pypi%20downloads&logo=PyPI&logoColor=white)](https://pepy.tech/project/shtab)
+[![Tests](https://img.shields.io/github/actions/workflow/status/iterative/shtab/test.yml?logo=github&label=tests)](https://github.com/iterative/shtab/actions)
 [![Coverage](https://codecov.io/gh/iterative/shtab/branch/main/graph/badge.svg)](https://codecov.io/gh/iterative/shtab)
-[![conda-forge](https://img.shields.io/conda/v/conda-forge/shtab.svg?label=conda&logo=conda-forge)](https://anaconda.org/conda-forge/shtab)
 [![PyPI](https://img.shields.io/pypi/v/shtab.svg?label=pip&logo=PyPI&logoColor=white)](https://pypi.org/project/shtab)
+[![conda-forge](https://img.shields.io/conda/v/conda-forge/shtab.svg?label=conda&logo=conda-forge)](https://anaconda.org/conda-forge/shtab)
 
 - What: Automatically generate shell tab completion scripts for Python CLI apps
 - Why: Speed & correctness. Alternatives like

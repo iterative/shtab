@@ -3,7 +3,7 @@
 shtab
 =====
 
-|Tests| |Coverage| |Conda| |PyPI|
+|PyPI-Downloads| |Tests| |Coverage| |PyPI| |Conda|
 
 - What: Automatically generate shell tab completion scripts for Python CLI apps
 - Why: Speed & correctness. Alternatives like
@@ -60,8 +60,8 @@ There are two ways of using ``shtab``:
 - `Library Usage <https://docs.iterative.ai/shtab/use/#library-usage>`_: as a library integrated into your CLI application
 
   - adds a couple of lines to your application
-  - argument mode: end-users execute ``your_cli_app --print-completion {bash,zsh}``
-  - subparser mode: end-users execute ``your_cli_app completion {bash,zsh}``
+  - argument mode: end-users execute ``your_cli_app --print-completion {bash,zsh,tcsh}``
+  - subparser mode: end-users execute ``your_cli_app completion {bash,zsh,tcsh}``
 
 Examples
 --------
@@ -108,7 +108,7 @@ for more guidance.
 |Hits|
 
 .. |Logo| image:: https://github.com/iterative/shtab/raw/main/meta/logo.png
-.. |Tests| image:: https://github.com/iterative/shtab/workflows/Test/badge.svg
+.. |Tests| image:: https://img.shields.io/github/actions/workflow/status/iterative/shtab/test.yml?logo=github&label=tests
    :target: https://github.com/iterative/shtab/actions
    :alt: Tests
 .. |Coverage| image:: https://codecov.io/gh/iterative/shtab/branch/main/graph/badge.svg
@@ -120,6 +120,9 @@ for more guidance.
 .. |PyPI| image:: https://img.shields.io/pypi/v/shtab.svg?label=pip&logo=PyPI&logoColor=white
    :target: https://pypi.org/project/shtab
    :alt: PyPI
+.. |PyPI-Downloads| image:: https://img.shields.io/pypi/dm/shtab.svg?label=pypi%20downloads&logo=PyPI&logoColor=white
+   :target: https://pepy.tech/project/shtab
+   :alt: Downloads
 .. |Hits| image:: https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden
    :target: https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social
    :alt: Hits
