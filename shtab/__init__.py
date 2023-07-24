@@ -475,14 +475,13 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
         return isinstance(opt, OPTION_MULTI)
 
     def format_optional(opt, parser):
-        formatter = parser._get_formatter()
-        formatter._width = 1000000
+        get_help = parser._get_formatter()._expand_help
         return (('{nargs}{options}"[{help}]"' if isinstance(
             opt, FLAG_OPTION) else '{nargs}{options}"[{help}]:{dest}:{pattern}"').format(
                 nargs=('"(- : *)"' if is_opt_end(opt) else '"*"' if is_opt_multiline(opt) else ""),
                 options=("{{{}}}".format(",".join(opt.option_strings)) if len(opt.option_strings)
                          > 1 else '"{}"'.format("".join(opt.option_strings))),
-                help=escape_zsh(formatter._expand_help(opt) if opt.help else ""),
+                help=escape_zsh(get_help(opt) if opt.help else ""),
                 dest=opt.dest,
                 pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
                     opt, "complete") else
@@ -491,12 +490,10 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
             ).replace('""', ""))
 
     def format_positional(opt, parser):
-        formatter = parser._get_formatter()
-        formatter._width = 1000000
+        get_help = parser._get_formatter()._expand_help
         return '"{nargs}:{help}:{pattern}"'.format(
             nargs={ONE_OR_MORE: "(*)", ZERO_OR_MORE: "(*):", REMAINDER: "(-)*"}.get(opt.nargs, ""),
-            help=escape_zsh(
-                (formatter._expand_help(opt) if opt.help else opt.dest).strip().split("\n")[0]),
+            help=escape_zsh((get_help(opt) if opt.help else opt.dest).strip().split("\n")[0]),
             pattern=complete2pattern(opt.complete, "zsh", choice_type2fn) if hasattr(
                 opt, "complete") else
             (choice_type2fn[opt.choices[0].type] if isinstance(opt.choices[0], Choice) else
