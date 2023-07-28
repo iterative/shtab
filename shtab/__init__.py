@@ -384,8 +384,8 @@ ${root_prefix}() {
   local completing_word="${COMP_WORDS[COMP_CWORD]}"
   COMPREPLY=()
 
-  prefix=${root_prefix}
-  word_index=0
+  local prefix=${root_prefix}
+  local word_index=0
   _set_parser_defaults
   word_index=1
 
