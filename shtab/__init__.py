@@ -394,13 +394,13 @@ ${root_prefix}() {
   while [ $word_index -ne $COMP_CWORD ]; do
     local this_word="${COMP_WORDS[$word_index]}"
 
-    if [[ -n $sub_parsers && " ${sub_parsers[@]} " =~ " ${this_word} " ]]; then
+    if [[ -n $sub_parsers && " ${sub_parsers[@]} " == *" ${this_word} "* ]]; then
       # valid subcommand: add it to the prefix & reset the current action
       prefix="${prefix}_$(_shtab_replace_nonword $this_word)"
       _set_parser_defaults
     fi
 
-    if [[ " ${current_option_strings[@]} " =~ " ${this_word} " ]]; then
+    if [[ " ${current_option_strings[@]} " == *" ${this_word} "* ]]; then
       # a new action should be acquired (due to recognised option string or
       # no more input expected from current action);
       # the next positional action can fill in here
