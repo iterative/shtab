@@ -20,7 +20,7 @@ class Bash:
     def test(self, cmd="1", failure_message=""):
         """Equivalent to `bash -c '{init}; [[ {cmd} ]]'`."""
         init = self.init + "\n" if self.init else ""
-        proc = subprocess.Popen(["bash", "-o", "pipefail", "-ec", f"{init}[[ {cmd} ]]"])
+        proc = subprocess.Popen(["bash", "-o", "pipefail", "-euc", f"{init}[[ {cmd} ]]"])
         stdout, stderr = proc.communicate()
         assert (0 == proc.wait() and not stdout and not stderr), f"""\
 {failure_message}
@@ -36,7 +36,7 @@ class Bash:
         )
 
 
-@pytest.mark.parametrize("init,test", [("export FOO=1", '"$FOO" -eq 1'), ("", '-z "$FOO"')])
+@pytest.mark.parametrize("init,test", [("export FOO=1", '"$FOO" -eq 1'), ("", '-z "${FOO-}"')])
 def test_bash(init, test):
     shell = Bash(init)
     shell.test(test)
@@ -192,7 +192,7 @@ def test_subparser_custom_complete(shell, caplog):
         shell.compgen('-W "${_shtab_test_subparsers[*]}"', "s", "sub")
         shell.compgen('-W "$_shtab_test_pos_0_choices"', "s", "sub")
         shell.test('"$($_shtab_test_sub_pos_0_COMPGEN o)" = "one"')
-        shell.test('-z "$_shtab_test_COMPGEN"')
+        shell.test('-z "${_shtab_test_COMPGEN-}"')
 
     assert not caplog.record_tuples
 
@@ -217,7 +217,7 @@ def test_subparser_aliases(shell, caplog):
         shell.compgen('-W "${_shtab_test_subparsers[*]}"', "y", "ysub")
         shell.compgen('-W "${_shtab_test_pos_0_choices[*]}"', "y", "ysub")
         shell.test('"$($_shtab_test_sub_pos_0_COMPGEN o)" = "one"')
-        shell.test('-z "$_shtab_test_COMPGEN"')
+        shell.test('-z "${_shtab_test_COMPGEN-}"')
 
     assert not caplog.record_tuples
 
@@ -235,7 +235,7 @@ def test_subparser_colons(shell, caplog):
         shell = Bash(completion)
         shell.compgen('-W "${_shtab_test_subparsers[*]}"', "s", "sub:cmd")
         shell.compgen('-W "${_shtab_test_pos_0_choices[*]}"', "s", "sub:cmd")
-        shell.test('-z "$_shtab_test_COMPGEN"')
+        shell.test('-z "${_shtab_test_COMPGEN-}"')
 
     assert not caplog.record_tuples
 
