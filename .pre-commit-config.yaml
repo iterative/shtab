@@ -5,11 +5,12 @@ repos:
   rev: v4.4.0
   hooks:
   - id: check-added-large-files
+  - id: check-builtin-literals
   - id: check-case-conflict
   - id: check-docstring-first
   - id: check-executables-have-shebangs
-  - id: check-toml
   - id: check-merge-conflict
+  - id: check-toml
   - id: check-yaml
   - id: debug-statements
   - id: end-of-file-fixer
@@ -39,12 +40,12 @@ repos:
     - flake8-pyproject
     - flake8-string-format
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.3.0
+  rev: v1.4.1
   hooks:
   - id: mypy
     additional_dependencies: [types-setuptools]
 - repo: https://github.com/google/yapf
-  rev: v0.33.0
+  rev: v0.40.0
   hooks:
   - id: yapf
     args: [-i]
@@ -53,3 +54,6 @@ repos:
   rev: 5.12.0
   hooks:
   - id: isort
+ci:
+  autoupdate_schedule: monthly
+  skip: [flake8]
