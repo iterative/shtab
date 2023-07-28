@@ -339,7 +339,7 @@ _shtab_replace_nonword() {
 # set default values (called for the initial parser & any subparsers)
 _set_parser_defaults() {
   local subparsers_var="${prefix}_subparsers[@]"
-  sub_parsers=${!subparsers_var}
+  sub_parsers=${!subparsers_var-}
 
   local current_option_strings_var="${prefix}_option_strings[@]"
   current_option_strings=${!current_option_strings_var}
@@ -356,13 +356,13 @@ _set_new_action() {
   current_action="${prefix}_$(_shtab_replace_nonword $1)"
 
   local current_action_compgen_var=${current_action}_COMPGEN
-  current_action_compgen="${!current_action_compgen_var}"
+  current_action_compgen="${!current_action_compgen_var-}"
 
   local current_action_choices_var="${current_action}_choices[@]"
-  current_action_choices="${!current_action_choices_var}"
+  current_action_choices="${!current_action_choices_var-}"
 
   local current_action_nargs_var="${current_action}_nargs"
-  if [ -n "${!current_action_nargs_var}" ]; then
+  if [ -n "${!current_action_nargs_var-}" ]; then
     current_action_nargs="${!current_action_nargs_var}"
   else
     current_action_nargs=1
