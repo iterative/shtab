@@ -382,6 +382,15 @@ _set_new_action() {
 #     ${!x} -> ${hello} -> "world"
 ${root_prefix}() {
   local completing_word="${COMP_WORDS[COMP_CWORD]}"
+  local completed_positional_actions
+  local current_action
+  local current_action_args_start_index
+  local current_action_choices
+  local current_action_compgen
+  local current_action_is_positional
+  local current_action_nargs
+  local current_option_strings
+  local sub_parsers
   COMPREPLY=()
 
   local prefix=${root_prefix}
