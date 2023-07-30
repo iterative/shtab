@@ -69,7 +69,7 @@ def mark_completer(shell):
     return wrapper
 
 
-def get_completer(shell):
+def get_completer(shell: str):
     try:
         return _SUPPORTED_COMPLETERS[shell]
     except KeyError:
@@ -123,7 +123,7 @@ class Required:
     DIR = DIRECTORY = [Choice("directory", True)]
 
 
-def complete2pattern(opt_complete, shell, choice_type2fn) -> str:
+def complete2pattern(opt_complete, shell: str, choice_type2fn) -> str:
     return (opt_complete.get(shell, "")
             if isinstance(opt_complete, dict) else choice_type2fn[opt_complete])
 
