@@ -763,7 +763,7 @@ complete ${prog} \\
 
 
 def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] = None,
-             preamble: Union[str, Dict] = "", choice_functions: Opt[Any] = None) -> str:
+             preamble: Union[str, Dict[str, str]] = "", choice_functions: Opt[Any] = None) -> str:
     """
     shell:
       bash/zsh/tcsh
@@ -789,7 +789,7 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
     )
 
 
-def completion_action(parent: Opt[ArgumentParser] = None, preamble: Union[str, Dict] = ""):
+def completion_action(parent: Opt[ArgumentParser] = None, preamble: Union[str, Dict[str, str]] = ""):
     class PrintCompletionAction(_ShtabPrintCompletionAction):
         def __call__(self, parser, namespace, values, option_string=None):
             print(complete(parent or parser, values, preamble=preamble))
@@ -803,7 +803,7 @@ def add_argument_to(
     option_string: Union[str, List[str]] = "--print-completion",
     help: str = "print shell completion script",
     parent: Opt[ArgumentParser] = None,
-    preamble: Union[str, Dict] = "",
+    preamble: Union[str, Dict[str, str]] = "",
 ):
     """
     option_string:
