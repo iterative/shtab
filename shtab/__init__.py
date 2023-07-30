@@ -123,7 +123,7 @@ class Required:
     DIR = DIRECTORY = [Choice("directory", True)]
 
 
-def complete2pattern(opt_complete, shell, choice_type2fn) -> bool:
+def complete2pattern(opt_complete, shell, choice_type2fn) -> str:
     return (opt_complete.get(shell, "")
             if isinstance(opt_complete, dict) else choice_type2fn[opt_complete])
 
