@@ -69,7 +69,7 @@ def mark_completer(shell):
     return wrapper
 
 
-def get_completer(shell):
+def get_completer(shell: str):
     try:
         return _SUPPORTED_COMPLETERS[shell]
     except KeyError:
@@ -123,7 +123,7 @@ class Required:
     DIR = DIRECTORY = [Choice("directory", True)]
 
 
-def complete2pattern(opt_complete, shell, choice_type2fn) -> bool:
+def complete2pattern(opt_complete, shell: str, choice_type2fn) -> str:
     return (opt_complete.get(shell, "")
             if isinstance(opt_complete, dict) else choice_type2fn[opt_complete])
 
@@ -772,7 +772,7 @@ complete ${prog} \\
 
 
 def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] = None,
-             preamble: Union[str, Dict] = "", choice_functions: Opt[Any] = None) -> str:
+             preamble: Union[str, Dict[str, str]] = "", choice_functions: Opt[Any] = None) -> str:
     """
     shell:
       bash/zsh/tcsh
@@ -798,7 +798,7 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
     )
 
 
-def completion_action(parent: Opt[ArgumentParser] = None, preamble: Union[str, Dict] = ""):
+def completion_action(parent: Opt[ArgumentParser] = None, preamble: Union[str, Dict[str, str]] = ""):
     class PrintCompletionAction(_ShtabPrintCompletionAction):
         def __call__(self, parser, namespace, values, option_string=None):
             print(complete(parent or parser, values, preamble=preamble))
@@ -812,7 +812,7 @@ def add_argument_to(
     option_string: Union[str, List[str]] = "--print-completion",
     help: str = "print shell completion script",
     parent: Opt[ArgumentParser] = None,
-    preamble: Union[str, Dict] = "",
+    preamble: Union[str, Dict[str, str]] = "",
 ):
     """
     option_string:
