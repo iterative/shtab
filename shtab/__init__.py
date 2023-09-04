@@ -798,7 +798,8 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
     )
 
 
-def completion_action(parent: Opt[ArgumentParser] = None, preamble: Union[str, Dict[str, str]] = ""):
+def completion_action(parent: Opt[ArgumentParser] = None, preamble: Union[str, Dict[str,
+                                                                                    str]] = ""):
     class PrintCompletionAction(_ShtabPrintCompletionAction):
         def __call__(self, parser, namespace, values, option_string=None):
             print(complete(parent or parser, values, preamble=preamble))
