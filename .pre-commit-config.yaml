@@ -27,7 +27,7 @@ repos:
     types: [text]
     exclude: ^(.pre-commit-config.yaml|.github/workflows/test.yml)$
 - repo: https://github.com/PyCQA/flake8
-  rev: 5.0.4
+  rev: 6.1.0
   hooks:
   - id: flake8
     args: [-j8]
@@ -40,7 +40,7 @@ repos:
     - flake8-pyproject
     - flake8-string-format
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.4.1
+  rev: v1.5.1
   hooks:
   - id: mypy
     additional_dependencies: [types-setuptools]
