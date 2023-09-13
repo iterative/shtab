@@ -35,7 +35,6 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-        token: ${{ secrets.GH_TOKEN || github.token }}
     - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
@@ -53,7 +52,7 @@ jobs:
         tag="${GITHUB_REF#refs/tags/}"
         gh release create --title "shtab $tag beta" --draft --notes "$changelog" "$tag" dist/${{ steps.dist.outputs.whl }} dist/${{ steps.dist.outputs.targz }}
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+        GH_TOKEN: ${{ github.token }}
     - name: Docs
       run: |
         pushd docs
