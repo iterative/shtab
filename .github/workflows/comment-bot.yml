@@ -6,6 +6,10 @@ jobs:
   tag:  # /tag <tagname> <commit>
     if: startsWith(github.event.comment.body, '/tag ')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
     - uses: actions/checkout@v3
     - name: React Seen
@@ -27,7 +31,6 @@ jobs:
           post({
             owner: context.repo.owner, repo: context.repo.repo,
             comment_id: context.payload.comment.id, content: "eyes"})
-        github-token: ${{ secrets.GH_TOKEN }}
     - name: Tag Commit
       run: |
         git clone https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY} repo
@@ -47,4 +50,3 @@ jobs:
           post({
             owner: context.repo.owner, repo: context.repo.repo,
             comment_id: context.payload.comment.id, content: "rocket"})
-        github-token: ${{ secrets.GH_TOKEN }}
