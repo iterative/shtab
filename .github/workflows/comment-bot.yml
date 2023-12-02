@@ -11,9 +11,9 @@ jobs:
       pull-requests: write
       issues: write
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: React Seen
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           const perm = await github.rest.repos.getCollaboratorPermissionLevel({
@@ -41,7 +41,7 @@ jobs:
         BODY: ${{ github.event.comment.body }}
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     - name: React Success
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           post = (context.eventName == "issue_comment"
