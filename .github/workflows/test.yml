@@ -50,7 +50,7 @@ jobs:
       run: |
         changelog=$(git log --pretty='format:%d%n- %s%n%b---' $(git tag --sort=v:refname | tail -n2 | head -n1)..HEAD)
         tag="${GITHUB_REF#refs/tags/}"
-        gh release create --title "shtab $tag beta" --draft --notes "$changelog" "$tag" dist/${{ steps.dist.outputs.whl }} dist/${{ steps.dist.outputs.targz }}
+        gh release create --title "shtab $tag stable" --draft --notes "$changelog" "$tag" dist/${{ steps.dist.outputs.whl }} dist/${{ steps.dist.outputs.targz }}
       env:
         GH_TOKEN: ${{ github.token }}
     - name: Docs
