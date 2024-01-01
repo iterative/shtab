@@ -40,7 +40,7 @@ repos:
     - flake8-pyproject
     - flake8-string-format
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.6.1
+  rev: v1.8.0
   hooks:
   - id: mypy
     additional_dependencies: [types-setuptools]
@@ -51,7 +51,7 @@ repos:
     args: [-i]
     additional_dependencies: [toml]
 - repo: https://github.com/PyCQA/isort
-  rev: 5.12.0
+  rev: 5.13.2
   hooks:
   - id: isort
 ci:
