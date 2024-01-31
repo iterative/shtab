@@ -659,7 +659,15 @@ ${command_cases}
 ${preamble}
 
 typeset -A opt_args
-${root_prefix} "$@\"""").safe_substitute(
+
+if [[ $zsh_eval_context[-1] == eval ]]; then
+  # eval/source/. command, register function for later
+  compdef ${root_prefix} -N ${prog}
+else
+  # autoload from fpath, call function directly
+  ${root_prefix} "$@\"
+fi
+""").safe_substitute(
         prog=prog,
         root_prefix=root_prefix,
         command_cases="\n".join(starmap(command_case, sorted(subcommands.items()))),

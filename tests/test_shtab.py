@@ -107,7 +107,8 @@ def test_prog_scripts(shell, caplog, capsys):
     elif shell == "zsh":
         assert script_py == [
             "#compdef script.py", "_describe 'script.py commands' _commands",
-            "_shtab_shtab_options+=(': :_shtab_shtab_commands' '*::: :->script.py')", "script.py)"]
+            "_shtab_shtab_options+=(': :_shtab_shtab_commands' '*::: :->script.py')", "script.py)",
+            "compdef _shtab_shtab -N script.py"]
     elif shell == "tcsh":
         assert script_py == ["complete script.py \\"]
     else:
@@ -271,7 +272,7 @@ def test_add_argument_to_positional(shell, caplog, capsys):
             assert exc.value.code == 0
     completion, err = capsys.readouterr()
     print(completion)
-    assert completion_manual == completion.rstrip()
+    assert completion_manual.rstrip() == completion.rstrip()
     assert not err
 
     if shell == "bash":
