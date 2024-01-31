@@ -16,13 +16,13 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install
       run: pip install -U -e .[dev]
     - run: pytest
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v4
   deploy:
     needs: test
     name: PyPI Deploy
@@ -35,7 +35,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.x'
     - id: dist
