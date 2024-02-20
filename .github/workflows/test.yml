@@ -14,8 +14,7 @@ jobs:
         python: [3.7, 3.11]
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      with: {fetch-depth: 0}
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
@@ -23,6 +22,8 @@ jobs:
       run: pip install -U -e .[dev]
     - run: pytest
     - uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
   deploy:
     needs: test
     name: PyPI Deploy
@@ -33,11 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      with: {fetch-depth: 0}
     - uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
+      with: {python-version: '3.x'}
     - id: dist
       uses: casperdcl/deploy-pypi@v2
       with:
