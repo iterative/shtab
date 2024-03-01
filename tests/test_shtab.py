@@ -242,6 +242,25 @@ def test_subparser_colons(shell, caplog):
 
 
 @fix_shell
+def test_subparser_slashes(shell, caplog):
+    parser = ArgumentParser(prog="test")
+    subparsers = parser.add_subparsers()
+    subparsers.add_parser("sub/cmd", help="help message")
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell=shell)
+    print(completion)
+
+    if shell == "bash":
+        shell = Bash(completion)
+        shell.compgen('-W "${_shtab_test_subparsers[*]}"', "s", "sub/cmd")
+        shell.compgen('-W "${_shtab_test_pos_0_choices[*]}"', "s", "sub/cmd")
+        shell.test('-z "${_shtab_test_COMPGEN-}"')
+    elif shell == "zsh":
+        # make sure the slash was properly substituted to avoid syntax errors
+        assert "_shtab_test_sub/cmd" not in completion
+
+
+@fix_shell
 def test_add_argument_to_optional(shell, caplog):
     parser = ArgumentParser(prog="test")
     shtab.add_argument_to(parser, ["-s", "--shell"])
