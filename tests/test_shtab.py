@@ -256,8 +256,8 @@ def test_subparser_slashes(shell, caplog):
         shell.compgen('-W "${_shtab_test_pos_0_choices[*]}"', "s", "sub/cmd")
         shell.test('-z "${_shtab_test_COMPGEN-}"')
     elif shell == "zsh":
-        # make sure the slash was properly substituted to avoid syntax errors
         assert "_shtab_test_sub/cmd" not in completion
+        assert "_shtab_test_sub_cmd" in completion
 
 
 @fix_shell
