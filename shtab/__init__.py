@@ -38,8 +38,8 @@ log = logging.getLogger(__name__)
 SUPPORTED_SHELLS: List[str] = []
 _SUPPORTED_COMPLETERS = {}
 CHOICE_FUNCTIONS: Dict[str, Dict[str, str]] = {
-    "file": {"bash": "_shtab_compgen_files", "zsh": "_files", "tcsh": "f"},
-    "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d"}}
+    "file": {"bash": "_shtab_compgen_files", "zsh": "_files", "tcsh": "f", "fish": None},
+    "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d", "fish": None}}
 FILE = CHOICE_FUNCTIONS["file"]
 DIRECTORY = DIR = CHOICE_FUNCTIONS["directory"]
 FLAG_OPTION = (
@@ -782,6 +782,197 @@ complete ${prog} \\
         prog=parser.prog, optionals_double_str=' '.join(sorted(optionals_double)),
         optionals_single_str=' '.join(sorted(optionals_single)),
         optionals_special_str=' \\\n        '.join(specials))
+
+
+def get_fish_commands(root_parser, choice_functions=None):
+    """
+    Recursive subcommand parser traversal, returning lists of information on
+    commands (formatted for output to the completions script).
+    printing fish syntax.
+    """
+    choice_type2fn = {k: v["fish"] for k, v in CHOICE_FUNCTIONS.items()}
+    if choice_functions:
+        choice_type2fn.update(choice_functions)
+
+    def get_option_strings(parser):
+        """Flattened list of all `parser`'s option strings."""
+        res = []
+        for opt in parser._get_optional_actions():
+            line = []
+            if opt.help == SUPPRESS:
+                continue
+            short_opt, long_opt = None, None
+            for o in opt.option_strings:
+                if o.startswith("--"):
+                    long_opt = o[2:]
+                elif o.startswith("-") and len(o) == 2:
+                    short_opt = o[1:]
+            if short_opt:
+                line.extend(["-s", short_opt])
+            if long_opt:
+                line.extend(["-l", long_opt])
+            if opt.help:
+                line.extend(["-d", opt.help])
+
+            complete_args = None
+            if opt.choices:
+                complete_args = []
+                for c in opt.choices:
+                    complete_args.append(c)
+                    complete_args.append(opt.dest)
+            res.append((line, complete_args))
+        return res
+
+    option_strings = []
+    choices = []
+
+    def recurse(parser, using_cmd=()):
+        """recurse through subparsers, appending to the return lists"""
+
+        def _escape_and_quote_if_needed(word, quote="'", escape_cmd=False):
+            word = word.replace("'", r"\'")  # escape
+            if escape_cmd:
+                word = word.replace("(", r"\(")  # escape
+                word = word.replace(")", r"\)")  # escape
+            if " " in word and not (word[0] in ('"', "'") and word[-1] in ('"', "'")):
+                word = f"{quote}{word}{quote}"
+            return word
+
+        def format_complete_command(
+            args=None,
+            complete_args=None,
+            complete_args_with_exclusive=True,
+            desc=None,
+        ):
+            complete_command = ["complete", "-c", root_parser.prog]
+            if using_cmd:
+                complete_command.extend(
+                    [
+                        "-n",
+                        f"__fish_seen_subcommand_from {' '.join(using_cmd)}",
+                    ]
+                )
+            else:
+                complete_command.extend(["-n", f"__fish_use_subcommand"])
+            if args:
+                complete_command.extend(args)
+            if desc:
+                complete_command.extend(["-d", "command" if desc == SUPPRESS else desc])
+            # add quote if needed
+            complete_command = list(map(_escape_and_quote_if_needed, complete_command))
+            # the following should not be quoted as a whole
+            # (printf - -"%s\n" "commands configs repo switches")
+            if complete_args:
+                complete_command.extend(
+                    [
+                        "-a",
+                        r'{q}(printf "%s\t%s\n" {args}){q}'.format(
+                            q="'",
+                            args=" ".join(
+                                _escape_and_quote_if_needed(
+                                    a, quote='"', escape_cmd=True
+                                )
+                                for a in complete_args
+                            ),
+                        ),
+                    ]
+                )
+                if complete_args_with_exclusive:
+                    complete_command.append("-x")
+            return " ".join(complete_command)
+
+        # positional arguments
+        discovered_subparsers = []
+        for positional in parser._get_positional_actions():
+            if positional.help == SUPPRESS:
+                continue
+
+            if positional.choices:
+                # map choice of action to their help msg
+                choices_to_action = {
+                    v.dest: v.help for v in positional._choices_actions
+                }
+
+                this_positional_choices = []
+                for choice in positional.choices:
+
+                    if isinstance(choice, Choice):
+                        # not supported
+                        pass
+                    elif isinstance(positional.choices, dict):
+                        # subparser, so append to list of subparsers & recurse
+                        log.debug("subcommand:%s", choice)
+                        public_cmds = get_public_subcommands(positional)
+                        if choice in public_cmds:
+                            # ic(choice)
+                            discovered_subparsers.append(str(choice))
+                            this_positional_choices.extend(
+                                (choice, choices_to_action.get(choice, ""))
+                            )
+                            recurse(
+                                positional.choices[choice],
+                                using_cmd=using_cmd + (choice,),
+                            )
+                        else:
+                            log.debug("skip:subcommand:%s", choice)
+                    else:
+                        # simple choice
+                        this_positional_choices.extend(
+                            (choice, choices_to_action.get(choice, ""))
+                        )
+
+                if this_positional_choices:
+                    choices.append(
+                        format_complete_command(
+                            complete_args=this_positional_choices,
+                            # desc=positional.dest,
+                        )
+                    )
+
+        # optional arguments
+        option_strings.extend(
+            [
+                format_complete_command(ret[0], complete_args=ret[1])
+                for ret in get_option_strings(parser)
+            ]
+        )
+
+    recurse(root_parser)
+    return option_strings, choices
+
+
+@mark_completer("fish")
+def complete_fish(parser, root_prefix=None, preamble="", choice_functions=None):
+    """
+    Returns fish syntax autocompletion script.
+
+    See `complete` for arguments.
+    """
+
+    option_strings, choices = get_fish_commands(
+        parser, choice_functions=choice_functions
+    )
+
+    return Template(
+        """\
+# AUTOMATICALLY GENERATED by `shtab`
+
+${option_strings}
+
+${choices}\
+\
+${preamble}
+"""
+    ).safe_substitute(
+        option_strings="\n".join(option_strings),
+        choices="\n".join(choices),
+        preamble=(
+            "\n# Custom Preamble\n" + preamble + "\n# End Custom Preamble\n"
+            if preamble
+            else ""
+        ),
+        prog=parser.prog,
+    )
 
 
 def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] = None,
