@@ -828,12 +828,11 @@ def get_fish_commands(root_parser, choice_functions=None):
 
     def recurse(parser, using_cmd=()):
         """recurse through subparsers, appending to the return lists"""
-
         def _escape_and_quote_if_needed(word, quote="'", escape_cmd=False):
-            word = word.replace("'", r"\'")  # escape
+            word = word.replace("'", r"\'")     # escape
             if escape_cmd:
-                word = word.replace("(", r"\(")  # escape
-                word = word.replace(")", r"\)")  # escape
+                word = word.replace("(", r"\(") # escape
+                word = word.replace(")", r"\)") # escape
             if " " in word and not (word[0] in ('"', "'") and word[-1] in ('"', "'")):
                 word = f"{quote}{word}{quote}"
             return word
@@ -846,12 +845,9 @@ def get_fish_commands(root_parser, choice_functions=None):
         ):
             complete_command = ["complete", "-c", root_parser.prog]
             if using_cmd:
-                complete_command.extend(
-                    [
-                        "-n",
-                        f"__fish_seen_subcommand_from {' '.join(using_cmd)}",
-                    ]
-                )
+                complete_command.extend([
+                    "-n",
+                    f"__fish_seen_subcommand_from {' '.join(using_cmd)}",])
             else:
                 complete_command.extend(["-n", f"__fish_use_subcommand"])
             if args:
@@ -863,20 +859,14 @@ def get_fish_commands(root_parser, choice_functions=None):
             # the following should not be quoted as a whole
             # (printf - -"%s\n" "commands configs repo switches")
             if complete_args:
-                complete_command.extend(
-                    [
-                        "-a",
-                        r'{q}(printf "%s\t%s\n" {args}){q}'.format(
-                            q="'",
-                            args=" ".join(
-                                _escape_and_quote_if_needed(
-                                    a, quote='"', escape_cmd=True
-                                )
-                                for a in complete_args
-                            ),
-                        ),
-                    ]
-                )
+                complete_command.extend([
+                    "-a",
+                    r'{q}(printf "%s\t%s\n" {args}){q}'.format(
+                        q="'",
+                        args=" ".join(
+                            _escape_and_quote_if_needed(a, quote='"', escape_cmd=True)
+                            for a in complete_args),
+                    ),])
                 if complete_args_with_exclusive:
                     complete_command.append("-x")
             return " ".join(complete_command)
@@ -889,9 +879,7 @@ def get_fish_commands(root_parser, choice_functions=None):
 
             if positional.choices:
                 # map choice of action to their help msg
-                choices_to_action = {
-                    v.dest: v.help for v in positional._choices_actions
-                }
+                choices_to_action = {v.dest: v.help for v in positional._choices_actions}
 
                 this_positional_choices = []
                 for choice in positional.choices:
@@ -907,8 +895,7 @@ def get_fish_commands(root_parser, choice_functions=None):
                             # ic(choice)
                             discovered_subparsers.append(str(choice))
                             this_positional_choices.extend(
-                                (choice, choices_to_action.get(choice, ""))
-                            )
+                                (choice, choices_to_action.get(choice, "")))
                             recurse(
                                 positional.choices[choice],
                                 using_cmd=using_cmd + (choice,),
@@ -917,25 +904,18 @@ def get_fish_commands(root_parser, choice_functions=None):
                             log.debug("skip:subcommand:%s", choice)
                     else:
                         # simple choice
-                        this_positional_choices.extend(
-                            (choice, choices_to_action.get(choice, ""))
-                        )
+                        this_positional_choices.extend((choice, choices_to_action.get(choice, "")))
 
                 if this_positional_choices:
                     choices.append(
-                        format_complete_command(
-                            complete_args=this_positional_choices,
-                            # desc=positional.dest,
-                        )
-                    )
+                        format_complete_command(complete_args=this_positional_choices,
+                                                                                       # desc=positional.dest,
+                                                ))
 
         # optional arguments
-        option_strings.extend(
-            [
-                format_complete_command(ret[0], complete_args=ret[1])
-                for ret in get_option_strings(parser)
-            ]
-        )
+        option_strings.extend([
+            format_complete_command(ret[0], complete_args=ret[1])
+            for ret in get_option_strings(parser)])
 
     recurse(root_parser)
     return option_strings, choices
@@ -949,12 +929,9 @@ def complete_fish(parser, root_prefix=None, preamble="", choice_functions=None):
     See `complete` for arguments.
     """
 
-    option_strings, choices = get_fish_commands(
-        parser, choice_functions=choice_functions
-    )
+    option_strings, choices = get_fish_commands(parser, choice_functions=choice_functions)
 
-    return Template(
-        """\
+    return Template("""\
 # AUTOMATICALLY GENERATED by `shtab`
 
 ${option_strings}
@@ -962,15 +939,11 @@ ${option_strings}
 ${choices}\
 \
 ${preamble}
-"""
-    ).safe_substitute(
+""").safe_substitute(
         option_strings="\n".join(option_strings),
         choices="\n".join(choices),
-        preamble=(
-            "\n# Custom Preamble\n" + preamble + "\n# End Custom Preamble\n"
-            if preamble
-            else ""
-        ),
+        preamble=("\n# Custom Preamble\n" + preamble +
+                  "\n# End Custom Preamble\n" if preamble else ""),
         prog=parser.prog,
     )
 
