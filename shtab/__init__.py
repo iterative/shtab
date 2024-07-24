@@ -890,7 +890,7 @@ def get_fish_commands(root_parser, choice_functions=None):
             if positional.choices:
                 # map choice of action to their help msg
                 choices_to_action = {
-                    v.dest: v.help for v in positional._choices_actions
+                    v.dest: v.help for v in getattr(positional, "_choices_actions", [])
                 }
 
                 this_positional_choices = []
