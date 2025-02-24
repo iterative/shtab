@@ -8,7 +8,7 @@ jobs:
   test:
     if: github.event_name != 'pull_request' || !contains('OWNER,MEMBER,COLLABORATOR', github.event.pull_request.author_association)
     name: Test py${{ matrix.python }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ matrix.python == 3.7 && '22.04' || 'latest' }}
     strategy:
       matrix:
         python: [3.7, 3.12]
@@ -21,7 +21,7 @@ jobs:
     - name: Install
       run: pip install -U -e .[dev]
     - run: pytest
-    - uses: codecov/codecov-action@v4
+    - uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
   deploy:
