@@ -382,6 +382,7 @@ _set_new_action() {
 #     ${!x} -> ${hello} -> "world"
 ${root_prefix}() {
   local completing_word="${COMP_WORDS[COMP_CWORD]}"
+  local previous_word="${COMP_WORDS[COMP_CWORD-1]}"
   local completed_positional_actions
   local current_action
   local current_action_args_start_index
@@ -438,6 +439,11 @@ ${root_prefix}() {
   if [[ $pos_only = 0 && "${completing_word}" == -* ]]; then
     # optional argument started: use option strings
     COMPREPLY=( $(compgen -W "${current_option_strings[*]}" -- "${completing_word}") )
+  elif [[ "${completing_word}" == ">"* || "${completing_word}" == ">>"* ||
+          "${completing_word}" == "2>"* || "${previous_word}" == ">" ||
+          "${previous_word}" == ">>" || "${previous_word}" == "2>" ]]; then
+    # handle redirection operators
+    COMPREPLY=( $(compgen -f -- "${completing_word}") )
   else
     # use choices & compgen
     local IFS=$'\\n' # items may contain spaces, so delimit using newline

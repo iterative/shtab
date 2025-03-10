@@ -2,6 +2,7 @@
 Tests for `shtab`.
 """
 import logging
+import os
 import subprocess
 from argparse import ArgumentParser
 
@@ -316,3 +317,28 @@ def test_get_completer_invalid():
         pass
     else:
         raise NotImplementedError("invalid")
+
+
+@pytest.fixture
+def change_dir(tmp_path):
+    original_cwd = os.getcwd()
+    os.chdir(tmp_path)
+    yield tmp_path
+    os.chdir(original_cwd)
+
+
+def test_path_completion_after_redirection(caplog, change_dir):
+    parser = ArgumentParser(prog="test")
+    shtab.add_argument_to(parser, ["-s", "--shell"])
+    with caplog.at_level(logging.INFO):
+        completion = shtab.complete(parser, shell="bash")
+    print(completion)
+
+    (change_dir / "test_file.txt").touch()
+
+    for redirection in [">", ">>", "2>"]:
+        shell = Bash(completion +
+                     f"\nCOMP_WORDS=(test '{redirection}' tes); COMP_CWORD=2; _shtab_test;")
+        shell.test('"${COMPREPLY[@]}" = "test_file.txt"', f"Redirection {redirection} failed")
+
+    assert not caplog.record_tuples
