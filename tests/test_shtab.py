@@ -336,7 +336,7 @@ def test_path_completion_after_redirection(caplog, change_dir):
 
     (change_dir / "test_file.txt").touch()
 
-    for redirection in [">", ">>", "2>"]:
+    for redirection in [">", ">>", "1>", "1>>", "2>", "2>>"]:
         shell = Bash(completion +
                      f"\nCOMP_WORDS=(test '{redirection}' tes); COMP_CWORD=2; _shtab_test;")
         shell.test('"${COMPREPLY[@]}" = "test_file.txt"', f"Redirection {redirection} failed")

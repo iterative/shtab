@@ -439,9 +439,8 @@ ${root_prefix}() {
   if [[ $pos_only = 0 && "${completing_word}" == -* ]]; then
     # optional argument started: use option strings
     COMPREPLY=( $(compgen -W "${current_option_strings[*]}" -- "${completing_word}") )
-  elif [[ "${completing_word}" == ">"* || "${completing_word}" == ">>"* ||
-          "${completing_word}" == "2>"* || "${previous_word}" == ">" ||
-          "${previous_word}" == ">>" || "${previous_word}" == "2>" ]]; then
+  elif [[ "${previous_word}" == ">" || "${previous_word}" == ">>" ||
+          "${previous_word}" =~ ^[12]">" || "${previous_word}" =~ ^[12]">>" ]]; then
     # handle redirection operators
     COMPREPLY=( $(compgen -f -- "${completing_word}") )
   else
