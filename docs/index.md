@@ -98,7 +98,6 @@ application. Use `-u, --error-unimportable` to noisily complain.
 
 - [argcomplete](https://pypi.org/project/argcomplete)
     - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
-    - only provides `bash` completion
 - [pyzshcomplete](https://pypi.org/project/pyzshcomplete)
     - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
     - only provides `zsh` completion
@@ -110,7 +109,7 @@ application. Use `-u, --error-unimportable` to noisily complain.
 
 Please do open [issues][GH-issue] & [pull requests][GH-pr]! Some ideas:
 
-- support `fish`
+- support `fish` ([#174](https://github.com/iterative/shtab/pull/174))
 - support `powershell`
 
 See
