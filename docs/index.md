@@ -117,7 +117,7 @@ See
 [CONTRIBUTING.md](https://github.com/iterative/shtab/tree/main/CONTRIBUTING.md)
 for more guidance.
 
-[![Hits](https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden)](https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social)
+[![Hits](https://cgi.cdcl.ml/hits?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden)](https://cgi.cdcl.ml/hits?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social)
 
 [GH-issue]: https://github.com/iterative/shtab/issues
 [GH-pr]: https://github.com/iterative/shtab/pulls

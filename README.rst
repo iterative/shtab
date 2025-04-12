@@ -123,6 +123,6 @@ for more guidance.
 .. |PyPI-Downloads| image:: https://img.shields.io/pypi/dm/shtab.svg?label=pypi%20downloads&logo=PyPI&logoColor=white
    :target: https://pepy.tech/project/shtab
    :alt: Downloads
-.. |Hits| image:: https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden
-   :target: https://caspersci.uk.to/cgi-bin/hits.cgi?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social
+.. |Hits| image:: https://cgi.cdcl.ml/hits?q=shtab&style=social&r=https://github.com/iterative/shtab&a=hidden
+   :target: https://cgi.cdcl.ml/hits?q=shtab&a=plot&r=https://github.com/iterative/shtab&style=social
    :alt: Hits
