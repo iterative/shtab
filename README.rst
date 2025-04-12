@@ -80,7 +80,6 @@ Alternatives
 
   - executes the underlying script *every* time ``<TAB>`` is pressed (slow and
     has side-effects)
-  - only provides ``bash`` completion
 
 - `pyzshcomplete <https://pypi.org/project/pyzshcomplete>`_
 
@@ -98,7 +97,7 @@ Contributions
 
 Please do open `issues <https://github.com/iterative/shtab/issues>`_ & `pull requests <https://github.com/iterative/shtab/pulls>`_! Some ideas:
 
-- support ``fish``
+- support ``fish`` (`#174 <https://github.com/iterative/shtab/pull/174>`_)
 - support ``powershell``
 
 See
