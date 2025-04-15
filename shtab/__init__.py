@@ -421,6 +421,7 @@ ${root_prefix}() {
 
       if [[ "$current_action_nargs" != "*" ]] && \\
          [[ "$current_action_nargs" != "+" ]] && \\
+         [[ "$current_action_nargs" != "?" ]] && \\
          [[ "$current_action_nargs" != *"..." ]] && \\
          (( $word_index + 1 - $current_action_args_start_index - $pos_only >= \\
             $current_action_nargs )); then
