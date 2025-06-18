@@ -74,7 +74,7 @@ Below are various examples of enabling `shtab`'s own tab completion scripts.
     ```sh
     mkdir -p ~/.zsh/completions
     fpath=($fpath ~/.zsh/completions)  # must be before `compinit` lines
-    shtab --shell=zsh shtab.main.get_main_parser > ~/.zsh/completions/_shtab
+    shtab --shell=zsh shtab.main.get_main_parser -o ~/.zsh/completions/_shtab
     ```
 
 === "tcsh"

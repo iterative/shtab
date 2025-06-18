@@ -14,6 +14,8 @@ def get_main_parser():
     parser.add_argument("parser", help="importable parser (or function returning parser)")
     parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
     parser.add_argument("-s", "--shell", default=SUPPORTED_SHELLS[0], choices=SUPPORTED_SHELLS)
+    parser.add_argument("-o", "--output", help="write output to file instead of stdout",
+                        type=argparse.FileType("w"), default=sys.stdout)
     parser.add_argument("--prefix", help="prepended to generated functions to avoid clashes")
     parser.add_argument("--preamble", help="prepended to generated script")
     parser.add_argument("--prog", help="custom program name (overrides `parser.prog`)")
@@ -54,4 +56,4 @@ def main(argv=None):
         other_parser.prog = args.prog
     print(
         complete(other_parser, shell=args.shell, root_prefix=args.prefix
-                 or args.parser.split(".", 1)[0], preamble=args.preamble))
+                 or args.parser.split(".", 1)[0], preamble=args.preamble), file=args.output)
