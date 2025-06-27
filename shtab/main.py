@@ -1,12 +1,26 @@
 import argparse
+import contextlib
 import logging
 import os
 import sys
 from importlib import import_module
+from pathlib import Path
+from typing import Generator
+from typing import Optional as Opt
+from typing import TextIO
 
 from . import SUPPORTED_SHELLS, __version__, add_argument_to, complete
 
 log = logging.getLogger(__name__)
+
+
+@contextlib.contextmanager
+def extract_stdout(output: Opt[Path]) -> Generator[TextIO, None, None]:
+    if output is None:
+        yield sys.stdout
+    else:
+        with output.open("w") as stdout:
+            yield stdout
 
 
 def get_main_parser():
@@ -14,8 +28,7 @@ def get_main_parser():
     parser.add_argument("parser", help="importable parser (or function returning parser)")
     parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
     parser.add_argument("-s", "--shell", default=SUPPORTED_SHELLS[0], choices=SUPPORTED_SHELLS)
-    parser.add_argument("-o", "--output", help="write output to file instead of stdout",
-                        type=argparse.FileType("w"), default=sys.stdout)
+    parser.add_argument("-o", "--output", help="write output to file instead of stdout", type=Path)
     parser.add_argument("--prefix", help="prepended to generated functions to avoid clashes")
     parser.add_argument("--preamble", help="prepended to generated script")
     parser.add_argument("--prog", help="custom program name (overrides `parser.prog`)")
@@ -54,6 +67,7 @@ def main(argv=None):
         other_parser = other_parser()
     if args.prog:
         other_parser.prog = args.prog
-    print(
-        complete(other_parser, shell=args.shell, root_prefix=args.prefix
-                 or args.parser.split(".", 1)[0], preamble=args.preamble), file=args.output)
+    with extract_stdout(args.output) as stdout:
+        print(
+            complete(other_parser, shell=args.shell, root_prefix=args.prefix
+                     or args.parser.split(".", 1)[0], preamble=args.preamble), file=stdout)

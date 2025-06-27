@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 import pytest
 
 import shtab
-from shtab.main import get_main_parser, main
+from shtab.main import extract_stdout, get_main_parser, main
 
 fix_shell = pytest.mark.parametrize("shell", shtab.SUPPORTED_SHELLS)
 
@@ -342,3 +342,17 @@ def test_path_completion_after_redirection(caplog, change_dir):
         shell.test('"${COMPREPLY[@]}" = "test_file.txt"', f"Redirection {redirection} failed")
 
     assert not caplog.record_tuples
+
+
+def test_extract_stdout(tmp_path):
+    path = tmp_path / "completions"
+    with extract_stdout(path) as output:
+        output.write("completion")
+    assert path.read_text() == "completion"
+
+
+def test_extract_stdout_empty(capsys):
+    with extract_stdout(None) as output:
+        output.write("completion")
+    captured = capsys.readouterr()
+    assert captured.out == "completion"
