@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
+requires = ["setuptools>=77", "wheel", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -26,7 +26,8 @@ description = "Automagic shell tab completion for Python CLI applications"
 readme = "README.rst"
 requires-python = ">=3.7"
 keywords = ["tab", "complete", "completion", "shell", "bash", "zsh", "argparse"]
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
+license-files = ["LICENCE"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -37,7 +38,6 @@ classifiers = [
     "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Other Audience",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: MacOS",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX",
