@@ -84,6 +84,9 @@ dev = ["pytest>=6", "pytest-cov", "pytest-timeout"]
 [project.scripts]
 shtab = "shtab.main:main"
 
+[project.entry-points."setuptools.finalize_distribution_options"]
+generate = "shtab.setuptools:generate_completions"
+
 [tool.flake8]
 max_line_length = 99
 extend_ignore = ["E261", "P101"]
