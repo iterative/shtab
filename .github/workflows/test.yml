@@ -41,6 +41,7 @@ jobs:
       uses: casperdcl/deploy-pypi@v2
       with:
         build: true
+        requirements: 'build twine packaging>=24.2' # https://github.com/pypa/twine/issues/1216
         upload: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
     - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
       name: Release
