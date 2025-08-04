@@ -24,7 +24,7 @@ authors = [{name = "Casper da Costa-Luis", email = "casper.dcl@physics.org"}]
 maintainers = [{name = "Iterative", email = "support@iterative.ai"}]
 description = "Automagic shell tab completion for Python CLI applications"
 readme = "README.rst"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 keywords = ["tab", "complete", "completion", "shell", "bash", "zsh", "argparse"]
 license = "Apache-2.0"
 classifiers = [
@@ -48,12 +48,11 @@ classifiers = [
     "Programming Language :: Other Scripting Engines",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: Implementation",
     "Programming Language :: Python :: Implementation :: IronPython",
