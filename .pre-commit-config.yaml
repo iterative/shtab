@@ -26,6 +26,13 @@ repos:
     entry: TODO
     types: [text]
     exclude: ^(.pre-commit-config.yaml|.github/workflows/test.yml)$
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.4.1
+  hooks:
+    - id: codespell
+      args: ["--skip", "aider/website/docs/languages.md"]
+      additional_dependencies:
+        - tomli
 - repo: https://github.com/PyCQA/flake8
   rev: 7.3.0
   hooks:
