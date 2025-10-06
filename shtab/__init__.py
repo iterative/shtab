@@ -934,10 +934,18 @@ def get_fish_commands(root_parser, choice_functions=None):
                         log.debug("subcommand:%s", choice)
                         public_cmds = get_public_subcommands(positional)
                         if choice in public_cmds:
-                            # ic(choice)
-                            discovered_subparsers.append(str(choice))
-                            this_positional_choices.extend(
-                                (choice, choices_to_action.get(choice, "")))
+                            subparser = positional.choices[choice]
+                            formatter = subparser._get_formatter()
+                            backup_width = formatter._width
+                            # large number to effectively disable wrapping
+                            formatter._width = 1234567
+                            try:
+                                desc = formatter._format_text(subparser.description or "").strip()
+                                help = desc.split("\n")[0]
+                                this_positional_choices.extend((choice, help))
+                                discovered_subparsers.append(str(choice))
+                            finally:
+                                formatter._width = backup_width
                             recurse(
                                 positional.choices[choice],
                                 using_cmd=using_cmd + (choice,),
