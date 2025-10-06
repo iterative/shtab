@@ -106,11 +106,9 @@ def test_prog_scripts(shell, caplog, capsys):
         assert script_py == ["complete -o filenames -F _shtab_shtab script.py"]
     elif shell == "zsh":
         assert script_py == [
-            "#compdef script.py",
-            "_describe 'script.py commands' _commands",
-            "_shtab_shtab_options+=(': :_shtab_shtab_commands' '*::: :->script.py')",
-            "script.py)",
-            "compdef _shtab_shtab -N script.py",]
+            "#compdef script.py", "_describe 'script.py commands' _commands",
+            "_shtab_shtab_options+=(': :_shtab_shtab_commands' '*::: :->script.py')", "script.py)",
+            "compdef _shtab_shtab -N script.py"]
     elif shell == "tcsh":
         assert script_py == ["complete script.py \\"]
     elif shell == "fish":
