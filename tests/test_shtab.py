@@ -106,23 +106,43 @@ def test_prog_scripts(shell, caplog, capsys):
         assert script_py == ["complete -o filenames -F _shtab_shtab script.py"]
     elif shell == "zsh":
         assert script_py == [
-            "#compdef script.py", "_describe 'script.py commands' _commands",
-            "_shtab_shtab_options+=(': :_shtab_shtab_commands' '*::: :->script.py')", "script.py)",
-            "compdef _shtab_shtab -N script.py"]
+            "#compdef script.py",
+            "_describe 'script.py commands' _commands",
+            "_shtab_shtab_options+=(': :_shtab_shtab_commands' '*::: :->script.py')",
+            "script.py)",
+            "compdef _shtab_shtab -N script.py",]
     elif shell == "tcsh":
         assert script_py == ["complete script.py \\"]
     elif shell == "fish":
         assert script_py == [
-            "complete -c script.py -n __fish_use_subcommand -s h -l help -d 'show this help message and exit'",
-            "complete -c script.py -n __fish_use_subcommand -l version -d 'show program\\'s version number and exit'",
-            "complete -c script.py -n __fish_use_subcommand -s s -l shell -a '(printf \"%s\\t%s\\n\" bash shell zsh shell tcsh shell fish shell)' -x",
-            "complete -c script.py -n __fish_use_subcommand -l prefix -d 'prepended to generated functions to avoid clashes'",
-            "complete -c script.py -n __fish_use_subcommand -l preamble -d 'prepended to generated script'",
-            "complete -c script.py -n __fish_use_subcommand -l prog -d 'custom program name (overrides `parser.prog`)'",
-            "complete -c script.py -n __fish_use_subcommand -s u -l error-unimportable -d 'raise errors if `parser` is not found in $PYTHONPATH'",
-            "complete -c script.py -n __fish_use_subcommand -l verbose -d 'Log debug information'",
-            "complete -c script.py -n __fish_use_subcommand -l print-own-completion -d 'print shtab\\'s own completion' -a '(printf \"%s\\t%s\\n\" bash print_own_completion zsh print_own_completion tcsh print_own_completion fish print_own_completion)' -x",
-        ]
+            """\
+complete -c script.py -n __fish_script_py_needs_command -s h -l help \
+-d 'show this help message and exit'""",
+            """\
+complete -c script.py -n __fish_script_py_needs_command -l version \
+-d 'show program\\'s version number and exit'""",
+            """\
+complete -c script.py -n __fish_script_py_needs_command -s s -l shell \
+-a '(printf \"%s\\t%s\\n\" bash shell zsh shell tcsh shell fish shell)' -x""",
+            """\
+complete -c script.py -n __fish_script_py_needs_command -l prefix \
+-d 'prepended to generated functions to avoid clashes'""",
+            """\
+complete -c script.py -n __fish_script_py_needs_command -l preamble \
+-d 'prepended to generated script'""",
+            """\
+complete -c script.py -n __fish_script_py_needs_command -l prog \
+-d 'custom program name (overrides `parser.prog`)'""",
+            """\
+complete -c script.py -n __fish_script_py_needs_command -s u -l error-unimportable \
+-d 'raise errors if `parser` is not found in $PYTHONPATH'""",
+            """\
+complete -c script.py -n __fish_script_py_needs_command -l verbose -d 'Log debug information'""",
+            """\
+complete -c script.py -n __fish_script_py_needs_command -l print-own-completion \
+-d 'print shtab\\'s own completion' \
+-a \'(printf "%s\\t%s\\n" bash print_own_completion zsh print_own_completion tcsh \
+print_own_completion fish print_own_completion)' -x""",]
     else:
         raise NotImplementedError(shell)
 
