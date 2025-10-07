@@ -115,32 +115,25 @@ def test_prog_scripts(shell, caplog, capsys):
         assert script_py == [
             """\
 complete -c script.py -n __fish_script_py_needs_command -s h -l help \
--d 'show this help message and exit'""",
-            """\
+-d 'show this help message and exit'""", """\
 complete -c script.py -n __fish_script_py_needs_command -l version \
--d 'show program\\'s version number and exit'""",
-            """\
-complete -c script.py -n __fish_script_py_needs_command -s s -l shell \
--a '(printf \"%s\\t%s\\n\" bash shell zsh shell tcsh shell fish shell)' -x""",
-            """\
+-d 'show program\\'s version number and exit'""", """\
+complete -c script.py -n __fish_script_py_needs_command -s s -l shell -r -f \
+-a '(printf \"%s\\t%s\\n\" bash shell zsh shell tcsh shell fish shell)' -x""", """\
 complete -c script.py -n __fish_script_py_needs_command -l prefix \
--d 'prepended to generated functions to avoid clashes'""",
-            """\
+-d 'prepended to generated functions to avoid clashes'""", """\
 complete -c script.py -n __fish_script_py_needs_command -l preamble \
--d 'prepended to generated script'""",
-            """\
+-d 'prepended to generated script'""", """\
 complete -c script.py -n __fish_script_py_needs_command -l prog \
--d 'custom program name (overrides `parser.prog`)'""",
-            """\
+-d 'custom program name (overrides `parser.prog`)'""", """\
 complete -c script.py -n __fish_script_py_needs_command -s u -l error-unimportable \
--d 'raise errors if `parser` is not found in $PYTHONPATH'""",
-            """\
+-d 'raise errors if `parser` is not found in $PYTHONPATH'""", """\
 complete -c script.py -n __fish_script_py_needs_command -l verbose -d 'Log debug information'""",
             """\
 complete -c script.py -n __fish_script_py_needs_command -l print-own-completion \
--d 'print shtab\\'s own completion' \
+-d 'print shtab\\'s own completion' -r -f \
 -a \'(printf "%s\\t%s\\n" bash print_own_completion zsh print_own_completion tcsh \
-print_own_completion fish print_own_completion)' -x""",]
+print_own_completion fish print_own_completion)' -x"""]
     else:
         raise NotImplementedError(shell)
 

@@ -39,11 +39,10 @@ log = logging.getLogger(__name__)
 SUPPORTED_SHELLS: List[str] = []
 _SUPPORTED_COMPLETERS = {}
 CHOICE_FUNCTIONS: Dict[str, Dict[str, str]] = {
-    "file": {
-        "bash": "_shtab_compgen_files", "zsh": "_files", "tcsh": "f",
-        "fish": "__fish_complete_path"}, "directory": {
-            "bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d",
-            "fish": "__fish_complete_directories"}}
+    "file": {"bash": "_shtab_compgen_files", "zsh": "_files", "tcsh": "f", "fish": "-F"},
+    "directory": {
+        "bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d",
+        "fish": "-f -a \"(__fish_complete_directories)\""}}
 FILE = CHOICE_FUNCTIONS["file"]
 DIRECTORY = DIR = CHOICE_FUNCTIONS["directory"]
 FLAG_OPTION = (
@@ -860,6 +859,7 @@ def get_fish_commands(root_parser, choice_functions=None):
             complete_args_with_exclusive=True,
             complete_func=None,
             desc=None,
+            positional=True,
         ):
             # see: https://github.com/clap-rs/clap/pull/5568
             needs_fn_name = f"__fish_{eprog}_needs_command"
@@ -891,11 +891,13 @@ def get_fish_commands(root_parser, choice_functions=None):
             complete_command = list(map(_escape_and_quote_if_needed, complete_command))
             # the following should not be quoted as a whole
             # (printf - -"%s\n" "commands configs repo switches")
+            if not positional and (complete_args or complete_func):
+                complete_command.append("-r")
             if complete_func:
-                complete_command.extend(["-a", f'"({complete_func})"', "-fr"])
+                complete_command.append(complete_func)
             elif complete_args:
                 complete_command.extend([
-                    "-a",
+                    "-f -a",
                     r'{q}(printf "%s\t%s\n" {args}){q}'.format(
                         q="'",
                         args=" ".join(
@@ -916,7 +918,8 @@ def get_fish_commands(root_parser, choice_functions=None):
                 # shtab `.complete = ...` functions
                 comp_pattern = complete2pattern(positional.complete, "fish", choice_type2fn)
                 option_strings.append(
-                    format_complete_command(desc=positional.help, complete_func=comp_pattern))
+                    format_complete_command(desc=positional.help, complete_func=comp_pattern,
+                                            positional=True))
 
             if positional.choices:
                 # map choice of action to their help msg
@@ -960,12 +963,13 @@ def get_fish_commands(root_parser, choice_functions=None):
                     choices.append(
                         format_complete_command(
                             complete_args=this_positional_choices, # desc=positional.dest,
+                            positional=True,
                         ))
 
         # optional arguments
         option_strings.extend([
-            format_complete_command(ret[0], complete_args=ret[1], complete_func=ret[2])
-            for ret in get_option_strings(parser)])
+            format_complete_command(ret[0], complete_args=ret[1], complete_func=ret[2],
+                                    positional=False) for ret in get_option_strings(parser)])
 
     recurse(root_parser)
 
