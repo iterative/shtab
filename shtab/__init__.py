@@ -1032,13 +1032,10 @@ function __fish_${eprog}_using_subcommand
     and return 1
     contains -- $cmd[1] $argv
 end
-
+${preamble}
 ${option_strings}
 
-${choices}\
-
-${preamble}
-""").safe_substitute(
+${choices}""").safe_substitute(
         option_strings="\n".join(option_strings),
         choices="\n".join(choices),
         preamble=("\n# Custom Preamble\n" + preamble +
