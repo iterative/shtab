@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import logging
 import os
@@ -5,13 +7,14 @@ import sys
 from contextlib import contextmanager
 from importlib import import_module
 from pathlib import Path
+from typing import IO, Callable, Iterator
 
 from . import SUPPORTED_SHELLS, __version__, add_argument_to, complete
 
 log = logging.getLogger(__name__)
 
 
-def get_main_parser():
+def get_main_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="shtab")
     parser.add_argument("parser", help="importable parser (or function returning parser)")
     parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
@@ -34,13 +37,13 @@ def get_main_parser():
     return parser
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> None:
     parser = get_main_parser()
     args = parser.parse_args(argv)
     logging.basicConfig(level=args.loglevel)
     log.debug(args)
 
-    module, other_parser = args.parser.rsplit(".", 1)
+    module, _, other_parser_name = args.parser.rpartition(".")
     if sys.path and sys.path[0]:
         # not blank so not searching curdir
         sys.path.insert(1, os.curdir)
@@ -51,14 +54,15 @@ def main(argv=None):
             raise
         log.debug(str(err))
         return
-    other_parser = getattr(module, other_parser)
+    other_parser: argparse.ArgumentParser | Callable[[], argparse.ArgumentParser] = getattr(
+        module, other_parser_name)
     if callable(other_parser):
         other_parser = other_parser()
     if args.prog:
         other_parser.prog = args.prog
 
     @contextmanager
-    def _open(out_path):
+    def _open(out_path: Path) -> Iterator[IO[str]]:
         if str(out_path) in ("-", "stdout"):
             yield sys.stdout
         else:
