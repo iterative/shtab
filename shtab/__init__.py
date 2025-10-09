@@ -18,9 +18,7 @@ from collections import defaultdict
 from functools import total_ordering
 from itertools import starmap
 from string import Template
-from typing import Any, Dict, List
-from typing import Optional as Opt
-from typing import Union
+from typing import Any
 
 # version detector. Precedence: installed dist, git, 'UNKNOWN'
 try:
@@ -35,9 +33,9 @@ except ImportError:
 __all__ = ["complete", "add_argument_to", "SUPPORTED_SHELLS", "FILE", "DIRECTORY", "DIR"]
 log = logging.getLogger(__name__)
 
-SUPPORTED_SHELLS: List[str] = []
+SUPPORTED_SHELLS: list[str] = []
 _SUPPORTED_COMPLETERS = {}
-CHOICE_FUNCTIONS: Dict[str, Dict[str, str]] = {
+CHOICE_FUNCTIONS: dict[str, dict[str, str]] = {
     "file": {"bash": "_shtab_compgen_files", "zsh": "_files", "tcsh": "f"},
     "directory": {"bash": "_shtab_compgen_dirs", "zsh": "_files -/", "tcsh": "d"}}
 FILE = CHOICE_FUNCTIONS["file"]
@@ -782,8 +780,8 @@ complete ${prog} \\
         optionals_special_str=' \\\n        '.join(specials))
 
 
-def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] = None,
-             preamble: Union[str, Dict[str, str]] = "", choice_functions: Opt[Any] = None) -> str:
+def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: str | None = None,
+             preamble: str | dict[str, str] = "", choice_functions: Any | None = None) -> str:
     """
     shell:
       bash/zsh/tcsh
@@ -809,8 +807,8 @@ def complete(parser: ArgumentParser, shell: str = "bash", root_prefix: Opt[str] 
     )
 
 
-def completion_action(parent: Opt[ArgumentParser] = None, preamble: Union[str, Dict[str,
-                                                                                    str]] = ""):
+def completion_action(parent: ArgumentParser | None = None, preamble: str | dict[str,
+                                                                                    str] = ""):
     class PrintCompletionAction(_ShtabPrintCompletionAction):
         def __call__(self, parser, namespace, values, option_string=None):
             print(complete(parent or parser, values, preamble=preamble))
@@ -821,10 +819,10 @@ def completion_action(parent: Opt[ArgumentParser] = None, preamble: Union[str, D
 
 def add_argument_to(
     parser: ArgumentParser,
-    option_string: Union[str, List[str]] = "--print-completion",
+    option_string: str | list[str] = "--print-completion",
     help: str = "print shell completion script",
-    parent: Opt[ArgumentParser] = None,
-    preamble: Union[str, Dict[str, str]] = "",
+    parent: ArgumentParser | None = None,
+    preamble: str | dict[str, str] = "",
 ):
     """
     option_string:
