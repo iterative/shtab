@@ -320,12 +320,12 @@ ${nargs}
 ${preamble}
 # $1=COMP_WORDS[1]
 _shtab_compgen_files() {
-  compgen -f -- $1  # files
+  compgen -f -- "$1"  # files
 }
 
 # $1=COMP_WORDS[1]
 _shtab_compgen_dirs() {
-  compgen -d -- $1  # recurse into subdirs
+  compgen -d -- "$1"  # recurse into subdirs
 }
 
 # $1=COMP_WORDS[1]
@@ -350,7 +350,7 @@ _set_parser_defaults() {
 # $2=positional action (bool)
 # set all identifiers for an action's parameters
 _set_new_action() {
-  current_action="${prefix}_$(_shtab_replace_nonword $1)"
+  current_action="${prefix}_$(_shtab_replace_nonword "$1")"
 
   local current_action_compgen_var=${current_action}_COMPGEN
   current_action_compgen="${!current_action_compgen_var-}"
@@ -391,7 +391,7 @@ ${root_prefix}() {
   local sub_parsers
   COMPREPLY=()
 
-  local prefix=${root_prefix}
+  local prefix="${root_prefix}"
   declare -i word_index=0
   local pos_only=0 # "--" delimeter not encountered yet
   _set_parser_defaults
@@ -399,13 +399,13 @@ ${root_prefix}() {
 
   # determine what arguments are appropriate for the current state
   # of the arg parser
-  while [ $word_index -ne $COMP_CWORD ]; do
+  while [ "$word_index" -ne "$COMP_CWORD" ]; do
     local this_word="${COMP_WORDS[word_index]}"
 
-    if [[ $pos_only = 1 || " $this_word " != " -- " ]]; then
-      if [[ -n $sub_parsers && " ${sub_parsers[@]} " == *" ${this_word} "* ]]; then
+    if [[ "$pos_only" = 1 || " $this_word " != " -- " ]]; then
+      if [[ -n "$sub_parsers" && " ${sub_parsers[@]} " == *" ${this_word} "* ]]; then
         # valid subcommand: add it to the prefix & reset the current action
-        prefix="${prefix}_$(_shtab_replace_nonword $this_word)"
+        prefix="${prefix}_$(_shtab_replace_nonword "$this_word")"
         _set_parser_defaults
       fi
 
@@ -413,7 +413,7 @@ ${root_prefix}() {
         # a new action should be acquired (due to recognised option string or
         # no more input expected from current action);
         # the next positional action can fill in here
-        _set_new_action $this_word false
+        _set_new_action "$this_word" false
       fi
 
       if [[ "$current_action_nargs" != "*" ]] &&
@@ -422,7 +422,7 @@ ${root_prefix}() {
          [[ "$current_action_nargs" != *"..." ]] &&
          (( word_index + 1 - current_action_args_start_index - pos_only >= current_action_nargs ))
       then
-        $current_action_is_positional && completed_positional_actions+=1
+        "$current_action_is_positional" && completed_positional_actions+=1
         _set_new_action "pos_${completed_positional_actions}" true
       fi
     else
@@ -434,7 +434,7 @@ ${root_prefix}() {
 
   # Generate the completions
 
-  if [[ $pos_only = 0 && "${completing_word}" == -* ]]; then
+  if [[ "$pos_only" = 0 && "${completing_word}" == -* ]]; then
     # optional argument started: use option strings
     COMPREPLY=( $(compgen -W "${current_option_strings[*]}" -- "${completing_word}") )
   elif [[ "${previous_word}" =~ ^[0-9\\&]*[\\<\\>]\\>?$ ]]; then
