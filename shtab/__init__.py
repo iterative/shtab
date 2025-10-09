@@ -365,7 +365,7 @@ _set_new_action() {
     current_action_nargs=1
   fi
 
-  current_action_args_start_index=$(( $word_index + 1 - $pos_only ))
+  current_action_args_start_index=$(( word_index + 1 - pos_only ))
 
   current_action_is_positional=$2
 }
@@ -400,7 +400,7 @@ ${root_prefix}() {
   # determine what arguments are appropriate for the current state
   # of the arg parser
   while [ $word_index -ne $COMP_CWORD ]; do
-    local this_word="${COMP_WORDS[$word_index]}"
+    local this_word="${COMP_WORDS[word_index]}"
 
     if [[ $pos_only = 1 || " $this_word " != " -- " ]]; then
       if [[ -n $sub_parsers && " ${sub_parsers[@]} " == *" ${this_word} "* ]]; then
@@ -420,8 +420,8 @@ ${root_prefix}() {
          [[ "$current_action_nargs" != "+" ]] &&
          [[ "$current_action_nargs" != "?" ]] &&
          [[ "$current_action_nargs" != *"..." ]] &&
-         (( $word_index + 1 - $current_action_args_start_index - $pos_only >= \\
-            $current_action_nargs )); then
+         (( word_index + 1 - current_action_args_start_index - pos_only >= current_action_nargs ))
+      then
         $current_action_is_positional && let "completed_positional_actions += 1"
         _set_new_action "pos_${completed_positional_actions}" true
       fi
