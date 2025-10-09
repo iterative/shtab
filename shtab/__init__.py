@@ -416,10 +416,10 @@ ${root_prefix}() {
         _set_new_action $this_word false
       fi
 
-      if [[ "$current_action_nargs" != "*" ]] && \\
-         [[ "$current_action_nargs" != "+" ]] && \\
-         [[ "$current_action_nargs" != "?" ]] && \\
-         [[ "$current_action_nargs" != *"..." ]] && \\
+      if [[ "$current_action_nargs" != "*" ]] &&
+         [[ "$current_action_nargs" != "+" ]] &&
+         [[ "$current_action_nargs" != "?" ]] &&
+         [[ "$current_action_nargs" != *"..." ]] &&
          (( $word_index + 1 - $current_action_args_start_index - $pos_only >= \\
             $current_action_nargs )); then
         $current_action_is_positional && let "completed_positional_actions += 1"
@@ -443,8 +443,8 @@ ${root_prefix}() {
   else
     # use choices & compgen
     local IFS=$'\\n' # items may contain spaces, so delimit using newline
-    COMPREPLY=( $([ -n "${current_action_compgen}" ] \\
-                  && "${current_action_compgen}" "${completing_word}") )
+    COMPREPLY=( $([ -n "${current_action_compgen}" ] &&
+                  "${current_action_compgen}" "${completing_word}") )
     unset IFS
     COMPREPLY+=( $(compgen -W "${current_action_choices[*]}" -- "${completing_word}") )
   fi
