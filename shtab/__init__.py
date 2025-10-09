@@ -380,7 +380,7 @@ _set_new_action() {
 ${root_prefix}() {
   local completing_word="${COMP_WORDS[COMP_CWORD]}"
   local previous_word="${COMP_WORDS[COMP_CWORD-1]}"
-  local completed_positional_actions
+  declare -i completed_positional_actions
   local current_action
   local current_action_args_start_index
   local current_action_choices
@@ -392,7 +392,7 @@ ${root_prefix}() {
   COMPREPLY=()
 
   local prefix=${root_prefix}
-  local word_index=0
+  declare -i word_index=0
   local pos_only=0 # "--" delimeter not encountered yet
   _set_parser_defaults
   word_index=1
@@ -422,14 +422,14 @@ ${root_prefix}() {
          [[ "$current_action_nargs" != *"..." ]] &&
          (( word_index + 1 - current_action_args_start_index - pos_only >= current_action_nargs ))
       then
-        $current_action_is_positional && let "completed_positional_actions += 1"
+        $current_action_is_positional && completed_positional_actions+=1
         _set_new_action "pos_${completed_positional_actions}" true
       fi
     else
       pos_only=1 # "--" delimeter encountered
     fi
 
-    let "word_index+=1"
+    word_index+=1
   done
 
   # Generate the completions
