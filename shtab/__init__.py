@@ -245,9 +245,6 @@ def get_bash_commands(root_parser, root_prefix, choice_functions=None):
         options_strings_str = "' '".join(get_option_strings(parser))
         option_strings.append(f"{prefix}_option_strings=('{options_strings_str}')")
         for optional in parser._get_optional_actions():
-            if optional == SUPPRESS:
-                continue
-
             for option_string in optional.option_strings:
                 if hasattr(optional, "complete"):
                     # shtab `.complete = ...` functions
