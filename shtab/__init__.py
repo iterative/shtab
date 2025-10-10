@@ -395,11 +395,10 @@ ${root_prefix}() {
   declare -i word_index=0
   local pos_only=0 # "--" delimeter not encountered yet
   _set_parser_defaults
-  word_index=1
 
   # determine what arguments are appropriate for the current state
   # of the arg parser
-  while [ "$word_index" -ne "$COMP_CWORD" ]; do
+  for ((word_index=1;word_index<COMP_CWORD;word_index++)); do
     local this_word="${COMP_WORDS[word_index]}"
 
     if [[ "$pos_only" = 1 || " $this_word " != " -- " ]]; then
@@ -428,8 +427,6 @@ ${root_prefix}() {
     else
       pos_only=1 # "--" delimeter encountered
     fi
-
-    word_index+=1
   done
 
   # Generate the completions
