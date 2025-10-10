@@ -634,13 +634,12 @@ def complete_zsh(
         case_fmt_on_no_sub = """{name}) _arguments -C -s ${prefix}_{name_wordify}_options ;;"""
         case_fmt_on_sub = """{name}) {prefix}_{name_wordify} ;;"""
 
-        cases = []
-        for _, options in sorted(commands.items()):
-            fmt = case_fmt_on_sub if options.get("commands") else case_fmt_on_no_sub
-            cases.append(
-                fmt.format(name=options["cmd"], name_wordify=wordify(options["cmd"]),
-                           prefix=prefix))
-        cases = "\n\t".expandtabs(8).join(cases)
+        cases = "\n\t".expandtabs(8).join(
+            (case_fmt_on_sub if options.get("commands") else case_fmt_on_no_sub).format(
+                name=options["cmd"],
+                name_wordify=wordify(options["cmd"]),
+                prefix=prefix,
+            ) for _, options in sorted(commands.items()))
 
         return f"""\
 {prefix}() {{
