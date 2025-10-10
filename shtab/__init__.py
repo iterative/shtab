@@ -214,9 +214,9 @@ def get_bash_commands(
             if positional.help == SUPPRESS:
                 continue
 
-            if hasattr(positional, "complete"):
+            if complete := getattr(positional, "complete", None):
                 # shtab `.complete = ...` functions
-                comp_pattern = complete2pattern(positional.complete, "bash", choice_type2fn)
+                comp_pattern = complete2pattern(complete, "bash", choice_type2fn)
                 compgens.append(f"{prefix}_pos_{i}_COMPGEN={quote(comp_pattern)}")
 
             if positional.choices:
@@ -275,9 +275,9 @@ def get_bash_commands(
         option_strings.append(f"{prefix}_option_strings=({join(get_option_strings(parser))})")
         for optional in parser._get_optional_actions():
             for option_string in optional.option_strings:
-                if hasattr(optional, "complete"):
+                if complete := getattr(optional, "complete", None):
                     # shtab `.complete = ...` functions
-                    comp_pattern_str = complete2pattern(optional.complete, "bash", choice_type2fn)
+                    comp_pattern_str = complete2pattern(complete, "bash", choice_type2fn)
                     compgens.append(f"{prefix}_{wordify(option_string)}_COMPGEN="
                                     f"{join(comp_pattern_str)}")
 
@@ -746,8 +746,8 @@ def complete_tcsh(
         if arg.choices:
             choice_strs = ' '.join(map(str, arg.choices))
             yield f"'{arg_type}/{arg_sel}/({choice_strs})/'"
-        elif hasattr(arg, 'complete'):
-            complete_fn = complete2pattern(arg.complete, 'tcsh', choice_type2fn)
+        elif complete := getattr(arg, 'complete', None):
+            complete_fn = complete2pattern(complete, 'tcsh', choice_type2fn)
             if complete_fn:
                 yield f"'{arg_type}/{arg_sel}/{complete_fn}/'"
 
