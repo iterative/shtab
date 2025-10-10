@@ -183,12 +183,11 @@ def get_bash_commands(
     if choice_functions:
         choice_type2fn.update(choice_functions)
 
-    def get_option_strings(parser) -> list[str]:
+    def get_option_strings(parser: ArgumentParser) -> list[str]:
         """Flattened list of all `parser`'s option strings."""
-        return sum(
-            (opt.option_strings for opt in parser._get_optional_actions() if opt.help != SUPPRESS),
-            [],
-        )
+        return [
+            o for opt in parser._get_optional_actions() if opt.help != SUPPRESS
+            for o in opt.option_strings]
 
     def recurse(
         parser: ArgumentParser,
@@ -543,7 +542,7 @@ def complete_zsh(
                  "({})".format(" ".join(map(str, choices)))) if choices else "",
             ).replace('""', ""))
 
-    def format_positional(opt, parser: ArgumentParser):
+    def format_positional(opt: Action, parser: ArgumentParser) -> str:
         get_help = parser._get_formatter()._expand_help
         complete = getattr(opt, "complete", None)
         choices = list(opt.choices or [])
@@ -568,7 +567,7 @@ def complete_zsh(
             "help": (parser.description
                      or "").strip().split("\n")[0], "commands": [], "paths": []}}
 
-    def recurse(parser: ArgumentParser, prefix: str, paths=None):
+    def recurse(parser: ArgumentParser, prefix: str, paths: list[str] | None = None) -> list[str]:
         paths = paths or []
         subcmds = []
         for sub in parser._get_positional_actions():
@@ -662,7 +661,7 @@ def complete_zsh(
 }}
 """
 
-    def command_option(prefix: str, options) -> str:
+    def command_option(prefix: str, options: dict[str, Any]) -> str:
         arguments = "\n  ".join(options["arguments"])
         return f"""\
 {prefix}_options=(
@@ -670,7 +669,7 @@ def complete_zsh(
 )
 """
 
-    def command_list(prefix: str, options) -> str:
+    def command_list(prefix: str, options: dict[str, Any]) -> str:
         name = " ".join([prog, *options["paths"]])
         commands = "\n    ".join(f'"{escape_zsh(cmd)}:{escape_zsh(opt["help"])}"'
                                  for cmd, opt in sorted(options["commands"].items()))
@@ -743,7 +742,7 @@ def complete_tcsh(
     optionals_single: set[str] = set()
     optionals_double: set[str] = set()
     specials: list[str] = []
-    index_choices: dict[int, dict[tuple, Action]] = defaultdict(dict)
+    index_choices: dict[int, dict[tuple[str, ...], Action]] = defaultdict(dict)
 
     choice_type2fn = {k: v["tcsh"] for k, v in CHOICE_FUNCTIONS.items()}
     if choice_functions:
