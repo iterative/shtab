@@ -402,18 +402,18 @@ ${root_prefix}() {
     local this_word="${COMP_WORDS[word_index]}"
 
     if [[ "$pos_only" = 1 || " $this_word " != " -- " ]]; then
-      if [[ -n "$sub_parsers" && " ${sub_parsers[@]} " == *" ${this_word} "* ]]; then
+      [ -n "$sub_parsers" ] && case " ${sub_parsers[*]} " in *" ${this_word} "*)
         # valid subcommand: add it to the prefix & reset the current action
         prefix="${prefix}_$(_shtab_replace_nonword "$this_word")"
         _set_parser_defaults
-      fi
+      esac
 
-      if [[ " ${current_option_strings[@]} " == *" ${this_word} "* ]]; then
+      case " ${current_option_strings[*]} " in *" ${this_word} "*)
         # a new action should be acquired (due to recognised option string or
         # no more input expected from current action);
         # the next positional action can fill in here
         _set_new_action "$this_word" false
-      fi
+      esac
 
       if [[ "$current_action_nargs" != "*" ]] &&
          [[ "$current_action_nargs" != "+" ]] &&
