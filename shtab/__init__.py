@@ -606,10 +606,14 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
         return f"""\
 {prefix}() {{
-  local context state line curcontext="$curcontext" one_or_more='(*)' remainder='(-)*'
+  local context state line curcontext="$curcontext" one_or_more='(*)' remainder='(-)*' default='*::: :->{name}'
 
-  if ((${{{prefix}_options[(I)${{(q)one_or_more}}*]}} + ${{{prefix}_options[(I)${{(q)remainder}}*]}} == 0)); then  # noqa: E501
-    {prefix}_options+=(': :{prefix}_commands' '*::: :->{name}')
+  # Add default positional/remainder specs only if none exist, and only once per session
+  if (( ! {prefix}_defaults_added )); then
+    if (( ${{{prefix}_options[(I)${{(q)one_or_more}}*]}} + ${{{prefix}_options[(I)${{(q)remainder}}*]}} + ${{{prefix}_options[(I)${{(q)default}}]}} == 0 )); then
+      {prefix}_options+=(': :{prefix}_commands' '*::: :->{name}')
+    fi
+    {prefix}_defaults_added=1
   fi
   _arguments -C -s ${prefix}_options
 
@@ -631,6 +635,9 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 {prefix}_options=(
   {arguments}
 )
+
+# guard to ensure default positional specs are added only once per session
+{prefix}_defaults_added=0
 """
 
     def command_list(prefix, options):
