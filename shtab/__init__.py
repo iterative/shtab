@@ -606,7 +606,7 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
         return f"""\
 {prefix}() {{
-  local context state line curcontext="$curcontext" one_or_more='(-)*' remainder='(*)'
+  local context state line curcontext="$curcontext" one_or_more='(*)' remainder='(-)*'
 
   if ((${{{prefix}_options[(I)${{(q)one_or_more}}*]}} + ${{{prefix}_options[(I)${{(q)remainder}}*]}} == 0)); then  # noqa: E501
     {prefix}_options+=(': :{prefix}_commands' '*::: :->{name}')
