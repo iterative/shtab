@@ -606,11 +606,14 @@ def complete_zsh(parser, root_prefix=None, preamble="", choice_functions=None):
 
         return f"""\
 {prefix}() {{
-  local context state line curcontext="$curcontext" one_or_more='(*)' remainder='(-)*' default='*::: :->{name}'
+  local context state line \
+curcontext="$curcontext" one_or_more='(*)' remainder='(-)*' default='*::: :->{name}'
 
   # Add default positional/remainder specs only if none exist, and only once per session
   if (( ! {prefix}_defaults_added )); then
-    if (( ${{{prefix}_options[(I)${{(q)one_or_more}}*]}} + ${{{prefix}_options[(I)${{(q)remainder}}*]}} + ${{{prefix}_options[(I)${{(q)default}}]}} == 0 )); then
+    if (( ${{{prefix}_options[(I)${{(q)one_or_more}}*]}} +\
+          ${{{prefix}_options[(I)${{(q)remainder}}*]}} +\
+          ${{{prefix}_options[(I)${{(q)default}}]}} == 0 )); then
       {prefix}_options+=(': :{prefix}_commands' '*::: :->{name}')
     fi
     {prefix}_defaults_added=1
