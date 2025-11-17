@@ -133,6 +133,8 @@ def test_prog_scripts(shell, caplog, capsys):
     elif shell == "zsh":
         assert script_py == [
             "#compdef script.py", "_describe 'script.py commands' _commands",
+            'local context state line curcontext="$curcontext" '
+            "one_or_more='(*)' remainder='(-)*' default='*::: :->script.py'",
             "_shtab_shtab_options+=(': :_shtab_shtab_commands' '*::: :->script.py')", "script.py)",
             "compdef _shtab_shtab -N script.py"]
     elif shell == "tcsh":
