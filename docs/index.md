@@ -62,7 +62,7 @@ follow the OS-specific instructions below.
     fi
     ```
 
-=== "MacOS"
+=== "macOS"
 
     First run `brew install bash-completion`, then add the following to
     `~/.bash_profile`:
@@ -82,7 +82,7 @@ Not working?
     - if using [`options.entry_points.console_scripts=MY_PROG=...`](https://setuptools.pypa.io/en/latest/userguide/entry_point.html), then ensure the main parser's `prog` matches `argparse.ArgumentParser(prog="MY_PROG")` or override it using `shtab MY_PROG.get_main_parser --prog=MY_PROG`.
     - if executing a script file `./MY_PROG.py` (with a [shebang](<https://en.wikipedia.org/wiki/Shebang_(Unix)>) `#!/usr/bin/env python`) directly, then use `argparse.ArgumentParser(prog="MY_PROG.py")` or override it using `shtab MY_PROG.get_main_parser --prog=MY_PROG.py`.
 - Make sure that all arguments have `help` messages (`parser.add_argument('positional', help="documented; i.e. not hidden")`).
-- [Ask a general question on StackOverflow](https://stackoverflow.com/questions/tagged/shtab).
+- [Ask a general question on Stack Overflow](https://stackoverflow.com/questions/tagged/shtab).
 - [Report bugs and open feature requests on GitHub][GH-issue].
 
 "Eager" installation (completions are re-generated upon login/terminal start) is
@@ -102,7 +102,7 @@ application. Use `-u, --error-unimportable` to noisily complain.
     - executes the underlying script *every* time `<TAB>` is pressed (slow and has side-effects)
     - only provides `zsh` completion
 - [click](https://pypi.org/project/click)
-    - different framework completely replacing the builtin `argparse`
+    - different framework completely replacing the built-in `argparse`
     - solves multiple problems (rather than POSIX-style "do one thing well")
 
 ## Contributions

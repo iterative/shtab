@@ -170,7 +170,7 @@ Add direct support to scripts for a little more configurability:
     def get_main_parser():
         parser = argparse.ArgumentParser(prog="pathcomplete")
         shtab.add_argument_to(parser, ["-s", "--print-completion"])  # magic!
-        # file & directory tab complete
+        # file and directory tab completion
         parser.add_argument("file", nargs="?").complete = shtab.FILE
         parser.add_argument("--dir", default=".").complete = shtab.DIRECTORY
         return parser
