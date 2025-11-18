@@ -13,9 +13,9 @@ jobs:
       matrix:
         python: [3.9, 3.13]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with: {fetch-depth: 0}
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python }}
     - name: Install
@@ -33,9 +33,9 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with: {fetch-depth: 0}
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with: {python-version: '3.x'}
     - id: dist
       uses: casperdcl/deploy-pypi@v2
