@@ -21,14 +21,19 @@ class Bash:
     def test(self, cmd="1", failure_message=""):
         """Equivalent to `bash -c '{init}; [[ {cmd} ]]'`."""
         init = self.init + "\n" if self.init else ""
-        proc = subprocess.Popen(["bash", "-o", "pipefail", "-euc", f"{init}[[ {cmd} ]]"])
+        proc = subprocess.Popen(
+            ["bash", "-o", "pipefail", "-euc", f"{init}[[ {cmd} ]]"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8",
+        )
         stdout, stderr = proc.communicate()
-        assert (0 == proc.wait() and not stdout and not stderr), f"""\
+        assert (0 == proc.wait() and stdout == "" and stderr == ""), f"""\
 {failure_message}
 {cmd}
 === stdout ===
-{stdout or ""}=== stderr ===
-{stderr or ""}"""
+{stdout}=== stderr ===
+{stderr}"""
 
     def compgen(self, compgen_cmd, word, expected_completions, failure_message=""):
         self.test(
