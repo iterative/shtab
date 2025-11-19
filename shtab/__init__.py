@@ -396,7 +396,7 @@ ${root_prefix}() {
 
   local prefix=${root_prefix}
   local word_index=0
-  local pos_only=0 # "--" delimeter not encountered yet
+  local pos_only=0 # "--" delimiter not encountered yet
   _set_parser_defaults
   word_index=1
 
@@ -429,7 +429,7 @@ ${root_prefix}() {
         _set_new_action "pos_${completed_positional_actions}" true
       fi
     else
-      pos_only=1 # "--" delimeter encountered
+      pos_only=1 # "--" delimiter encountered
     fi
 
     let "word_index+=1"
